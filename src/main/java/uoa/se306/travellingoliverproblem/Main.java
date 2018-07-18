@@ -1,4 +1,4 @@
-package uoa.se206.travellingoliverproblem;
+package uoa.se306.travellingoliverproblem;
 
 public class Main {
     public static void main(String[] args) {
