@@ -21,6 +21,10 @@ public class ScheduledProcessor {
         return schedule.peek().getEndTime();
     }
 
+    public ScheduleEntry lastEntry() {
+        return schedule.peek();
+    }
+
     // Add with no communication cost
     public void add(Node node) {
         add(node, 0);
