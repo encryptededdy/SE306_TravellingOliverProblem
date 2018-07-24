@@ -48,14 +48,19 @@ public class ScheduledProcessor {
         if (entrySet.isEmpty() || entrySet.first().getStartTime() - startTime >= processTime) {
             return startTime;
         }
-        ScheduleEntry lastSeenEntry = entrySet.first();
-        for (ScheduleEntry e : entrySet) {
-            if (lastSeenEntry.getEndTime() >= startTime) {
-                if (e.getStartTime() - lastSeenEntry.getEndTime() >= processTime) {
-                    return lastSeenEntry.getEndTime();
+        // ScheduleBefore is the one before the gap where we fit processTime, ScheduleAfter is after.
+        ScheduleEntry scheduleBefore = entrySet.first();
+        for (ScheduleEntry scheduleAfter : entrySet) {
+            if (scheduleAfter.getStartTime() >= startTime+processTime) {
+                if (scheduleBefore.getEndTime() < startTime) {
+                    return startTime;
+                } else {
+                    if (scheduleAfter.getStartTime() - scheduleBefore.getEndTime() >= processTime) {
+                        return scheduleBefore.getEndTime();
+                    }
                 }
             }
-            lastSeenEntry = e;
+            scheduleBefore = scheduleAfter;
         }
         return lastEntry().getEndTime();
     }
