@@ -2,6 +2,7 @@ package uoa.se306.travellingoliverproblem.graph;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Node {
     private String name;
@@ -41,5 +42,20 @@ public class Node {
     @Override
     public String toString() {
         return name;
+    }
+
+    // Check equality by name and children comparison
+    // TODO: Find a way to check parents(?) - currently causes loop
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Node) {
+            return (((Node) obj).name.equals(name) && ((Node) obj).children.equals(children));
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }
