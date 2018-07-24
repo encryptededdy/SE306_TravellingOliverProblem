@@ -1,20 +1,19 @@
 package uoa.se306.travellingoliverproblem.scheduler;
 
 import uoa.se306.travellingoliverproblem.graph.Graph;
-import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
-import java.util.HashSet;
-
+/*
+Scheduler for the BranchAndBound Algorithm
+ */
 public class BranchAndBoundScheduler extends Scheduler {
 
-    public BranchAndBoundScheduler(Graph graph) {
-        super(graph);
+    public BranchAndBoundScheduler(Graph graph, int amountOfProcessors) {
+        super(graph, amountOfProcessors);
     }
 
     @Override
-    public int calculateSchedule(Schedule currentSchedule) {
-        return 0;
+    public void calculateSchedule(Schedule currentSchedule) {
     }
 }
