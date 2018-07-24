@@ -90,7 +90,7 @@ public class DotReader implements GraphFileReader {
             throw new InvalidFileFormatException("Cycle found in acyclic graph (or empty)");
         }
 
-        Graph graph = new Graph(startNodes);
+        Graph graph = new Graph(startNodes, foundNodes.values());
         return graph;
     }
 }
