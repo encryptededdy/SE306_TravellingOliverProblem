@@ -27,5 +27,5 @@ public abstract class Scheduler {
     }
 
     // Recursive function, to be implemented by children
-    public abstract void calculateSchedule(Schedule currentSchedule);
+    protected abstract void calculateSchedule(Schedule currentSchedule);
 }

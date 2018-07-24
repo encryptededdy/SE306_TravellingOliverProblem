@@ -14,6 +14,6 @@ public class BranchAndBoundScheduler extends Scheduler {
     }
 
     @Override
-    public void calculateSchedule(Schedule currentSchedule) {
+    protected void calculateSchedule(Schedule currentSchedule) {
     }
 }

@@ -1,8 +1,13 @@
 package uoa.se306.travellingoliverproblem;
 
 import uoa.se306.travellingoliverproblem.fileIO.DotReader;
+import uoa.se306.travellingoliverproblem.fileIO.DotWriter;
 import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
+import uoa.se306.travellingoliverproblem.fileIO.GraphFileWriter;
 import uoa.se306.travellingoliverproblem.graph.Graph;
+import uoa.se306.travellingoliverproblem.schedule.Schedule;
+import uoa.se306.travellingoliverproblem.scheduler.BranchAndBoundScheduler;
+import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,9 +37,9 @@ public class Main {
             }
         } else {
             String fileName = args[0];
-
+            int processors = 1;
             try {
-                int processors = Integer.parseInt(args[1]);
+                processors = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
                 System.err.println("Invalid number of processors.\nType -h or --help for help.");
                 System.exit(1);
@@ -82,10 +87,23 @@ public class Main {
                     }
                 }
             }
+            Scheduler scheduler = new BranchAndBoundScheduler(graph, processors);
+            Schedule bestSchedule = scheduler.getBestSchedule();
+
+            GraphFileWriter writer = new DotWriter();
+            try {
+                writer.createFile(new File(outputFileName));
+                writer.writeFile(bestSchedule);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("Couldn't create/write to file: " + outputFileName +"\nType -h or --help for help.");
+                System.exit(1);
+            }
+
             //Testing purposes
             System.out.println("Read graph with " + graph.getStartingNodes().size() + " starting nodes");
             System.out.println("Number of cores to use: " + Integer.toString(numOfCores));
-            System.out.println("Use visuals ? " + String.valueOf(useVisuals));
+            System.out.println("Use visuals? " + String.valueOf(useVisuals));
             System.out.println("The output file name will be: " + outputFileName);
         }
     }
