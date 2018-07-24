@@ -55,10 +55,6 @@
                 </dependencies>
                 <configuration>
                     <trimStackTrace>false</trimStackTrace>
-                    <includes>
-                        <include>**/*.class</include>
-                    </includes>
-                    <excludedGroups>${project.groupId}.SlowTest</excludedGroups>
                 </configuration>
             </plugin>
             <plugin>
