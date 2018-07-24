@@ -2,32 +2,31 @@ package uoa.se306.travellingoliverproblem.schedule;
 
 import uoa.se306.travellingoliverproblem.graph.Node;
 
-import java.util.Stack;
+import java.util.*;
 
 public class ScheduledProcessor {
-    private Stack<ScheduleEntry> schedule = new Stack<>();
+    private Map<Node,ScheduleEntry> nodeMap = new HashMap<>();
+    private TreeSet<ScheduleEntry> entrySet = new TreeSet<>();
 
-    public void add(Node node, Integer communication) {
-        if (schedule.empty()) {
-            // No existing schedule, so add after 0
-            schedule.push(new ScheduleEntry(communication, node));
-        } else {
-            // Add new ScheduleEntry, after the last scheduled item
-            schedule.push(new ScheduleEntry(endTime() + 1 + communication, node));
-        }
+    public void add(Node node, Integer startTime) {
+        ScheduleEntry entry = new ScheduleEntry(startTime, node);
+        nodeMap.put(node, entry);
+        entrySet.add(entry);
     }
 
     public int endTime() {
-        return schedule.peek().getEndTime();
+        return entrySet.last().getEndTime();
     }
 
     public ScheduleEntry lastEntry() {
-        return schedule.peek();
+        return entrySet.last();
     }
 
-    // Add with no communication cost
-    public void add(Node node) {
-        add(node, 0);
+    public boolean contains(Node node) {
+        return nodeMap.containsKey(node);
     }
 
+    public ScheduleEntry getEntry(Node node) {
+        return nodeMap.get(node);
+    }
 }
