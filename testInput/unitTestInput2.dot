@@ -1,0 +1,6 @@
+digraph Cycle {
+    1   [Weight=2];
+    0   [Weight=4];
+    0 -> 1  [Weight=1];
+    1 -> 0  [Weight=1];
+}
