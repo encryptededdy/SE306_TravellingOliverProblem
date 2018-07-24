@@ -2,22 +2,23 @@ package uoa.se306.travellingoliverproblem.schedule;
 
 import uoa.se306.travellingoliverproblem.graph.Node;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /*
 This class describes a section of a schedule for a given input graph
  */
 public class Schedule {
-    private Set<Node> addedNodes;
-    private Set<Node> unAddedNodes;
-    private Set<Node> availableNodes;
+    private Set<Node> unAddedNodes = new HashSet<>();
+    private Set<Node> availableNodes = new HashSet<>();
 
     private ScheduledProcessor[] processors;
 
     // Constructor
-    public Schedule(int processorCount, Set<Node> availableNodes, Set<Node> allNodes) {
-        unAddedNodes = allNodes;
-        this.availableNodes = availableNodes;
+    public Schedule(int processorCount, Collection<Node> availableNodes, Collection<Node> allNodes) {
+        unAddedNodes.addAll(allNodes);
+        this.availableNodes.addAll(availableNodes);
 
         processors = new ScheduledProcessor[processorCount];
         for (int i = 0; i < processorCount; i++) {
@@ -31,23 +32,18 @@ public class Schedule {
     }
 
     // Adds a node to a given processor
-    public boolean addToSchedule(Node node, ScheduledProcessor processor) {
-        return false;
-    }
-
-    // Gets the processor that has the earliest start time for a given node
-    public ScheduledProcessor getEarliestProcessor(Node node) {
-        return null;
-    }
-
-    // Gets the earliest start time for a node and a specified processor
-    private int getEarliestTimeForProcessor(Node node, ScheduledProcessor processor) {
-        return 0;
-    }
-
-    // Returns all nodes that have been added to the schedule
-    public Set<Node> getAddedNodes() {
-        return addedNodes;
+    public void addToSchedule(Node node, int processorNo, int startTime) {
+        processors[processorNo].add(node, startTime);
+        unAddedNodes.remove(node);
+        availableNodes.remove(node);
+        // Check to see if any new nodes become available
+        for (Node child : node.getChildren().keySet()) {
+            boolean available = true;
+            for (Node childParent : child.getParents().keySet()) {
+                if (unAddedNodes.contains(childParent)) available = false;
+            }
+            if (available) availableNodes.add(child);
+        }
     }
 
     // Returns all nodes that have not been added to the schedule
@@ -58,5 +54,10 @@ public class Schedule {
     // Returns all nodes that have had their dependencies fulfilled
     public Set<Node> getAvailableNodes() {
         return availableNodes;
+    }
+
+    public boolean checkValidity() {
+        // TODO: Implement Schedule validity check (i.e. no overlaps etc.)
+        return true;
     }
 }

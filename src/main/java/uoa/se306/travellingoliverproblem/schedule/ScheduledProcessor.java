@@ -16,7 +16,7 @@ public class ScheduledProcessor {
     private TreeSet<ScheduleEntry> entrySet = new TreeSet<>();
 
     // Add a node to the processor at a given start time
-    public void add(Node node, Integer startTime) {
+    void add(Node node, Integer startTime) {
         ScheduleEntry entry = new ScheduleEntry(startTime, node);
         nodeMap.put(node, entry);
         entrySet.add(entry);
@@ -44,7 +44,19 @@ public class ScheduledProcessor {
 
     // Return the earliest time after the specified start time that can fit the
     // nodes processing time on without collision
-    public int getLatestStartAfter(int startTime, int processTime) {
-        return 0;
+    public int getEarliestStartAfter(int startTime, int processTime) {
+        if (entrySet.isEmpty() || entrySet.first().getStartTime() - startTime >= processTime) {
+            return startTime;
+        }
+        ScheduleEntry lastSeenEntry = entrySet.first();
+        for (ScheduleEntry e : entrySet) {
+            if (lastSeenEntry.getEndTime() >= startTime) {
+                if (e.getStartTime() - lastSeenEntry.getEndTime() >= processTime) {
+                    return lastSeenEntry.getEndTime();
+                }
+            }
+            lastSeenEntry = e;
+        }
+        return lastEntry().getEndTime();
     }
 }
