@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-
 public class ScheduledProcessor {
     private Map<Node,ScheduleEntry> nodeMap = new HashMap<>();
     private TreeSet<ScheduleEntry> entrySet = new TreeSet<>();
