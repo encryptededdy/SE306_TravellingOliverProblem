@@ -9,6 +9,7 @@ import uoa.se306.travellingoliverproblem.graph.Node;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -51,6 +52,9 @@ public class TestDotReader {
         assertEquals(startingNode.getChildren().get(node1), new Integer(1));
         assertEquals(startingNode.getChildren().get(node2), new Integer(1));
         assertEquals(startingNode.getChildren().get(node3), new Integer(3));
+
+        // Check getAllNodes
+        assertTrue(output.getAllNodes().containsAll(Arrays.asList(node0, node1, node2, node3)));
 
     }
 

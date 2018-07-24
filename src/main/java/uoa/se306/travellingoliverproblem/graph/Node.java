@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class Node {
+public class Node implements Comparable<Node> {
     private String name;
     private Integer cost = 0;
     private Map<Node, Integer> children = new HashMap<>();
@@ -57,5 +57,10 @@ public class Node {
     @Override
     public int hashCode() {
         return Objects.hash(name);
+    }
+
+    @Override
+    public int compareTo(Node o) {
+        return name.compareTo(o.name);
     }
 }
