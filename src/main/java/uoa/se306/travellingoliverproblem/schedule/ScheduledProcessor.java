@@ -2,7 +2,10 @@ package uoa.se306.travellingoliverproblem.schedule;
 
 import uoa.se306.travellingoliverproblem.graph.Node;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
+
 
 public class ScheduledProcessor {
     private Map<Node,ScheduleEntry> nodeMap = new HashMap<>();
