@@ -28,6 +28,18 @@ public class Schedule {
         }
     }
 
+    // Copy constructor
+    public Schedule(Schedule toCopy) {
+        processors = new ScheduledProcessor[toCopy.processors.length];
+        overallTime = toCopy.overallTime;
+        unAddedNodes = new HashSet<>(toCopy.unAddedNodes);
+        availableNodes = new HashSet<>(toCopy.availableNodes);
+        // Copy the ScheduledProcessors within using copy constructor
+        for (int i = 0; i < processors.length; i++) {
+            processors[i] = new ScheduledProcessor(toCopy.processors[i]);
+        }
+    }
+
     // Returns all the processors
     public ScheduledProcessor[] getProcessors() {
         return processors;

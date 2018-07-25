@@ -15,6 +15,16 @@ public class ScheduledProcessor {
     // For quick look up of scheduled entries
     private TreeSet<ScheduleEntry> entrySet = new TreeSet<>();
 
+    ScheduledProcessor() {
+        super();
+    }
+
+    // Copy constructor
+    ScheduledProcessor(ScheduledProcessor toCopy) {
+        this.nodeMap = new HashMap<>(toCopy.nodeMap);
+        this.entrySet = new TreeSet<>(toCopy.entrySet);
+    }
+
     // Add a node to the processor at a given start time
     void add(Node node, Integer startTime) {
         ScheduleEntry entry = new ScheduleEntry(startTime, node);
