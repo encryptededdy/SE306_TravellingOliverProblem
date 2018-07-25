@@ -61,7 +61,7 @@ public class DFSScheduler extends Scheduler {
                 }
                 startTime = processor.getEarliestStartAfter(startTime, node.getCost());
                 currentSchedule.addToSchedule(node, j, startTime);
-                calculateSchedule(currentSchedule);
+                calculateSchedule(currentSchedule);//recursive
             }
         }
     }

@@ -5,13 +5,17 @@ import uoa.se306.travellingoliverproblem.fileIO.DotWriter;
 import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
 import uoa.se306.travellingoliverproblem.fileIO.GraphFileWriter;
 import uoa.se306.travellingoliverproblem.graph.Graph;
+import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
+import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
+import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import uoa.se306.travellingoliverproblem.scheduler.BranchAndBoundScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
@@ -101,12 +105,19 @@ public class Main {
                 System.exit(1);
             }
 
-
-            System.out.println("The best overall time was: " + bestSchedule.getOverallTime());
+            //Testing purposes
             System.out.println("Read graph with " + graph.getStartingNodes().size() + " starting nodes");
             System.out.println("Number of cores to use: " + Integer.toString(numOfCores));
             System.out.println("Use visuals? " + String.valueOf(useVisuals));
             System.out.println("The output file name will be: " + outputFileName);
+            System.out.println();
+
+            ScheduledProcessor[] pro = bestSchedule.getProcessors();
+            for (int i = 0; i < pro.length; i++){
+                Map<Node, ScheduleEntry> nodeMap = pro[i].getNodeMap();
+                System.out.println("processor " + Integer.toString(i) + " has tasks:" + nodeMap.keySet().toString());
+            }
+            System.out.println("The best overall time was: " + bestSchedule.getOverallTime());
         }
     }
 }
