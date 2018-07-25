@@ -12,6 +12,8 @@ This class describes a section of a schedule for a given input graph
 public class Schedule {
     private Set<Node> unAddedNodes = new HashSet<>();
     private Set<Node> availableNodes = new HashSet<>();
+    private int overallTime = 0;
+
     private ScheduledProcessor[] processors;
 
     // Constructor
@@ -34,6 +36,9 @@ public class Schedule {
     // Adds a node to a given processor
     public void addToSchedule(Node node, int processorNo, int startTime) {
         processors[processorNo].add(node, startTime);
+        if (node.getCost() + startTime > overallTime) {
+            overallTime = node.getCost() + startTime;
+        }
         unAddedNodes.remove(node);
         availableNodes.remove(node);
         // Check to see if any new nodes become available
@@ -56,6 +61,10 @@ public class Schedule {
     // Returns all nodes that have had their dependencies fulfilled
     public Set<Node> getAvailableNodes() {
         return availableNodes;
+    }
+
+    public int getOverallTime() {
+        return overallTime;
     }
 
     public boolean checkValidity() {

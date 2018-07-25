@@ -10,12 +10,12 @@ Outlines signature for schedulers to adhere to
 public abstract class Scheduler {
 
     // Best schedule found from all iterations
-    private Schedule bestSchedule;
-    private int amountOfProcessors;
+    protected Schedule bestSchedule;
+    protected int amountOfProcessors;
     // Graph of all nodes
-    private Graph graph;
+    protected Graph graph;
 
-    public Scheduler(Graph graph, int amountOfProcessors){
+    Scheduler(Graph graph, int amountOfProcessors){
         this.graph = graph;
         this.amountOfProcessors = amountOfProcessors;
     }

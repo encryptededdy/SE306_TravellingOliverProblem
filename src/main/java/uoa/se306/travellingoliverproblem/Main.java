@@ -7,6 +7,7 @@ import uoa.se306.travellingoliverproblem.fileIO.GraphFileWriter;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.BranchAndBoundScheduler;
+import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
 
 import java.io.File;
@@ -87,9 +88,9 @@ public class Main {
                     }
                 }
             }
-            Scheduler scheduler = new BranchAndBoundScheduler(graph, processors);
+            Scheduler scheduler = new DFSScheduler(graph, processors);
             Schedule bestSchedule = scheduler.getBestSchedule();
-
+            System.out.println(bestSchedule.getOverallTime());
             GraphFileWriter writer = new DotWriter();
             try {
                 writer.createFile(new File(outputFileName));
