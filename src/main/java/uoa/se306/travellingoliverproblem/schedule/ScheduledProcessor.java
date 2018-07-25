@@ -27,6 +27,11 @@ public class ScheduledProcessor {
         return entrySet.last().getEndTime();
     }
 
+    // Get the map of all the nodes in this processor
+    public Map<Node, ScheduleEntry> getNodeMap(){
+        return nodeMap;
+    }
+
     // Get the last scheduled entry
     public ScheduleEntry lastEntry() {
         return entrySet.last();

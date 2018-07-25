@@ -90,7 +90,7 @@ public class Main {
             }
             Scheduler scheduler = new DFSScheduler(graph, processors);
             Schedule bestSchedule = scheduler.getBestSchedule();
-            System.out.println("The best overall time was: " + bestSchedule.getOverallTime());
+
             GraphFileWriter writer = new DotWriter();
             try {
                 writer.createFile(new File(outputFileName));
@@ -101,7 +101,8 @@ public class Main {
                 System.exit(1);
             }
 
-            //Testing purposes
+
+            System.out.println("The best overall time was: " + bestSchedule.getOverallTime());
             System.out.println("Read graph with " + graph.getStartingNodes().size() + " starting nodes");
             System.out.println("Number of cores to use: " + Integer.toString(numOfCores));
             System.out.println("Use visuals? " + String.valueOf(useVisuals));
