@@ -90,7 +90,7 @@ public class Main {
             }
             Scheduler scheduler = new DFSScheduler(graph, processors);
             Schedule bestSchedule = scheduler.getBestSchedule();
-            System.out.println(bestSchedule.getOverallTime());
+            System.out.println("The best overall time was: " + bestSchedule.getOverallTime());
             GraphFileWriter writer = new DotWriter();
             try {
                 writer.createFile(new File(outputFileName));

@@ -14,5 +14,8 @@ public class AStarSearchScheduler extends Scheduler {
 
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
+
+
+
     }
 }

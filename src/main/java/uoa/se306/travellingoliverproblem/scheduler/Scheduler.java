@@ -15,12 +15,14 @@ public abstract class Scheduler {
     // Graph of all nodes
     protected Graph graph;
 
+    // constructor to initialize the input graph and the amount of processors to use
     Scheduler(Graph graph, int amountOfProcessors){
         this.graph = graph;
         this.amountOfProcessors = amountOfProcessors;
     }
 
-    // Initial call to the recursive function
+    // Initial call to the recursive function, returns a Schedule object
+    // Template method pattern
     public Schedule getBestSchedule() {
         calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes()));
         return bestSchedule;
