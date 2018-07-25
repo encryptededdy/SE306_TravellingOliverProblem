@@ -45,18 +45,26 @@ public class ScheduledProcessor {
     // Return the earliest time after the specified start time that can fit the
     // nodes processing time on without collision
     public int getEarliestStartAfter(int startTime, int processTime) {
+        // If the processor doesn't have any entries/nodes, or if the first entry/node didn't start on 0
+        // and it has a gap (before the node) large enough for the processTime, we can just return the startTime
         if (entrySet.isEmpty() || entrySet.first().getStartTime() - startTime >= processTime) {
             return startTime;
         }
-        ScheduleEntry lastSeenEntry = entrySet.first();
-        for (ScheduleEntry e : entrySet) {
-            if (lastSeenEntry.getEndTime() >= startTime) {
-                if (e.getStartTime() - lastSeenEntry.getEndTime() >= processTime) {
-                    return lastSeenEntry.getEndTime();
+        // ScheduleBefore is the one before the gap where we fit processTime, ScheduleAfter is after.
+        ScheduleEntry scheduleBefore = entrySet.first();
+        for (ScheduleEntry scheduleAfter : entrySet) { // For every nodeAfter scheduled in the processor
+            if (scheduleAfter.getStartTime() >= startTime+processTime) { // If the nodeAfters start time is just before the finishing time of the inputNode
+                if (scheduleBefore.getEndTime() < startTime) { // If the nodeBefore end time is smaller than inputNodes startTime
+                    return startTime;                          // you can fit the inputNode between nodeBefore and nodeAfter
+                } else {
+                    // If you can fit the processTime of the inputNode in-between nodeBefore and nodeAfter
+                    if (scheduleAfter.getStartTime() - scheduleBefore.getEndTime() >= processTime) {
+                        return scheduleBefore.getEndTime(); // Return the endTime of nodeBefore
+                    }
                 }
             }
-            lastSeenEntry = e;
+            scheduleBefore = scheduleAfter; // Increment to the next node to test for a gap
         }
-        return lastEntry().getEndTime();
+        return lastEntry().getEndTime(); // This gets returned when there is no gap large enough in the processor to fit the inputNode
     }
 }

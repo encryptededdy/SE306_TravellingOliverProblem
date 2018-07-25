@@ -12,13 +12,13 @@ This class describes a section of a schedule for a given input graph
 public class Schedule {
     private Set<Node> unAddedNodes = new HashSet<>();
     private Set<Node> availableNodes = new HashSet<>();
-
     private ScheduledProcessor[] processors;
 
     // Constructor
     public Schedule(int processorCount, Collection<Node> availableNodes, Collection<Node> allNodes) {
-        unAddedNodes.addAll(allNodes);
-        this.availableNodes.addAll(availableNodes);
+        unAddedNodes.addAll(allNodes); // Why is this adding all the nodes to the unAdded set ?
+                                        //because initially, none of the nodes have been added the schedule
+        this.availableNodes.addAll(availableNodes); // Keeps track of which nodes becomes available to be added in a processor
 
         processors = new ScheduledProcessor[processorCount];
         for (int i = 0; i < processorCount; i++) {
@@ -39,9 +39,11 @@ public class Schedule {
         // Check to see if any new nodes become available
         for (Node child : node.getChildren().keySet()) {
             boolean available = true;
+            // check if the dependencies of this child has been fulfilled (added into processor)
             for (Node childParent : child.getParents().keySet()) {
                 if (unAddedNodes.contains(childParent)) available = false;
             }
+            // If the child has had all its dependencies fulfilled, add the child to the available set
             if (available) availableNodes.add(child);
         }
     }
