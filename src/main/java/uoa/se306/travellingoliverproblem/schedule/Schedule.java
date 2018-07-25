@@ -38,11 +38,11 @@ public class Schedule {
         availableNodes.remove(node);
         // Check to see if any new nodes become available
         for (Node child : node.getChildren().keySet()) {
-            boolean avaliable = true;
+            boolean available = true;
             for (Node childParent : child.getParents().keySet()) {
-                if (unAddedNodes.contains(childParent)) avaliable = false;
+                if (unAddedNodes.contains(childParent)) available = false;
             }
-            if (avaliable) availableNodes.add(child);
+            if (available) availableNodes.add(child);
         }
     }
 
