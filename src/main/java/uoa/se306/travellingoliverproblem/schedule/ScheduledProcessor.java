@@ -80,6 +80,6 @@ public class ScheduledProcessor {
             }
             scheduleBefore = scheduleAfter; // Increment to the next node to test for a gap
         }
-        return lastEntry().getEndTime(); // This gets returned when there is no gap large enough in the processor to fit the inputNode
+        return lastEntry().getEndTime() > startTime ? lastEntry().getEndTime() : startTime; // This gets returned when there is no gap large enough in the processor to fit the inputNode
     }
 }

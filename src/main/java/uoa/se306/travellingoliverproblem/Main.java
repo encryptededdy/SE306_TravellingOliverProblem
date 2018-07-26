@@ -92,6 +92,7 @@ public class Main {
                     }
                 }
             }
+
             Scheduler scheduler = new DFSScheduler(graph, processors);
             Schedule bestSchedule = scheduler.getBestSchedule();
 

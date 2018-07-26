@@ -20,7 +20,7 @@ public class DFSScheduler extends Scheduler {
         // If the currentSchedule has no available nodes
         if (currentSchedule.getAvailableNodes().isEmpty()) {
             // If our bestSchedule is null or the overall time for the bestSchedule is less than our current schedule
-            if (bestSchedule == null || bestSchedule.getOverallTime() < currentSchedule.getOverallTime()) {
+            if (bestSchedule == null || bestSchedule.getOverallTime() > currentSchedule.getOverallTime()) {
                 bestSchedule = currentSchedule;
             }
             return;
@@ -34,11 +34,12 @@ public class DFSScheduler extends Scheduler {
             // for all the processors in the current schedule
             for (int j = 0; j < processors.length; j++) {
                 // get that processor
+                int processorStartTime;
                 ScheduledProcessor processor = processors[j];
                 int startTime = 0;
                 // for all the parent nodes of the current available node
+
                 for (Node parentNode: node.getParents().keySet()) {
-                    int processorStartTime;
                     // for all the processors of this current schedule
                     for (ScheduledProcessor checkProcessor: currentSchedule.getProcessors()) {
                         // if any of the processors have processed the parent node
@@ -48,20 +49,19 @@ public class DFSScheduler extends Scheduler {
                             // get the end time of the parent node
                             processorStartTime = sEntry.getEndTime();
                             // if the current processor doesn't have the parent node
-                            if (checkProcessor != processor) {
-                                // adds the execution to the total processorStartTime
-                                processorStartTime += parentNode.getChildren().get(node);
-                            }
+                            processorStartTime += processor != checkProcessor ? parentNode.getChildren().get(node) : 0;
                             // if processor does not have a task yet, add the this node as the first task.
                             if (processorStartTime > startTime) {
                                 startTime = processorStartTime;
+                                break;
                             }
                         }
                     }
                 }
                 startTime = processor.getEarliestStartAfter(startTime, node.getCost());
-                currentSchedule.addToSchedule(node, j, startTime);
-                calculateSchedule(currentSchedule);//recursive
+                Schedule tempSchedule = new Schedule(currentSchedule);
+                tempSchedule.addToSchedule(node, j, startTime);
+                calculateSchedule(tempSchedule);//recursive
             }
         }
     }
