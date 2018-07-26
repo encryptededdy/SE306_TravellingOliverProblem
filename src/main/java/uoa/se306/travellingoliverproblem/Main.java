@@ -114,10 +114,6 @@ public class Main extends Application {
                 }
             }
 
-            if (useVisuals) {
-                launch();
-            }
-
             Scheduler scheduler = new DFSScheduler(inputGraph, processors);
             Schedule bestSchedule = scheduler.getBestSchedule();
 
@@ -144,6 +140,10 @@ public class Main extends Application {
                 System.out.println("processor " + Integer.toString(i) + " has tasks:" + nodeMap.keySet().toString());
             }
             System.out.println("The best overall time was: " + bestSchedule.getOverallTime());
+
+            if (useVisuals) {
+                launch();
+            }
         }
     }
 }
