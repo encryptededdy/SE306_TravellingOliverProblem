@@ -16,11 +16,17 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Text>
+            <Text layoutX="407.0" layoutY="34.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Optimal Schedule">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Text>
          </children>
       </AnchorPane>
       <HBox prefHeight="600.0">
          <children>
               <Pane fx:id="graphPane" prefWidth="400.0" />
+            <Pane fx:id="schedulePane" prefWidth="800.0" />
          </children>
       </HBox>
       <HBox prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: #bebebe;" />

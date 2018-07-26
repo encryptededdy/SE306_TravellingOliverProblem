@@ -25,6 +25,7 @@ import java.util.Map;
 public class Main extends Application {
 
     private static Graph inputGraph;
+    private static Schedule schedule;
     private static FXController controller;
 
     // JavaFX start method (depends if visualisation enabled)
@@ -35,8 +36,10 @@ public class Main extends Application {
         controller = loader.getController();
         primaryStage.setTitle("Visualisation");
         primaryStage.setScene(new Scene(root, 1200, 800));
+        primaryStage.setResizable(false);
         primaryStage.show();
         controller.drawGraph(inputGraph);
+        controller.drawSchedule(schedule);
     }
 
     public static void main(String[] args) {
@@ -115,12 +118,12 @@ public class Main extends Application {
             }
 
             Scheduler scheduler = new DFSScheduler(inputGraph, processors);
-            Schedule bestSchedule = scheduler.getBestSchedule();
+            schedule = scheduler.getBestSchedule();
 
             GraphFileWriter writer = new DotWriter();
             try {
                 writer.createFile(new File(outputFileName));
-                writer.writeFile(bestSchedule);
+                writer.writeFile(schedule);
             } catch (IOException e) {
                 e.printStackTrace();
                 System.err.println("Couldn't create/write to file: " + outputFileName +"\nType -h or --help for help.");
@@ -134,12 +137,12 @@ public class Main extends Application {
             System.out.println("The output file name will be: " + outputFileName);
             System.out.println();
 
-            ScheduledProcessor[] pro = bestSchedule.getProcessors();
+            ScheduledProcessor[] pro = schedule.getProcessors();
             for (int i = 0; i < pro.length; i++){
                 Map<Node, ScheduleEntry> nodeMap = pro[i].getNodeMap();
                 System.out.println("processor " + Integer.toString(i) + " has tasks:" + nodeMap.keySet().toString());
             }
-            System.out.println("The best overall time was: " + bestSchedule.getOverallTime());
+            System.out.println("The best overall time was: " + schedule.getOverallTime());
 
             if (useVisuals) {
                 launch();
