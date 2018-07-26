@@ -62,5 +62,20 @@ public class ScheduleDrawer {
             processorNo++;
         }
 
+        // draw super rough scale
+        // TODO: don't use this it's bad
+        HBox row = new HBox();
+        row.setPrefHeight(30);
+        row.setPadding(new Insets(30, 0, 0, 0));
+        ScheduleNode header = new ScheduleNode("Scale");
+        row.getChildren().add(header);
+        for (int i = 1; i <= totalTime; i++) {
+            int width = (int) ((1 / (double)totalTime) * SCHEDULE_WIDTH); // cast to int because truncation is fine
+            ScheduleNode node = new ScheduleNode(Integer.toString(i), 0, width);
+            row.getChildren().add(node);
+        }
+        vbox.getChildren().add(row);
+        // end ugly code
+
     }
 }
