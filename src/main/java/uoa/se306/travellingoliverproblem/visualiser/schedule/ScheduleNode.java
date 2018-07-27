@@ -13,13 +13,13 @@ public class ScheduleNode extends Pane {
     private String name;
 
     // normal schedule
-    public ScheduleNode(String name, Integer cost, int width) {
+    public ScheduleNode(String name, Integer cost, double width) {
         super();
 
         this.name = name;
 
         Rectangle rect = new Rectangle();
-        rect.setHeight(30);
+        rect.setHeight(ScheduleDrawer.ROW_HEIGHT);
         rect.setWidth(width);
         rect.setFill(Color.SKYBLUE);
         rect.setStroke(Color.BLACK);
@@ -47,8 +47,8 @@ public class ScheduleNode extends Pane {
         this.name = processorName;
 
         Rectangle rect = new Rectangle();
-        rect.setHeight(30);
-        rect.setWidth(100);
+        rect.setHeight(ScheduleDrawer.ROW_HEIGHT);
+        rect.setWidth(ScheduleDrawer.HEADER_WIDTH);
         rect.setFill(Color.TRANSPARENT);
 
         Text nameLabel = new Text(name);
@@ -63,13 +63,13 @@ public class ScheduleNode extends Pane {
     }
 
     // empty space
-    public ScheduleNode(int space) {
+    public ScheduleNode(double space) {
         super();
 
         this.name = "Empty space";
 
         Rectangle rect = new Rectangle();
-        rect.setHeight(30);
+        rect.setHeight(ScheduleDrawer.ROW_HEIGHT);
         rect.setWidth(space);
         rect.setFill(Color.TRANSPARENT);
 

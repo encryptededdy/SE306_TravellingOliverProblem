@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScheduleDrawer {
-    private static int SCHEDULE_WIDTH = 700;
+    public static int SCHEDULE_WIDTH = 700;
+    public static int ROW_HEIGHT = 30;
+    public static int HEADER_WIDTH = 100;
 
     private Pane parentPane;
     private VBox vbox = new VBox();
@@ -48,12 +50,12 @@ public class ScheduleDrawer {
                 if (e.getStartTime() > lastScheduleEnd) {
                     // Draw gap
                     int gap = e.getStartTime() - lastScheduleEnd;
-                    int width = (int) ((gap / (double)totalTime) * SCHEDULE_WIDTH); // cast to int because truncation is fine
+                    double width = ((gap / (double)totalTime) * SCHEDULE_WIDTH);
                     ScheduleNode node = new ScheduleNode(width);
                     row.getChildren().add(node);
                 }
                 // Draw entry
-                int width = (int) ((e.getLength() / (double)totalTime) * SCHEDULE_WIDTH); // cast to int because truncation is fine
+                double width = ((e.getLength() / (double)totalTime) * SCHEDULE_WIDTH);
                 ScheduleNode node = new ScheduleNode(e.toString(), e.getLength(), width);
                 row.getChildren().add(node);
                 lastScheduleEnd = e.getEndTime();
@@ -62,16 +64,17 @@ public class ScheduleDrawer {
             processorNo++;
         }
 
-        // draw super rough scale
-        // TODO: don't use this it's bad
+        // draw scale
         HBox row = new HBox();
         row.setPrefHeight(30);
         row.setPadding(new Insets(30, 0, 0, 0));
-        ScheduleNode header = new ScheduleNode("Scale");
+
+        double width = ((1 / (double)totalTime) * SCHEDULE_WIDTH); // width for each "1" time unit
+
+        ScheduleNode header = new ScheduleNode(HEADER_WIDTH - width/2);
         row.getChildren().add(header);
         for (int i = 1; i <= totalTime; i++) {
-            int width = (int) ((1 / (double)totalTime) * SCHEDULE_WIDTH); // cast to int because truncation is fine
-            ScheduleNode node = new ScheduleNode(Integer.toString(i), 0, width);
+            ScheduleScaleNode node = new ScheduleScaleNode(i, width);
             row.getChildren().add(node);
         }
         vbox.getChildren().add(row);
