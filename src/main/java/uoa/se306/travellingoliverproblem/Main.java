@@ -35,8 +35,9 @@ public class Main extends Application {
         Parent root = loader.load();
         controller = loader.getController();
         primaryStage.setTitle("Visualisation");
-        primaryStage.setScene(new Scene(root, 1200, 800));
         primaryStage.setResizable(false);
+        primaryStage.setScene(new Scene(root, 1200, 800));
+        primaryStage.sizeToScene(); // JavaFX Bug RT-30647 workaround
         primaryStage.show();
         controller.drawGraph(inputGraph);
         controller.drawSchedule(schedule);
