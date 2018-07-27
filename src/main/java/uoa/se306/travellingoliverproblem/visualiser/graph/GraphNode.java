@@ -19,20 +19,20 @@ public class GraphNode extends Pane {
         this.name = name;
 
         Circle circle = new Circle();
-        circle.setRadius(40);
+        circle.setRadius(30);
         circle.setFill(Color.SKYBLUE);
 
         Text nameLabel = new Text(name);
         Text costLabel = new Text(cost.toString());
         nameLabel.setFill(Color.WHITE);
-        nameLabel.setFont(new Font(30));
-        costLabel.setFont(new Font(65));
+        nameLabel.setFont(new Font(25));
+        costLabel.setFont(new Font(45));
         costLabel.setOpacity(0.4);
         costLabel.setFill(Color.WHITE);
 
         StackPane stack = new StackPane();
         stack.getChildren().addAll(circle, costLabel, nameLabel);
-        stack.setPadding(new Insets(20));
+        stack.setPadding(new Insets(10));
 
         // set view
         getChildren().add(stack);

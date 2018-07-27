@@ -38,7 +38,7 @@ public class GraphDrawer {
         drawLevel(currentLevel);
 
         // hacky delay
-        PauseTransition pt = new PauseTransition(Duration.seconds(0.1));
+        PauseTransition pt = new PauseTransition(Duration.seconds(0.5));
         pt.setOnFinished(event -> drawLines());
         pt.play();
     }

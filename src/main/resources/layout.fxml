@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -25,8 +26,12 @@
       </AnchorPane>
       <HBox prefHeight="600.0">
          <children>
-              <Pane fx:id="graphPane" prefWidth="400.0" />
-            <Pane fx:id="schedulePane" prefWidth="800.0" />
+            <ScrollPane maxHeight="600.0" prefHeight="600.0" prefWidth="400.0">
+               <content>
+                    <Pane fx:id="graphPane" />
+               </content>
+            </ScrollPane>
+            <Pane fx:id="schedulePane" maxHeight="600.0" prefHeight="600.0" prefWidth="800.0" />
          </children>
       </HBox>
       <HBox prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: #bebebe;" />
