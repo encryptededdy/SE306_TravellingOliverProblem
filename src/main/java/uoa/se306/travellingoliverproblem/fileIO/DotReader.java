@@ -32,7 +32,7 @@ public class DotReader implements GraphFileReader {
         String line;
         int lineno = 1;
         try {
-            if (!br.readLine().matches("digraph \\w+ \\{")) {
+            if (!br.readLine().matches("digraph \\S+ \\{")) {
                 throw new InvalidFileFormatException("digraph definition not found");
             }
             while ((line = br.readLine()) != null) {

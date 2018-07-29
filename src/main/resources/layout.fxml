@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uoa.se306.travellingoliverproblem.visualiser.FXController">
+    <children>
+      <AnchorPane prefHeight="50.0" prefWidth="200.0">
+         <children>
+            <Text layoutX="14.0" layoutY="34.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Input DAG">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Text>
+            <Text layoutX="407.0" layoutY="34.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Optimal Schedule">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <HBox prefHeight="600.0">
+         <children>
+            <ScrollPane maxHeight="600.0" prefHeight="600.0" prefWidth="400.0">
+               <content>
+                    <Pane fx:id="graphPane" />
+               </content>
+            </ScrollPane>
+            <Pane fx:id="schedulePane" maxHeight="600.0" prefHeight="600.0" prefWidth="800.0" />
+         </children>
+      </HBox>
+      <HBox prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: #bebebe;" />
+    </children>
+</VBox>
