@@ -29,7 +29,7 @@ public class ScheduleEntry implements Comparable<ScheduleEntry> {
     // Node name followed by start time
     @Override
     public String toString() {
-        return node.toString() + Integer.toString(startTime);
+        return node.toString();
     }
 
     // Compare ScheduleEntries based on their end time
