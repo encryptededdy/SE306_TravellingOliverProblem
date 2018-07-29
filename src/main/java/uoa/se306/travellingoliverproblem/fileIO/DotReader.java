@@ -23,7 +23,7 @@ public class DotReader implements GraphFileReader {
     public Graph readFile() {
         // setup regex patterns
         Pattern nodePattern = Pattern.compile("(\\w+)\\s+\\[Weight=(\\d+)\\];");
-        Pattern edgePattern = Pattern.compile("(\\w+) -> (\\w+)\\s+\\[Weight=(\\d+)\\];");
+        Pattern edgePattern = Pattern.compile("(\\w+) [-−]> (\\w+)\\s+\\[Weight=(\\d+)\\];");
 
         // Temp storage of output nodes
         Map<String, Node> foundNodes = new HashMap<>();
