@@ -30,11 +30,19 @@ public class DotReader implements GraphFileReader {
 
         BufferedReader br = new BufferedReader(dotfile);
         String line;
+        String graphName = "";
         int lineno = 1;
         try {
-            if (!br.readLine().matches("digraph \\w+ \\{")) {
+            line = br.readLine();
+            if (!line.matches("digraph \\w+ \\{")) {
                 throw new InvalidFileFormatException("digraph definition not found");
             }
+
+            graphName = line.split(" ")[1];
+
+            System.out.println("Graph Name: " + graphName);
+            System.out.println(graphName.length());
+
             while ((line = br.readLine()) != null) {
                 lineno++;
                 if (line.contains("}")) {
@@ -90,7 +98,7 @@ public class DotReader implements GraphFileReader {
             throw new InvalidFileFormatException("Cycle found in acyclic graph (or empty)");
         }
 
-        Graph graph = new Graph(startNodes, foundNodes.values());
+        Graph graph = new Graph(startNodes, foundNodes.values(), graphName);
         return graph;
     }
 }

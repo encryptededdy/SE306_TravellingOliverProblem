@@ -1,9 +1,6 @@
 package uoa.se306.travellingoliverproblem;
 
-import uoa.se306.travellingoliverproblem.fileIO.DotReader;
-import uoa.se306.travellingoliverproblem.fileIO.DotWriter;
-import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
-import uoa.se306.travellingoliverproblem.fileIO.GraphFileWriter;
+import uoa.se306.travellingoliverproblem.fileIO.*;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
@@ -12,6 +9,7 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import uoa.se306.travellingoliverproblem.scheduler.BranchAndBoundScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
+import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,15 +94,7 @@ public class Main {
             Scheduler scheduler = new DFSScheduler(graph, processors);
             Schedule bestSchedule = scheduler.getBestSchedule();
 
-            GraphFileWriter writer = new DotWriter();
-            try {
-                writer.createFile(new File(outputFileName));
-                writer.writeFile(bestSchedule);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("Couldn't create/write to file: " + outputFileName +"\nType -h or --help for help.");
-                System.exit(1);
-            }
+
 
             //Testing purposes
             System.out.println("Read graph with " + graph.getStartingNodes().size() + " starting nodes");
@@ -113,12 +103,16 @@ public class Main {
             System.out.println("The output file name will be: " + outputFileName);
             System.out.println();
 
+
             ScheduledProcessor[] pro = bestSchedule.getProcessors();
             for (int i = 0; i < pro.length; i++){
                 Map<Node, ScheduleEntry> nodeMap = pro[i].getNodeMap();
                 System.out.println("processor " + Integer.toString(i) + " has tasks:" + nodeMap.keySet().toString());
             }
             System.out.println("The best overall time was: " + bestSchedule.getOverallTime());
+
+            DotFileWriter fileWriter = new DotFileWriter(graph, bestSchedule, outputFileName);
+            fileWriter.outputSchedule();
         }
     }
 }
