@@ -32,6 +32,12 @@ public class ScheduledProcessor {
         entrySet.add(entry);
     }
 
+    // Used for rendering schedules
+    // TODO: Remove this and use listeners instead
+    public TreeSet<ScheduleEntry> getFullSchedule() {
+        return entrySet;
+    }
+
     // Get the latest end time
     public int endTime() {
         return entrySet.last().getEndTime();
