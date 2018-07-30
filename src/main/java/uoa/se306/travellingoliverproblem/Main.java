@@ -7,9 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import uoa.se306.travellingoliverproblem.fileIO.DotReader;
-import uoa.se306.travellingoliverproblem.fileIO.DotWriter;
 import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
-import uoa.se306.travellingoliverproblem.fileIO.GraphFileWriter;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
@@ -123,16 +121,6 @@ public class Main extends Application {
             Scheduler scheduler = new DFSScheduler(inputGraph, processors);
             schedule = scheduler.getBestSchedule();
 
-            GraphFileWriter writer = new DotWriter();
-            try {
-                writer.createFile(new File(outputFileName));
-                writer.writeFile(bestSchedule);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("Couldn't create/write to file: " + outputFileName +"\nType -h or --help for help.");
-                System.exit(1);
-            }
-
             //Testing purposes
             System.out.println("Read graph with " + inputGraph.getStartingNodes().size() + " starting nodes");
             System.out.println("Number of cores to use: " + Integer.toString(numOfCores));
@@ -151,7 +139,7 @@ public class Main extends Application {
                 launch();
             }
 
-            DotFileWriter fileWriter = new DotFileWriter(graph, schedule, outputFileName);
+            DotFileWriter fileWriter = new DotFileWriter(inputGraph, schedule, outputFileName);
             fileWriter.outputSchedule();
         }
     }
