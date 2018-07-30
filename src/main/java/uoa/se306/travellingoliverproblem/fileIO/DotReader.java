@@ -40,9 +40,6 @@ public class DotReader implements GraphFileReader {
 
             graphName = line.split(" ")[1];
 
-            System.out.println("Graph Name: " + graphName);
-            System.out.println(graphName.length());
-
             while ((line = br.readLine()) != null) {
                 lineno++;
                 if (line.contains("}")) {
