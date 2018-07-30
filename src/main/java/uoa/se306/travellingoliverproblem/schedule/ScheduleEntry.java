@@ -26,6 +26,9 @@ public class ScheduleEntry implements Comparable<ScheduleEntry> {
     // Returns the time at which the ScheduledEntry ended on the processor
     public int getEndTime() { return startTime + length; }
 
+    // Returns the node the schedule entry is referring to
+    public Node getNode() {return this.node;}
+
     // Node name followed by start time
     @Override
     public String toString() {

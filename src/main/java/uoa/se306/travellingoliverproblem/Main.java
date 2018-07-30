@@ -1,14 +1,13 @@
 package uoa.se306.travellingoliverproblem;
 
+import uoa.se306.travellingoliverproblem.fileIO.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import uoa.se306.travellingoliverproblem.fileIO.DotReader;
-import uoa.se306.travellingoliverproblem.fileIO.DotWriter;
 import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
-import uoa.se306.travellingoliverproblem.fileIO.GraphFileWriter;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
@@ -16,6 +15,7 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
+import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
 import uoa.se306.travellingoliverproblem.visualiser.FXController;
 
 import java.io.File;
@@ -121,16 +121,6 @@ public class Main extends Application {
             Scheduler scheduler = new DFSScheduler(inputGraph, processors);
             schedule = scheduler.getBestSchedule();
 
-            GraphFileWriter writer = new DotWriter();
-            try {
-                writer.createFile(new File(outputFileName));
-                writer.writeFile(schedule);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("Couldn't create/write to file: " + outputFileName +"\nType -h or --help for help.");
-                System.exit(1);
-            }
-
             //Testing purposes
             System.out.println("Read graph with " + inputGraph.getStartingNodes().size() + " starting nodes");
             System.out.println("Number of cores to use: " + Integer.toString(numOfCores));
@@ -148,6 +138,9 @@ public class Main extends Application {
             if (useVisuals) {
                 launch();
             }
+
+            DotFileWriter fileWriter = new DotFileWriter(inputGraph, schedule, outputFileName);
+            fileWriter.outputSchedule();
         }
     }
 }
