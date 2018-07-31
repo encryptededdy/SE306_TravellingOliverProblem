@@ -80,7 +80,7 @@ public class Schedule {
     }
 
     public void setMaxOverallTime(){
-        overallTime = 2147483647;
+        overallTime = Integer.MAX_VALUE;
     }
 
     public boolean checkValidity() {
