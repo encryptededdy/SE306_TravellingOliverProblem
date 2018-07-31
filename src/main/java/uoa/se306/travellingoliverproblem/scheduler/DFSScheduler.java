@@ -24,12 +24,10 @@ public class DFSScheduler extends Scheduler {
     protected void calculateSchedule(Schedule currentSchedule) {
         if (useGreedyInitialSchedule) {
             GreedyBFS greedyScheduler = new GreedyBFS();
-            greedyScheduler.calculateGreedySchedule(currentSchedule);
-            Schedule greedySchedule = greedyScheduler.getBestSchedule();
-            calculateScheduleRecursive(greedySchedule);
-        } else {
-            calculateScheduleRecursive(currentSchedule);
+            greedyScheduler.calculateGreedySchedule(new Schedule(currentSchedule));
+            bestSchedule = greedyScheduler.getBestSchedule();
         }
+        calculateScheduleRecursive(currentSchedule);
     }
 
     private void calculateScheduleRecursive(Schedule currentSchedule) {
