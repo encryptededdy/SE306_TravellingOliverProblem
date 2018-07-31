@@ -66,6 +66,7 @@ public class DFSScheduler extends Scheduler {
                 Schedule tempSchedule = new Schedule(currentSchedule);
                 tempSchedule.addToSchedule(node, j, startTime);
                 // Only continue if sub-schedule time is under upper bound
+                // i.e. skip this branch if its overall time is already longer than the currently known best overall time
                 if (!useCurrentBestCulling || bestSchedule == null || tempSchedule.getOverallTime() <= bestSchedule.getOverallTime()) {
                     if (useEquivalentScheduleCulling) {
                         tempSchedules.add(tempSchedule);
