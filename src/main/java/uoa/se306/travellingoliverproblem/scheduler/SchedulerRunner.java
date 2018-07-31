@@ -27,7 +27,10 @@ public class SchedulerRunner {
 
         Scheduler scheduler = new DFSScheduler(inputGraph, noProcessors);
         // TODO: Multithread this
+        long startTime = System.nanoTime();
         schedule = scheduler.getBestSchedule();
+        long endTime = System.nanoTime();
+        System.out.println("Took " + (endTime - startTime) / 1000000 + " ms");
     }
 
     public void printResult() {

@@ -37,7 +37,7 @@ public class DotStandardOutput implements ScheduleOutputter {
         });
         this.dotOutputStringBuilder.append("\n}"); // Adding Final Line
 
-        System.out.print(this.dotOutputStringBuilder.toString());
+        //System.out.print(this.dotOutputStringBuilder.toString());
     }
 
     private void addEdgesToOutput(Node node) {
