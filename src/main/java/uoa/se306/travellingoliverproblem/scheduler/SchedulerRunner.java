@@ -12,6 +12,7 @@ public class SchedulerRunner {
     private Graph inputGraph;
     private int noProcessors;
     private Schedule schedule;
+    private ThreadListener tListener = null;
     // TODO: Add listeners
 
     public static SchedulerRunner getInstance() {
@@ -27,7 +28,17 @@ public class SchedulerRunner {
 
         Scheduler scheduler = new DFSScheduler(inputGraph, noProcessors);
         // TODO: Multithread this
-        schedule = scheduler.getBestSchedule();
+        Runnable scheduleTask = () -> {
+            schedule = scheduler.getBestSchedule();
+            System.out.println("Scheduler finished...");
+            if(tListener != null){
+                tListener.onScheduleFinish("hello");
+            }
+        };
+        Thread scheduleThread = new Thread(scheduleTask);
+        scheduleThread.start();
+        System.out.println("Done!");
+
     }
 
     public void printResult() {
@@ -45,5 +56,13 @@ public class SchedulerRunner {
 
     public Schedule getSchedule() {
         return schedule;
+    }
+
+    public void setThreadListener(ThreadListener listener){
+        this.tListener = listener;
+    }
+
+    public interface ThreadListener{
+        public void onScheduleFinish(String t);
     }
 }
