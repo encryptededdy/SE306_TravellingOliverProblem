@@ -13,6 +13,7 @@ public class DotStandardOutput implements ScheduleOutputter {
     private Graph graph;
     private Schedule schedule;
 
+    //Default constructor
     public DotStandardOutput() { }
 
     public DotStandardOutput(Graph graph, Schedule schedule) {
