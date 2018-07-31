@@ -5,6 +5,7 @@ import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
+import uoa.se306.travellingoliverproblem.scheduler.heuristics.GreedyBFS;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +14,7 @@ public class DFSScheduler extends Scheduler {
 
     private boolean useEquivalentScheduleCulling = true;
     private boolean useCurrentBestCulling = true;
+    private boolean useGreedyInitialSchedule = true;
 
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors);
@@ -20,6 +22,17 @@ public class DFSScheduler extends Scheduler {
 
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
+        if (useGreedyInitialSchedule) {
+            GreedyBFS greedyScheduler = new GreedyBFS();
+            greedyScheduler.calculateGreedySchedule(currentSchedule);
+            Schedule greedySchedule = greedyScheduler.getBestSchedule();
+            calculateScheduleRecursive(greedySchedule);
+        } else {
+            calculateScheduleRecursive(currentSchedule);
+        }
+    }
+
+    private void calculateScheduleRecursive(Schedule currentSchedule) {
         // If the currentSchedule has no available nodes
         if (currentSchedule.getAvailableNodes().isEmpty()) {
             // If our bestSchedule is null or the overall time for the bestSchedule is less than our current schedule
@@ -70,13 +83,13 @@ public class DFSScheduler extends Scheduler {
                     if (useEquivalentScheduleCulling) {
                         tempSchedules.add(tempSchedule);
                     } else {
-                        calculateSchedule(tempSchedule);//recursive
+                        calculateScheduleRecursive(tempSchedule);//recursive
                     }
                 }
             }
             if (useEquivalentScheduleCulling) {
                 for (Schedule s : tempSchedules) {
-                    calculateSchedule(s);
+                    calculateScheduleRecursive(s);
                 }
             }
         }
