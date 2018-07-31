@@ -60,10 +60,10 @@ public class DotReader implements GraphFileReader {
                         sourceNode.addChild(destnNode, edgeWeight);
 
 
-                        Integer distance = sourceNode.getDistanceFromParent() + 1;
-                        if (distance > destnNode.getDistanceFromParent()) {
-                            destnNode.setDistanceFromParent(distance);
-                            calculateParentDistance(destnNode, distance);
+                        Integer distance = sourceNode.getLevel() + 1;
+                        if (distance > destnNode.getLevel()) {
+                            destnNode.setLevel(distance);
+                            calculateChildLevel(destnNode, distance);
                         }
                         destnNode.addParent(sourceNode, edgeWeight);
                     } catch (Exception e) {
@@ -107,21 +107,20 @@ public class DotReader implements GraphFileReader {
         Graph graph = new Graph(startNodes, foundNodes.values(), graphName);
         Integer depth = 0;
         for (Node node: graph.getAllNodes()) {
-            if (node.getDistanceFromParent() > depth) {
-                depth = node.getDistanceFromParent();
+            if (node.getLevel() > depth) {
+                depth = node.getLevel();
             }
         }
-        System.out.println(depth + 1);
+        System.out.println(depth);
         return graph;
     }
 
-    private void calculateParentDistance(Node currentNode, Integer distance) {
+    private void calculateChildLevel(Node currentNode, Integer level) {
         for (Node childrenNodes: currentNode.getChildren().keySet()) {
-            if (distance > childrenNodes.getDistanceFromParent()) {
-                childrenNodes.setDistanceFromParent(distance);
-                calculateParentDistance(childrenNodes, distance++);
+            if (level > childrenNodes.getLevel()) {
+                childrenNodes.setLevel(level);
+                calculateChildLevel(childrenNodes, level++);
             }
-
         }
     }
 }
