@@ -12,6 +12,7 @@ import java.util.Set;
 public class DFSScheduler extends Scheduler {
 
     private boolean useEquivalentScheduleCulling = true;
+    private boolean useCurrentBestCulling = true;
 
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors);
@@ -64,10 +65,14 @@ public class DFSScheduler extends Scheduler {
                 startTime = processor.getEarliestStartAfter(startTime, node.getCost());
                 Schedule tempSchedule = new Schedule(currentSchedule);
                 tempSchedule.addToSchedule(node, j, startTime);
-                if (useEquivalentScheduleCulling) {
-                    tempSchedules.add(tempSchedule);
-                } else {
-                    calculateSchedule(tempSchedule);//recursive
+                // Only continue if sub-schedule time is under upper bound
+                // i.e. skip this branch if its overall time is already longer than the currently known best overall time
+                if (!useCurrentBestCulling || bestSchedule == null || tempSchedule.getOverallTime() <= bestSchedule.getOverallTime()) {
+                    if (useEquivalentScheduleCulling) {
+                        tempSchedules.add(tempSchedule);
+                    } else {
+                        calculateSchedule(tempSchedule);//recursive
+                    }
                 }
             }
             if (useEquivalentScheduleCulling) {
