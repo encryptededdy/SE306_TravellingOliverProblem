@@ -1,0 +1,3 @@
+digraph OneNode {
+    a [Weight=1];
+}
