@@ -11,6 +11,9 @@ import java.util.Set;
 
 public class DFSScheduler extends Scheduler {
 
+    private boolean useEquivalentScheduleCulling = true;
+    private boolean useCurrentBestCulling = true;
+
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors);
     }
@@ -29,7 +32,8 @@ public class DFSScheduler extends Scheduler {
         // Fix iterator issues
         Set<Node> tempSet = new HashSet<>(currentSchedule.getAvailableNodes());
         for (Node node: tempSet) {
-
+            Set<Schedule> tempSchedules = new HashSet<>();
+            // Get the amount of processors in the current schedule
             ScheduledProcessor[] processors = currentSchedule.getProcessors();
 
             for (int j = 0; j < processors.length; j++) {
@@ -47,9 +51,9 @@ public class DFSScheduler extends Scheduler {
                             ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
 
                             processorStartTime = sEntry.getEndTime();
-
-                            processorStartTime += processor != checkProcessor ? parentNode.getChildren().get(node) : 0;
-
+                            // if the current processor doesn't have the parent node
+                            processorStartTime += (processor != checkProcessor) ? parentNode.getChildren().get(node) : 0;
+                            // if processor does not have a task yet, add the this node as the first task.
                             if (processorStartTime > startTime) {
                                 startTime = processorStartTime;
                                 break;
@@ -60,7 +64,20 @@ public class DFSScheduler extends Scheduler {
                 startTime = processor.getEarliestStartAfter(startTime, node.getCost());
                 Schedule tempSchedule = new Schedule(currentSchedule);
                 tempSchedule.addToSchedule(node, j, startTime);
-                calculateSchedule(tempSchedule);//recursive
+                // Only continue if sub-schedule time is under upper bound
+                // i.e. skip this branch if its overall time is already longer than the currently known best overall time
+                if (!useCurrentBestCulling || bestSchedule == null || tempSchedule.getOverallTime() <= bestSchedule.getOverallTime()) {
+                    if (useEquivalentScheduleCulling) {
+                        tempSchedules.add(tempSchedule);
+                    } else {
+                        calculateSchedule(tempSchedule);//recursive
+                    }
+                }
+            }
+            if (useEquivalentScheduleCulling) {
+                for (Schedule s : tempSchedules) {
+                    calculateSchedule(s);
+                }
             }
         }
     }

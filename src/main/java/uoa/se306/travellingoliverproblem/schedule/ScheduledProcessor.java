@@ -63,6 +63,22 @@ public class ScheduledProcessor {
         return nodeMap.get(node);
     }
 
+    // Convert schedule into a string representation
+    @Override
+    public String toString() {
+        int lastScheduleEnd = 0;
+        StringBuilder builder = new StringBuilder();
+        for (ScheduleEntry entry : entrySet) {
+            if (entry.getStartTime() > lastScheduleEnd) {
+                // Insert Gap
+                builder.append(entry.getStartTime() - lastScheduleEnd);
+            }
+            // Insert entry name
+            builder.append(entry.toString());
+        }
+        return builder.toString();
+    }
+
     // Return the earliest time after the specified start time that can fit the
     // nodes processing time on without collision
     public int getEarliestStartAfter(int startTime, int processTime) {
