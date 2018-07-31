@@ -1,4 +1,4 @@
-digraph Bepis {
+digraph "Be p is" {
     1   [Weight=2];
     2   [Weight=2];
     3   [Weight=2];
