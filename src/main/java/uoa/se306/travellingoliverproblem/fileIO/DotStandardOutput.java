@@ -37,7 +37,7 @@ public class DotStandardOutput implements ScheduleOutputter {
         });
         this.dotOutputStringBuilder.append("\n}"); // Adding Final Line
 
-        System.out.print(this.dotOutputStringBuilder.toString());
+        //System.out.print(this.dotOutputStringBuilder.toString());
     }
 
     private void addEdgesToOutput(Node node) {
@@ -50,7 +50,7 @@ public class DotStandardOutput implements ScheduleOutputter {
             this.dotOutputStringBuilder.append(childNode);
             this.dotOutputStringBuilder.append("\t");
 
-            this.dotOutputStringBuilder.append("[ Weight=" + edgeWeight + "];");
+            this.dotOutputStringBuilder.append("[Weight=" + edgeWeight + "];");
 
         });
     }
@@ -61,7 +61,7 @@ public class DotStandardOutput implements ScheduleOutputter {
         this.dotOutputStringBuilder.append("\n\t");
         this.dotOutputStringBuilder.append(node);
         this.dotOutputStringBuilder.append("\t\t");
-        this.dotOutputStringBuilder.append("[ Weight=" + node.getCost() + ",");
+        this.dotOutputStringBuilder.append("[Weight=" + node.getCost() + ",");
         this.dotOutputStringBuilder.append("Start=" + entry.getStartTime() + ",");
         this.dotOutputStringBuilder.append("Processor=" + processor + "];");
     }
