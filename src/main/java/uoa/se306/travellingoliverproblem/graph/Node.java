@@ -7,6 +7,8 @@ import java.util.Objects;
 public class Node implements Comparable<Node> {
     private String name;
     private Integer cost = 0;
+
+    // Integers for parents and children in hash map are the edge weight costs
     private Map<Node, Integer> children = new HashMap<>();
     private Map<Node, Integer> parents = new HashMap<>();
 

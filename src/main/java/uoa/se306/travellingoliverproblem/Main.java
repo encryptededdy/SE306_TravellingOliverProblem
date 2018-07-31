@@ -5,27 +5,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
 import uoa.se306.travellingoliverproblem.fileIO.DotReader;
-import uoa.se306.travellingoliverproblem.fileIO.DotWriter;
 import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
-import uoa.se306.travellingoliverproblem.fileIO.GraphFileWriter;
 import uoa.se306.travellingoliverproblem.graph.Graph;
-import uoa.se306.travellingoliverproblem.graph.Node;
-import uoa.se306.travellingoliverproblem.schedule.Schedule;
-import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
-import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
-import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
-import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
+import uoa.se306.travellingoliverproblem.scheduler.SchedulerRunner;
 import uoa.se306.travellingoliverproblem.visualiser.FXController;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 public class Main extends Application {
 
-    private static Graph inputGraph;
-    private static Schedule schedule;
     private static FXController controller;
 
     // JavaFX start method (depends if visualisation enabled)
@@ -39,8 +30,8 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 1200, 800));
         primaryStage.sizeToScene(); // JavaFX Bug RT-30647 workaround
         primaryStage.show();
-        controller.drawGraph(inputGraph);
-        controller.drawSchedule(schedule);
+        controller.drawGraph(SchedulerRunner.getInstance().getInputGraph());
+        controller.drawSchedule(SchedulerRunner.getInstance().getSchedule());
     }
 
     public static void main(String[] args) {
@@ -83,7 +74,7 @@ public class Main extends Application {
                 System.err.println("Couldn't open file.\nType -h or --help for help.");
                 System.exit(1);
             }
-            inputGraph = reader.readFile();
+            Graph inputGraph = reader.readFile();
 
             File file = new File(fileName);
             //gets the file name of the provided file path, gets rid of the file type and appends output.dot to it.
@@ -118,19 +109,6 @@ public class Main extends Application {
                 }
             }
 
-            Scheduler scheduler = new DFSScheduler(inputGraph, processors);
-            schedule = scheduler.getBestSchedule();
-
-            GraphFileWriter writer = new DotWriter();
-            try {
-                writer.createFile(new File(outputFileName));
-                writer.writeFile(schedule);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("Couldn't create/write to file: " + outputFileName +"\nType -h or --help for help.");
-                System.exit(1);
-            }
-
             //Testing purposes
             System.out.println("Read graph with " + inputGraph.getStartingNodes().size() + " starting nodes");
             System.out.println("Number of cores to use: " + Integer.toString(numOfCores));
@@ -138,16 +116,15 @@ public class Main extends Application {
             System.out.println("The output file name will be: " + outputFileName);
             System.out.println();
 
-            ScheduledProcessor[] pro = schedule.getProcessors();
-            for (int i = 0; i < pro.length; i++){
-                Map<Node, ScheduleEntry> nodeMap = pro[i].getNodeMap();
-                System.out.println("processor " + Integer.toString(i) + " has tasks:" + nodeMap.keySet().toString());
-            }
-            System.out.println("The best overall time was: " + schedule.getOverallTime());
+            SchedulerRunner.getInstance().startScheduler(inputGraph, processors);
+            SchedulerRunner.getInstance().printResult();
 
             if (useVisuals) {
                 launch();
             }
+
+            DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), outputFileName);
+            fileWriter.outputSchedule();
         }
     }
 }
