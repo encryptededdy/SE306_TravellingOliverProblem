@@ -11,6 +11,8 @@ import java.util.Set;
 
 public class DFSScheduler extends Scheduler {
 
+    private boolean useEquivalentScheduleCulling = true;
+
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors);
     }
@@ -29,6 +31,7 @@ public class DFSScheduler extends Scheduler {
         // Fix iterator issues
         Set<Node> tempSet = new HashSet<>(currentSchedule.getAvailableNodes());
         for (Node node: tempSet) {
+            Set<Schedule> tempSchedules = new HashSet<>();
             // Get the amount of processors in the current schedule
             ScheduledProcessor[] processors = currentSchedule.getProcessors();
             // for all the processors in the current schedule
@@ -49,7 +52,7 @@ public class DFSScheduler extends Scheduler {
                             // get the end time of the parent node
                             processorStartTime = sEntry.getEndTime();
                             // if the current processor doesn't have the parent node
-                            processorStartTime += processor != checkProcessor ? parentNode.getChildren().get(node) : 0;
+                            processorStartTime += (processor != checkProcessor) ? parentNode.getChildren().get(node) : 0;
                             // if processor does not have a task yet, add the this node as the first task.
                             if (processorStartTime > startTime) {
                                 startTime = processorStartTime;
@@ -61,7 +64,16 @@ public class DFSScheduler extends Scheduler {
                 startTime = processor.getEarliestStartAfter(startTime, node.getCost());
                 Schedule tempSchedule = new Schedule(currentSchedule);
                 tempSchedule.addToSchedule(node, j, startTime);
-                calculateSchedule(tempSchedule);//recursive
+                if (useEquivalentScheduleCulling) {
+                    tempSchedules.add(tempSchedule);
+                } else {
+                    calculateSchedule(tempSchedule);//recursive
+                }
+            }
+            if (useEquivalentScheduleCulling) {
+                for (Schedule s : tempSchedules) {
+                    calculateSchedule(s);
+                }
             }
         }
     }
