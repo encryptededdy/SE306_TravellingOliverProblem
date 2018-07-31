@@ -58,6 +58,13 @@ public class DotReader implements GraphFileReader {
                         Node destnNode = foundNodes.get(destnNodeName);
 
                         sourceNode.addChild(destnNode, edgeWeight);
+
+
+                        Integer distance = sourceNode.getDistanceFromParent() + 1;
+                        if (distance > destnNode.getDistanceFromParent()) {
+                            destnNode.setDistanceFromParent(distance);
+                            calculateParentDistance(destnNode, distance);
+                        }
                         destnNode.addParent(sourceNode, edgeWeight);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -96,6 +103,23 @@ public class DotReader implements GraphFileReader {
         }
 
         Graph graph = new Graph(startNodes, foundNodes.values(), graphName);
+        Integer depth = 0;
+        for (Node node: graph.getAllNodes()) {
+            if (node.getDistanceFromParent() > depth) {
+                depth = node.getDistanceFromParent();
+            }
+        }
+        System.out.println(depth + 1);
         return graph;
+    }
+
+    private void calculateParentDistance(Node currentNode, Integer distance) {
+        for (Node childrenNodes: currentNode.getChildren().keySet()) {
+            if (distance > childrenNodes.getDistanceFromParent()) {
+                childrenNodes.setDistanceFromParent(distance);
+                calculateParentDistance(childrenNodes, distance++);
+            }
+
+        }
     }
 }
