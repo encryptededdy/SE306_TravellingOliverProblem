@@ -16,6 +16,7 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
 import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
+import uoa.se306.travellingoliverproblem.scheduler.heuristics.GreedyBFS;
 import uoa.se306.travellingoliverproblem.visualiser.FXController;
 
 import java.io.File;
@@ -118,11 +119,18 @@ public class Main extends Application {
                 }
             }
 
+            /*
+            Schedule tempSchedule = new Schedule(processors, inputGraph.getStartingNodes(), inputGraph.getAllNodes());
+            GreedyBFS a = new GreedyBFS();
+            a.calculateGreedySchedule(tempSchedule);
+            schedule = a.getBestSchedule();
+            */
             Scheduler scheduler = new DFSScheduler(inputGraph, processors);
             schedule = scheduler.getBestSchedule();
 
             //Testing purposes
             System.out.println("Read graph with " + inputGraph.getStartingNodes().size() + " starting nodes");
+            System.out.println("Number of processors to schedule: " + Integer.toString(processors));
             System.out.println("Number of cores to use: " + Integer.toString(numOfCores));
             System.out.println("Use visuals? " + String.valueOf(useVisuals));
             System.out.println("The output file name will be: " + outputFileName);

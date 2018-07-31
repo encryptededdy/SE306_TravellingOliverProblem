@@ -79,6 +79,10 @@ public class Schedule {
         return overallTime;
     }
 
+    public void setMaxOverallTime(){
+        overallTime = 2147483647;
+    }
+
     public boolean checkValidity() {
         // TODO: Implement Schedule validity check (i.e. no overlaps etc.)
         return true;
