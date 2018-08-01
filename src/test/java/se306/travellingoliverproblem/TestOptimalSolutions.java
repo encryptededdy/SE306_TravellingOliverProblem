@@ -70,6 +70,18 @@ public class TestOptimalSolutions {
         checkValidAndOptimal(scheduler.getBestSchedule(), 10);
     }
 
+    @Test
+    public void test10NodesRandom() throws FileNotFoundException {
+
+        Graph inputGraph = getGraphFromInput("10NodesRandom.dot");
+        // 2 starting nodes
+        assertEquals(inputGraph.getStartingNodes().size(), 2);
+
+        Scheduler scheduler = new DFSScheduler(inputGraph, 3);
+
+        checkValidAndOptimal(scheduler.getBestSchedule(), 50);
+    }
+
 
     private void checkValidAndOptimal(Schedule scheduleToCheck, int optimalTime) {
         //TODO implement this method
