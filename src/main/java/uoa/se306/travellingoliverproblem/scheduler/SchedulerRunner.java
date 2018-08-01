@@ -13,7 +13,6 @@ public class SchedulerRunner {
     private int noProcessors;
     private Schedule schedule;
     private ThreadListener tListener = null;
-    // TODO: Add listeners
 
     public static SchedulerRunner getInstance() {
         return ourInstance;
@@ -27,17 +26,17 @@ public class SchedulerRunner {
         this.noProcessors = noProcessors;
 
         Scheduler scheduler = new DFSScheduler(inputGraph, noProcessors);
-        // TODO: Multithread this
+        // create task to run on a separate thread
         Runnable scheduleTask = () -> {
             schedule = scheduler.getBestSchedule();
-            System.out.println("Scheduler finished...");
+            // trigger the thread listener
             if(tListener != null){
                 tListener.onScheduleFinish("hello");
             }
         };
+        // run scheduleTask on a new thread
         Thread scheduleThread = new Thread(scheduleTask);
         scheduleThread.start();
-        System.out.println("Done!");
 
     }
 
