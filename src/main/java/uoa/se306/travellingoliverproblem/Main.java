@@ -109,12 +109,6 @@ public class Main extends Application {
                 }
             }
 
-            /*
-            Schedule tempSchedule = new Schedule(processors, inputGraph.getStartingNodes(), inputGraph.getAllNodes());
-            GreedyBFS a = new GreedyBFS();
-            a.calculateGreedySchedule(tempSchedule);
-            schedule = a.getBestSchedule();
-            */
             //Testing purposes
             System.out.println("Read graph with " + inputGraph.getStartingNodes().size() + " starting nodes");
             System.out.println("Number of processors to schedule: " + Integer.toString(processors));
