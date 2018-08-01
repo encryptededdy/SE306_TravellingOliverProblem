@@ -109,7 +109,13 @@ public class DFSScheduler extends Scheduler {
         }
         if (useLocalPriorityQueue) {
             while (!candidateSchedules.isEmpty()) {
-                calculateScheduleRecursive(candidateSchedules.poll());
+                Schedule candidate = candidateSchedules.poll();
+                if (bestSchedule == null || candidate.getOverallTime() < bestSchedule.getOverallTime()) {
+                    calculateScheduleRecursive(candidate);
+                } else {
+                    branchesKilled+=candidateSchedules.size()+1;
+                    break; // It's a priority queue, so we can just drop the rest
+                }
             }
         }
     }
