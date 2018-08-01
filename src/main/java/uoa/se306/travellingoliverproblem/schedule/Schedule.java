@@ -101,6 +101,10 @@ public class Schedule {
         return overallTime;
     }
 
+    public void setMaxOverallTime(){
+        overallTime = Integer.MAX_VALUE;
+    }
+
     public boolean checkValidity() {
         // TODO: Implement Schedule validity check (i.e. no overlaps etc.)
         return true;

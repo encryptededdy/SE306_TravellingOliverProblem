@@ -111,6 +111,7 @@ public class Main extends Application {
 
             //Testing purposes
             System.out.println("Read graph with " + inputGraph.getStartingNodes().size() + " starting nodes");
+            System.out.println("Number of processors to schedule: " + Integer.toString(processors));
             System.out.println("Number of cores to use: " + Integer.toString(numOfCores));
             System.out.println("Use visuals? " + String.valueOf(useVisuals));
             System.out.println("The output file name will be: " + outputFileName);
