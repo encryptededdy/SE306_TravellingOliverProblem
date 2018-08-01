@@ -33,6 +33,7 @@ public class DFSScheduler extends Scheduler {
     }
 
     private void calculateScheduleRecursive(Schedule currentSchedule) {
+        existingSchedules.add(currentSchedule.toString()); // store this schedule as visited
         branchesConsidered++;
         // If the currentSchedule has no available nodes
         if (currentSchedule.getAvailableNodes().isEmpty()) {
@@ -81,17 +82,17 @@ public class DFSScheduler extends Scheduler {
                 // i.e. skip this branch if its overall time is already longer than the currently known best overall time
                 if (!useCurrentBestCulling || bestSchedule == null || tempSchedule.getOverallTime() <= bestSchedule.getOverallTime()) {
                     if (useEquivalentScheduleCulling) {
+                        // Only continue if this schedule hasn't been considered before
                         if (!existingSchedules.contains(tempSchedule.toString())) {
-                            existingSchedules.add(tempSchedule.toString());
                             calculateScheduleRecursive(tempSchedule);
                         } else {
-                            branchesKilled++;
+                            branchesKilled++; // drop this branch
                         }
                     } else {
                         calculateScheduleRecursive(tempSchedule);//recursive
                     }
                 } else {
-                    branchesKilled++;
+                    branchesKilled++; // drop this branch
                 }
             }
         }
