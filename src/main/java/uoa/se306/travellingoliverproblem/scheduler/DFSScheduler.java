@@ -8,6 +8,7 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import uoa.se306.travellingoliverproblem.scheduler.heuristics.GreedyBFS;
 
 import java.util.HashSet;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 public class DFSScheduler extends Scheduler {
@@ -15,6 +16,7 @@ public class DFSScheduler extends Scheduler {
     private boolean useEquivalentScheduleCulling = true;
     private boolean useCurrentBestCulling = true;
     private boolean useGreedyInitialSchedule = true;
+    private boolean useLocalPriorityQueue = true;
 
     private Set<String> existingSchedules = new HashSet<>();
 
@@ -44,6 +46,7 @@ public class DFSScheduler extends Scheduler {
             return;
         }
 
+        PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
         // Fix iterator issues
         Set<Node> tempSet = new HashSet<>(currentSchedule.getAvailableNodes());
         for (Node node: tempSet) {
@@ -80,20 +83,33 @@ public class DFSScheduler extends Scheduler {
                 tempSchedule.addToSchedule(node, j, startTime);
                 // Only continue if sub-schedule time is under upper bound
                 // i.e. skip this branch if its overall time is already longer than the currently known best overall time
-                if (!useCurrentBestCulling || bestSchedule == null || tempSchedule.getOverallTime() <= bestSchedule.getOverallTime()) {
+                if (!useCurrentBestCulling || bestSchedule == null || tempSchedule.getOverallTime() < bestSchedule.getOverallTime()) {
                     if (useEquivalentScheduleCulling) {
                         // Only continue if this schedule hasn't been considered before
                         if (!existingSchedules.contains(tempSchedule.toString())) {
-                            calculateScheduleRecursive(tempSchedule);
+                            if (useLocalPriorityQueue) {
+                                candidateSchedules.add(tempSchedule);
+                            } else {
+                                calculateScheduleRecursive(tempSchedule);
+                            }
                         } else {
                             branchesKilled++; // drop this branch
                         }
                     } else {
-                        calculateScheduleRecursive(tempSchedule);//recursive
+                        if (useLocalPriorityQueue) {
+                            candidateSchedules.add(tempSchedule);
+                        } else {
+                            calculateScheduleRecursive(tempSchedule);
+                        }
                     }
                 } else {
                     branchesKilled++; // drop this branch
                 }
+            }
+        }
+        if (useLocalPriorityQueue) {
+            while (!candidateSchedules.isEmpty()) {
+                calculateScheduleRecursive(candidateSchedules.poll());
             }
         }
     }
