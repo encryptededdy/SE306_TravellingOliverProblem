@@ -59,12 +59,13 @@ public class DotReader implements GraphFileReader {
 
                         sourceNode.addChild(destnNode, edgeWeight);
 
-
+                        // Set up the levels for each node
                         Integer distance = sourceNode.getLevel() + 1;
                         if (distance > destnNode.getLevel()) {
                             destnNode.setLevel(distance);
                             calculateChildLevel(destnNode, distance);
                         }
+
                         destnNode.addParent(sourceNode, edgeWeight);
                     } catch (Exception e) {
                         e.printStackTrace();
