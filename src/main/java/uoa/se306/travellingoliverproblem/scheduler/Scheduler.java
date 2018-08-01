@@ -15,6 +15,9 @@ public abstract class Scheduler {
     // Graph of all nodes
     protected Graph graph;
 
+    protected long branchesConsidered = 0;
+    protected long branchesKilled = 0;
+
     // constructor to initialize the input graph and the amount of processors to use
     Scheduler(Graph graph, int amountOfProcessors){
         this.graph = graph;
@@ -26,6 +29,18 @@ public abstract class Scheduler {
     public Schedule getBestSchedule() {
         calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes()));
         return bestSchedule;
+    }
+
+    public long getBranchesConsidered() {
+        return branchesConsidered;
+    }
+
+    public long getBranchesKilled() {
+        return branchesKilled;
+    }
+
+    public double proportionKilled() {
+        return (double)branchesKilled/(branchesConsidered+branchesKilled);
     }
 
     // Recursive function, to be implemented by children

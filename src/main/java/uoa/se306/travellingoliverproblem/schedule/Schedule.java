@@ -53,6 +53,11 @@ public class Schedule {
     }
 
     @Override
+    public String toString() {
+        return Arrays.stream(processors).map(ScheduledProcessor::toString).sorted().collect(Collectors.joining());
+    }
+
+    @Override
     public int hashCode() {
         String stringRep = Arrays.stream(processors).map(ScheduledProcessor::toString).sorted().collect(Collectors.joining());
         return stringRep.hashCode();

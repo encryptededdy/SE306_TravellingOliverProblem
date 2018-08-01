@@ -16,7 +16,9 @@ public class DFSScheduler extends Scheduler {
     private boolean useCurrentBestCulling = true;
     private boolean useGreedyInitialSchedule = true;
 
-    public DFSScheduler(Graph graph, int amountOfProcessors) {
+    private Set<String> existingSchedules = new HashSet<>();
+
+    DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors);
     }
 
@@ -31,6 +33,7 @@ public class DFSScheduler extends Scheduler {
     }
 
     private void calculateScheduleRecursive(Schedule currentSchedule) {
+        branchesConsidered++;
         // If the currentSchedule has no available nodes
         if (currentSchedule.getAvailableNodes().isEmpty()) {
             // If our bestSchedule is null or the overall time for the bestSchedule is less than our current schedule
@@ -43,7 +46,6 @@ public class DFSScheduler extends Scheduler {
         // Fix iterator issues
         Set<Node> tempSet = new HashSet<>(currentSchedule.getAvailableNodes());
         for (Node node: tempSet) {
-            Set<Schedule> tempSchedules = new HashSet<>();
             // Get the amount of processors in the current schedule
             ScheduledProcessor[] processors = currentSchedule.getProcessors();
 
@@ -79,15 +81,17 @@ public class DFSScheduler extends Scheduler {
                 // i.e. skip this branch if its overall time is already longer than the currently known best overall time
                 if (!useCurrentBestCulling || bestSchedule == null || tempSchedule.getOverallTime() <= bestSchedule.getOverallTime()) {
                     if (useEquivalentScheduleCulling) {
-                        tempSchedules.add(tempSchedule);
+                        if (!existingSchedules.contains(tempSchedule.toString())) {
+                            existingSchedules.add(tempSchedule.toString());
+                            calculateScheduleRecursive(tempSchedule);
+                        } else {
+                            branchesKilled++;
+                        }
                     } else {
                         calculateScheduleRecursive(tempSchedule);//recursive
                     }
-                }
-            }
-            if (useEquivalentScheduleCulling) {
-                for (Schedule s : tempSchedules) {
-                    calculateScheduleRecursive(s);
+                } else {
+                    branchesKilled++;
                 }
             }
         }

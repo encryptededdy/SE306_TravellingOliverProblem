@@ -12,6 +12,7 @@ public class SchedulerRunner {
     private Graph inputGraph;
     private int noProcessors;
     private Schedule schedule;
+    private Scheduler scheduler;
     // TODO: Add listeners
 
     public static SchedulerRunner getInstance() {
@@ -25,7 +26,7 @@ public class SchedulerRunner {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
-        Scheduler scheduler = new DFSScheduler(inputGraph, noProcessors);
+        scheduler = new DFSScheduler(inputGraph, noProcessors);
         // TODO: Multithread this
         long startTime = System.nanoTime();
         schedule = scheduler.getBestSchedule();
@@ -40,6 +41,10 @@ public class SchedulerRunner {
             System.out.println("Processor " + Integer.toString(i) + " has tasks:" + nodeMap.toString());
         }
         System.out.println("The best overall time was: " + schedule.getOverallTime());
+        System.out.printf("Out of %d branches, %d were pruned (%.1f%%)",
+                scheduler.getBranchesConsidered()+scheduler.getBranchesKilled(),
+                scheduler.getBranchesKilled(),
+                scheduler.proportionKilled()*100);
     }
 
     public Graph getInputGraph() {
