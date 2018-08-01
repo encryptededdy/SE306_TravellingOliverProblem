@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class DFSScheduler extends Scheduler {
 
-    private boolean useEquivalentScheduleCulling = true;
+    // useEquivalentScheduleCulling always enabled.
     private boolean useCurrentBestCulling = true;
     private boolean useGreedyInitialSchedule = true;
     private boolean useLocalPriorityQueue = true;
@@ -84,24 +84,7 @@ public class DFSScheduler extends Scheduler {
                 // Only continue if sub-schedule time is under upper bound
                 // i.e. skip this branch if its overall time is already longer than the currently known best overall time
                 if (!useCurrentBestCulling || bestSchedule == null || tempSchedule.getOverallTime() < bestSchedule.getOverallTime()) {
-                    if (useEquivalentScheduleCulling) {
-                        // Only continue if this schedule hasn't been considered before
-                        if (!existingSchedules.contains(tempSchedule.toString())) {
-                            if (useLocalPriorityQueue) {
-                                candidateSchedules.add(tempSchedule);
-                            } else {
-                                calculateScheduleRecursive(tempSchedule);
-                            }
-                        } else {
-                            branchesKilled++; // drop this branch
-                        }
-                    } else {
-                        if (useLocalPriorityQueue) {
-                            candidateSchedules.add(tempSchedule);
-                        } else {
-                            calculateScheduleRecursive(tempSchedule);
-                        }
-                    }
+                    candidateSchedules.add(tempSchedule);
                 } else {
                     branchesKilled++; // drop this branch
                 }
@@ -111,7 +94,12 @@ public class DFSScheduler extends Scheduler {
             while (!candidateSchedules.isEmpty()) {
                 Schedule candidate = candidateSchedules.poll();
                 if (bestSchedule == null || candidate.getOverallTime() < bestSchedule.getOverallTime()) {
-                    calculateScheduleRecursive(candidate);
+                    // Only continue if this schedule hasn't been considered before
+                    if (!existingSchedules.contains(candidate.toString())) {
+                        calculateScheduleRecursive(candidate);
+                    } else {
+                        branchesKilled++; // drop this branch
+                    }
                 } else {
                     branchesKilled+=candidateSchedules.size()+1;
                     break; // It's a priority queue, so we can just drop the rest
