@@ -120,7 +120,7 @@ public class Main extends Application {
             SchedulerRunner.getInstance().startScheduler(inputGraph, processors);
             final String tempOutputFileName = outputFileName;
             // run the following after the scheduler has finished.
-            SchedulerRunner.getInstance().setThreadListener(t -> {
+            SchedulerRunner.getInstance().setThreadListener(()-> {
                 SchedulerRunner.getInstance().printResult();
                 DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), tempOutputFileName);
                 fileWriter.outputSchedule();
