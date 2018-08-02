@@ -26,9 +26,13 @@ public class SchedulerRunner {
         this.noProcessors = noProcessors;
 
         Scheduler scheduler = new DFSScheduler(inputGraph, noProcessors);
+
         // create task to run on a separate thread
         Runnable scheduleTask = () -> {
+            long startTime = System.nanoTime();
             schedule = scheduler.getBestSchedule();
+            long endTime = System.nanoTime();
+            System.out.println("Took " + (endTime - startTime) / 1000000 + " ms");
             // trigger the thread listener
             if(tListener != null){
                 tListener.onScheduleFinish();
