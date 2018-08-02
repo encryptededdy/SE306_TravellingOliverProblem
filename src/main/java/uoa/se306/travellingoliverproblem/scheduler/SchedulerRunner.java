@@ -13,7 +13,8 @@ public class SchedulerRunner {
     private int noProcessors;
     private Schedule schedule;
     private Scheduler scheduler;
-    // TODO: Add listeners
+    private ThreadListener tListener = null;
+
 
     public static SchedulerRunner getInstance() {
         return ourInstance;
@@ -26,12 +27,23 @@ public class SchedulerRunner {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
-        scheduler = new DFSScheduler(inputGraph, noProcessors);
-        // TODO: Multithread this
-        long startTime = System.nanoTime();
-        schedule = scheduler.getBestSchedule();
-        long endTime = System.nanoTime();
-        System.out.println("Took " + (endTime - startTime) / 1000000 + " ms");
+        Scheduler scheduler = new DFSScheduler(inputGraph, noProcessors);
+
+        // create task to run on a separate thread
+        Runnable scheduleTask = () -> {
+            long startTime = System.nanoTime();
+            schedule = scheduler.getBestSchedule();
+            long endTime = System.nanoTime();
+            System.out.println("Took " + (endTime - startTime) / 1000000 + " ms");
+            // trigger the thread listener
+            if(tListener != null){
+                tListener.onScheduleFinish();
+            }
+        };
+        // run scheduleTask on a new thread
+        Thread scheduleThread = new Thread(scheduleTask);
+        scheduleThread.start();
+
     }
 
     public void printResult() {
@@ -53,5 +65,13 @@ public class SchedulerRunner {
 
     public Schedule getSchedule() {
         return schedule;
+    }
+
+    public void setThreadListener(ThreadListener listener){
+        this.tListener = listener;
+    }
+
+    public interface ThreadListener{
+        public void onScheduleFinish();
     }
 }
