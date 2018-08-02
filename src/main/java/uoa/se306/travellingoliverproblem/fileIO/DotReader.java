@@ -1,93 +1,58 @@
 package uoa.se306.travellingoliverproblem.fileIO;
 
+import com.paypal.digraph.parser.GraphEdge;
+import com.paypal.digraph.parser.GraphNode;
+import com.paypal.digraph.parser.GraphParser;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class DotReader implements GraphFileReader {
-    private FileReader dotfile;
+    private FileInputStream dotfile;
 
     @Override
     public void openFile(File file) throws FileNotFoundException {
-        dotfile = new FileReader(file);
+        dotfile = new FileInputStream(file);
     }
 
     @Override
     public Graph readFile() {
-        // setup regex patterns
-        Pattern nodePattern = Pattern.compile("(\\w+)\\s+\\[Weight=(\\d+)\\];");
-        Pattern edgePattern = Pattern.compile("(\\w+) [-−]> (\\w+)\\s+\\[Weight=(\\d+)\\];");
+        GraphParser parser = new GraphParser(dotfile);
+        Map<String, GraphNode> readNodes = parser.getNodes(); // Nodes in GraphParser format
+        Map<String, GraphEdge> readEdges = parser.getEdges(); // Edges in GraphParser format
+        String graphName = parser.getGraphId();
 
-        // Temp storage of output nodes
-        Map<String, Node> foundNodes = new HashMap<>();
+        Map<String, Node> convertedNodes = new HashMap<>();
 
-        BufferedReader br = new BufferedReader(dotfile);
-        String line;
-        String graphName = "";
-        int lineNo = 1;
         try {
-            line = br.readLine();
-            if (!line.matches("digraph .+ \\{")) {
-                throw new InvalidFileFormatException("digraph definition not found");
+            for (GraphNode node : readNodes.values()) {
+                Integer weight = Integer.parseInt(node.getAttribute("Weight").toString());
+                convertedNodes.put(node.getId(), new Node(node.getId(), weight));
             }
 
-            graphName = line.split(" ")[1];
-
-            while ((line = br.readLine()) != null) {
-                lineNo++;
-                if (line.contains("}")) {
-                    break;
-                }
-                Matcher nodeMatcher = nodePattern.matcher(line);
-                Matcher edgeMatcher = edgePattern.matcher(line);
-                if (edgeMatcher.find()) {
-                    // Found an edge
-                    try {
-                        String sourceNodeName = edgeMatcher.group(1);
-                        String destnNodeName = edgeMatcher.group(2);
-                        Integer edgeWeight = Integer.parseInt(edgeMatcher.group(3));
-
-                        Node sourceNode = foundNodes.get(sourceNodeName);
-                        Node destnNode = foundNodes.get(destnNodeName);
-
-                        sourceNode.addChild(destnNode, edgeWeight);
-                        destnNode.addParent(sourceNode, edgeWeight);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new InvalidFileFormatException(lineNo, line);
-                    }
-                } else if (nodeMatcher.find()) {
-                    // Found a node
-                    try {
-                        String nodeName = nodeMatcher.group(1);
-                        Integer nodeWeight = Integer.parseInt(nodeMatcher.group(2));
-                        if (foundNodes.containsKey(nodeName))
-                            throw new InvalidFileFormatException("Duplicate node: " + nodeName);
-                        Node node = new Node(nodeName, nodeWeight);
-                        foundNodes.put(nodeName, node);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new InvalidFileFormatException(lineNo, line);
-                    }
-                }
+            for (GraphEdge edge : readEdges.values()) {
+                Integer weight = Integer.parseInt(edge.getAttribute("Weight").toString());
+                Node source = convertedNodes.get(edge.getNode1().getId());
+                Node dest = convertedNodes.get(edge.getNode2().getId());
+                source.addChild(dest, weight);
+                dest.addParent(source, weight);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+        } catch (NumberFormatException e) {
+            throw new InvalidFileFormatException("Weight for edge/node missing or of invalid format");
         }
 
         // create the graph
         Set<Node> startNodes = new HashSet<>();
 
         // find parentless nodes
-        for (Node node : foundNodes.values()) {
+        for (Node node : convertedNodes.values()) {
             if (node.getParents().isEmpty()) {
                 startNodes.add(node);
             }
@@ -97,7 +62,6 @@ public class DotReader implements GraphFileReader {
             throw new InvalidFileFormatException("Cycle found in acyclic graph (or empty)");
         }
 
-        Graph graph = new Graph(startNodes, foundNodes.values(), graphName);
-        return graph;
+        return new Graph(startNodes, convertedNodes.values(), graphName);
     }
 }
