@@ -4,10 +4,7 @@ import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,8 +19,9 @@ public class DotReader implements GraphFileReader {
     @Override
     public Graph readFile() {
         // setup regex patterns
-        Pattern nodePattern = Pattern.compile("(\\w+)\\s+\\[Weight=(\\d+)\\];");
-        Pattern edgePattern = Pattern.compile("(\\w+) [-−]> (\\w+)\\s+\\[Weight=(\\d+)\\];");
+        Pattern nodePattern = Pattern.compile("(\\w+)\\s+\\[[\\S\\s]*Weight=(\\d+)[\\S\\s]*\\][\\S\\s]*");
+        Pattern edgePattern = Pattern.compile("(\\w+) [-−]> (\\w+)\\s+\\[[\\S\\s]*Weight=(\\d+)[\\S\\s]*\\][\\S\\s]*");
+        Pattern graphDefinitionPattern = Pattern.compile("digraph\\s+(.+)\\s+\\{");
 
         // Temp storage of output nodes
         Map<String, Node> foundNodes = new HashMap<>();
@@ -34,19 +32,45 @@ public class DotReader implements GraphFileReader {
         int lineNo = 1;
         try {
             line = br.readLine();
-            if (!line.matches("digraph .+ \\{")) {
+            Matcher definitionMatcher = graphDefinitionPattern.matcher(line);
+            if (!definitionMatcher.find()) {
                 throw new InvalidFileFormatException("digraph definition not found");
             }
 
-            graphName = line.split(" ")[1];
+            graphName = definitionMatcher.group(1);
+
+            StringBuilder builder = new StringBuilder();
+
+            ArrayList<String> semicolonSeperated = new ArrayList<>();
 
             while ((line = br.readLine()) != null) {
                 lineNo++;
                 if (line.contains("}")) {
                     break;
                 }
-                Matcher nodeMatcher = nodePattern.matcher(line);
-                Matcher edgeMatcher = edgePattern.matcher(line);
+
+                // Build up array of strings from the file (split by semicolon)
+                if (line.contains(";")) {
+                    String[] split = line.split(";");
+                    builder.append(split[0]);
+                    semicolonSeperated.add(builder.toString());
+                    // go through anything in the middle
+                    for (int i = 1; i < split.length - 1; i++) {
+                        semicolonSeperated.add(split[i]);
+                    }
+                    // tail
+                    builder = new StringBuilder();
+                    builder.append(line.split(";")[split.length - 1]);
+                } else {
+                    builder.append(line);
+                }
+            }
+
+            // Go through semicolonSeperated
+
+            for (String subString : semicolonSeperated) {
+                Matcher nodeMatcher = nodePattern.matcher(subString);
+                Matcher edgeMatcher = edgePattern.matcher(subString);
                 if (edgeMatcher.find()) {
                     // Found an edge
                     try {
