@@ -31,7 +31,7 @@ public class SchedulerRunner {
             schedule = scheduler.getBestSchedule();
             // trigger the thread listener
             if(tListener != null){
-                tListener.onScheduleFinish("hello");
+                tListener.onScheduleFinish();
             }
         };
         // run scheduleTask on a new thread
@@ -62,6 +62,6 @@ public class SchedulerRunner {
     }
 
     public interface ThreadListener{
-        public void onScheduleFinish(String t);
+        public void onScheduleFinish();
     }
 }
