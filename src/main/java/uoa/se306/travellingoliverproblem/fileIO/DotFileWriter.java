@@ -11,6 +11,7 @@ public class DotFileWriter extends DotStandardOutput implements ScheduleOutputte
     private String fileName;
 
 
+
     public DotFileWriter(Graph graph, Schedule schedule, String fileName) {
         super(graph, schedule);
         this.fileName = fileName;

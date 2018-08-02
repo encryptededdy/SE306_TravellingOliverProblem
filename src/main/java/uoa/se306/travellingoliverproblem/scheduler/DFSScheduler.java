@@ -5,11 +5,16 @@ import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
+import uoa.se306.travellingoliverproblem.scheduler.heuristics.GreedyBFS;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class DFSScheduler extends Scheduler {
+
+    private boolean useEquivalentScheduleCulling = true;
+    private boolean useCurrentBestCulling = true;
+    private boolean useGreedyInitialSchedule = true;
 
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors);
@@ -17,6 +22,15 @@ public class DFSScheduler extends Scheduler {
 
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
+        if (useGreedyInitialSchedule) {
+            GreedyBFS greedyScheduler = new GreedyBFS();
+            greedyScheduler.calculateGreedySchedule(new Schedule(currentSchedule));
+            bestSchedule = greedyScheduler.getBestSchedule();
+        }
+        calculateScheduleRecursive(currentSchedule);
+    }
+
+    private void calculateScheduleRecursive(Schedule currentSchedule) {
         // If the currentSchedule has no available nodes
         if (currentSchedule.getAvailableNodes().isEmpty()) {
             // If our bestSchedule is null or the overall time for the bestSchedule is less than our current schedule
@@ -29,27 +43,27 @@ public class DFSScheduler extends Scheduler {
         // Fix iterator issues
         Set<Node> tempSet = new HashSet<>(currentSchedule.getAvailableNodes());
         for (Node node: tempSet) {
+            Set<Schedule> tempSchedules = new HashSet<>();
             // Get the amount of processors in the current schedule
             ScheduledProcessor[] processors = currentSchedule.getProcessors();
-            // for all the processors in the current schedule
+
             for (int j = 0; j < processors.length; j++) {
-                // get that processor
+
                 int processorStartTime;
                 ScheduledProcessor processor = processors[j];
                 int startTime = 0;
-                // for all the parent nodes of the current available node
 
                 for (Node parentNode: node.getParents().keySet()) {
-                    // for all the processors of this current schedule
+
                     for (ScheduledProcessor checkProcessor: currentSchedule.getProcessors()) {
-                        // if any of the processors have processed the parent node
+
                         if (checkProcessor.contains(parentNode)) {
-                            //get the parent node
+
                             ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
-                            // get the end time of the parent node
+
                             processorStartTime = sEntry.getEndTime();
                             // if the current processor doesn't have the parent node
-                            processorStartTime += processor != checkProcessor ? parentNode.getChildren().get(node) : 0;
+                            processorStartTime += (processor != checkProcessor) ? parentNode.getChildren().get(node) : 0;
                             // if processor does not have a task yet, add the this node as the first task.
                             if (processorStartTime > startTime) {
                                 startTime = processorStartTime;
@@ -61,7 +75,20 @@ public class DFSScheduler extends Scheduler {
                 startTime = processor.getEarliestStartAfter(startTime, node.getCost());
                 Schedule tempSchedule = new Schedule(currentSchedule);
                 tempSchedule.addToSchedule(node, j, startTime);
-                calculateSchedule(tempSchedule);//recursive
+                // Only continue if sub-schedule time is under upper bound
+                // i.e. skip this branch if its overall time is already longer than the currently known best overall time
+                if (!useCurrentBestCulling || bestSchedule == null || tempSchedule.getOverallTime() <= bestSchedule.getOverallTime()) {
+                    if (useEquivalentScheduleCulling) {
+                        tempSchedules.add(tempSchedule);
+                    } else {
+                        calculateScheduleRecursive(tempSchedule);//recursive
+                    }
+                }
+            }
+            if (useEquivalentScheduleCulling) {
+                for (Schedule s : tempSchedules) {
+                    calculateScheduleRecursive(s);
+                }
             }
         }
     }

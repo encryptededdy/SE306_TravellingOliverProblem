@@ -31,7 +31,7 @@ public class DotReader implements GraphFileReader {
         BufferedReader br = new BufferedReader(dotfile);
         String line;
         String graphName = "";
-        int lineno = 1;
+        int lineNo = 1;
         try {
             line = br.readLine();
             if (!line.matches("digraph .+ \\{")) {
@@ -41,7 +41,7 @@ public class DotReader implements GraphFileReader {
             graphName = line.split(" ")[1];
 
             while ((line = br.readLine()) != null) {
-                lineno++;
+                lineNo++;
                 if (line.contains("}")) {
                     break;
                 }
@@ -61,18 +61,20 @@ public class DotReader implements GraphFileReader {
                         destnNode.addParent(sourceNode, edgeWeight);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        throw new InvalidFileFormatException(lineno, line);
+                        throw new InvalidFileFormatException(lineNo, line);
                     }
                 } else if (nodeMatcher.find()) {
                     // Found a node
                     try {
                         String nodeName = nodeMatcher.group(1);
                         Integer nodeWeight = Integer.parseInt(nodeMatcher.group(2));
+                        if (foundNodes.containsKey(nodeName))
+                            throw new InvalidFileFormatException("Duplicate node: " + nodeName);
                         Node node = new Node(nodeName, nodeWeight);
                         foundNodes.put(nodeName, node);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        throw new InvalidFileFormatException(lineno, line);
+                        throw new InvalidFileFormatException(lineNo, line);
                     }
                 }
             }
