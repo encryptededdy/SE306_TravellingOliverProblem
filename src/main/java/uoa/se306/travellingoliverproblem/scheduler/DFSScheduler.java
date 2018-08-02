@@ -15,7 +15,7 @@ public class DFSScheduler extends Scheduler {
 
     // useEquivalentScheduleCulling always enabled.
     private boolean useCurrentBestCulling = true;
-    private boolean useGreedyInitialSchedule = true;
+    private boolean useGreedyInitialSchedule = false;
     private boolean useLocalPriorityQueue = true;
 
     private Set<String> existingSchedules = new HashSet<>();
@@ -63,10 +63,8 @@ public class DFSScheduler extends Scheduler {
 
                     for (ScheduledProcessor checkProcessor: currentSchedule.getProcessors()) {
 
-                        if (checkProcessor.contains(parentNode)) {
-
-                            ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
-
+                        ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
+                        if (sEntry != null) {
                             processorStartTime = sEntry.getEndTime();
                             // if the current processor doesn't have the parent node
                             processorStartTime += (processor != checkProcessor) ? parentNode.getChildren().get(node) : 0;
