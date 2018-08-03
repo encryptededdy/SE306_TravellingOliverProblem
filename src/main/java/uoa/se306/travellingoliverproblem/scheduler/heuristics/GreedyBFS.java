@@ -52,11 +52,10 @@ public class GreedyBFS {
                 for (Node parentNode : node.getParents().keySet()) {
                     // for all the processors of this current schedule
                     // if any of the processors contains the parentNode
-                    // get the parentNode as a ScheduleEntry from that processor
                     // get the endTime of when this parentNode finishes inside that processor
                     for (ScheduledProcessor checkProcessor : partialSchedule.getProcessors()) {
-                        if (checkProcessor.contains(parentNode)) {
-                            ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
+                        ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
+                        if (sEntry != null) {
                             processorStartTime = sEntry.getEndTime();
                             // add the communication cost between childNode and parentNode if not on same processor
                             processorStartTime += processor != checkProcessor ? parentNode.getChildren().get(node) : 0;
