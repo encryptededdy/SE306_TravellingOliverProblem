@@ -53,6 +53,11 @@ public class Schedule {
     }
 
     @Override
+    public String toString() {
+        return Arrays.stream(processors).map(ScheduledProcessor::toString).sorted().collect(Collectors.joining());
+    }
+
+    @Override
     public int hashCode() {
         String stringRep = Arrays.stream(processors).map(ScheduledProcessor::toString).sorted().collect(Collectors.joining());
         return stringRep.hashCode();
@@ -99,6 +104,10 @@ public class Schedule {
 
     public int getOverallTime() {
         return overallTime;
+    }
+
+    public void setMaxOverallTime(){
+        overallTime = Integer.MAX_VALUE;
     }
 
     public boolean checkValidity() {
