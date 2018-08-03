@@ -51,7 +51,8 @@ public class FXController {
         task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent event) {
-                timeline.stop();
+                timeline.setCycleCount(1);
+                timeline.playFromStart();
                 SchedulerRunner.getInstance().printResult();
                 drawSchedule(SchedulerRunner.getInstance().getSchedule());
                 DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), outputName);
@@ -82,12 +83,12 @@ public class FXController {
                 .build();
 
         tilesBox.getChildren().addAll(memoryTile, generatedBranches, boundedBranches);
-        timeline = new Timeline(new KeyFrame(Duration.millis(1500), event -> {
+        timeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
             // Update statistics
             double memoryUse = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1000000d;
             memoryTile.setValue(memoryUse);
             generatedBranches.addChartData(new ChartData(SchedulerRunner.getInstance().getScheduler().getBranchesConsidered() + SchedulerRunner.getInstance().getScheduler().getBranchesKilled()));
-            boundedBranches.setValue(SchedulerRunner.getInstance().getScheduler().proportionKilled()*100);
+            boundedBranches.setValue(SchedulerRunner.getInstance().getScheduler().proportionKilled() * 100);
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
