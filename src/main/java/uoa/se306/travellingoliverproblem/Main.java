@@ -18,6 +18,9 @@ import java.io.IOException;
 public class Main extends Application {
 
     private static FXController controller;
+    private static Graph inputGraph;
+    private static int processors = 1;
+    private static String outputFileName;
 
     // JavaFX start method (depends if visualisation enabled)
     @Override
@@ -25,13 +28,12 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/layout.fxml"));
         Parent root = loader.load();
         controller = loader.getController();
+        controller.startProcessing(inputGraph, processors, outputFileName);
         primaryStage.setTitle("Visualisation");
         primaryStage.setResizable(false);
         primaryStage.setScene(new Scene(root, 1200, 800));
         primaryStage.sizeToScene(); // JavaFX Bug RT-30647 workaround
         primaryStage.show();
-        controller.drawGraph(SchedulerRunner.getInstance().getInputGraph());
-        controller.drawSchedule(SchedulerRunner.getInstance().getSchedule());
     }
 
     public static void main(String[] args) {
@@ -58,7 +60,6 @@ public class Main extends Application {
             }
         } else {
             String fileName = args[0];
-            int processors = 1;
             try {
                 processors = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
@@ -74,12 +75,12 @@ public class Main extends Application {
                 System.err.println("Couldn't open file.\nType -h or --help for help.");
                 System.exit(1);
             }
-            Graph inputGraph = reader.readFile();
+            inputGraph = reader.readFile();
 
             File file = new File(fileName);
             //gets the file name of the provided file path, gets rid of the file type and appends output.dot to it.
             //this will be the default output file name
-            String outputFileName = file.getName().substring(0, file.getName().lastIndexOf('.')) + "-output.dot";
+            outputFileName = file.getName().substring(0, file.getName().lastIndexOf('.')) + "-output.dot";
 
             //check if there are any valid optional arguments
             if (args.length > 2) {
@@ -117,21 +118,18 @@ public class Main extends Application {
             System.out.println("The output file name will be: " + outputFileName);
             System.out.println();
 
-            SchedulerRunner.getInstance().startScheduler(inputGraph, processors);
-            final String tempOutputFileName = outputFileName;
-            // run the following after the scheduler has finished.
-            SchedulerRunner.getInstance().setThreadListener(()-> {
-                SchedulerRunner.getInstance().printResult();
-                DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), tempOutputFileName);
-                fileWriter.outputSchedule();
-            });
-
-
             if (useVisuals) {
                 launch();
+            } else {
+                SchedulerRunner.getInstance().startScheduler(inputGraph, processors);
+                final String tempOutputFileName = outputFileName;
+                // run the following after the scheduler has finished.
+                SchedulerRunner.getInstance().setThreadListener(() -> {
+                    SchedulerRunner.getInstance().printResult();
+                    DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), tempOutputFileName);
+                    fileWriter.outputSchedule();
+                });
             }
-
-
 
         }
     }
