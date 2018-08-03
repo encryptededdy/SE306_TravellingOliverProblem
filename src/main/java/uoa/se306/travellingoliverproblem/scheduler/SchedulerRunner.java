@@ -14,7 +14,7 @@ public class SchedulerRunner {
     private Schedule schedule;
     private Scheduler scheduler;
     private ThreadListener tListener = null;
-
+    
     public static SchedulerRunner getInstance() {
         return ourInstance;
     }
@@ -27,7 +27,6 @@ public class SchedulerRunner {
         this.noProcessors = noProcessors;
 
         scheduler = new DFSScheduler(inputGraph, noProcessors);
-
         // create task to run on a separate thread
         Runnable scheduleTask = () -> {
             long startTime = System.nanoTime();
