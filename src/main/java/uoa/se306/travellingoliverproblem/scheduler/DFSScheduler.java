@@ -8,13 +8,15 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import uoa.se306.travellingoliverproblem.scheduler.heuristics.GreedyBFS;
 
 import java.util.HashSet;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 public class DFSScheduler extends Scheduler {
 
-    private boolean useEquivalentScheduleCulling = true;
+    // useEquivalentScheduleCulling always enabled.
     private boolean useCurrentBestCulling = true;
-    private boolean useGreedyInitialSchedule = true;
+    private boolean useGreedyInitialSchedule = false;
+    private boolean useLocalPriorityQueue = true;
 
     private Set<String> existingSchedules = new HashSet<>();
 
@@ -44,6 +46,7 @@ public class DFSScheduler extends Scheduler {
             return;
         }
 
+        PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
         // Fix iterator issues
         Set<Node> tempSet = new HashSet<>(currentSchedule.getAvailableNodes());
         for (Node node: tempSet) {
@@ -60,10 +63,8 @@ public class DFSScheduler extends Scheduler {
 
                     for (ScheduledProcessor checkProcessor: currentSchedule.getProcessors()) {
 
-                        if (checkProcessor.contains(parentNode)) {
-
-                            ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
-
+                        ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
+                        if (sEntry != null) {
                             processorStartTime = sEntry.getEndTime();
                             // if the current processor doesn't have the parent node
                             processorStartTime += (processor != checkProcessor) ? parentNode.getChildren().get(node) : 0;
@@ -80,19 +81,26 @@ public class DFSScheduler extends Scheduler {
                 tempSchedule.addToSchedule(node, j, startTime);
                 // Only continue if sub-schedule time is under upper bound
                 // i.e. skip this branch if its overall time is already longer than the currently known best overall time
-                if (!useCurrentBestCulling || bestSchedule == null || tempSchedule.getOverallTime() <= bestSchedule.getOverallTime()) {
-                    if (useEquivalentScheduleCulling) {
-                        // Only continue if this schedule hasn't been considered before
-                        if (!existingSchedules.contains(tempSchedule.toString())) {
-                            calculateScheduleRecursive(tempSchedule);
-                        } else {
-                            branchesKilled++; // drop this branch
-                        }
-                    } else {
-                        calculateScheduleRecursive(tempSchedule);//recursive
-                    }
+                if (!useCurrentBestCulling || bestSchedule == null || tempSchedule.getOverallTime() < bestSchedule.getOverallTime()) {
+                    candidateSchedules.add(tempSchedule);
                 } else {
                     branchesKilled++; // drop this branch
+                }
+            }
+        }
+        if (useLocalPriorityQueue) {
+            while (!candidateSchedules.isEmpty()) {
+                Schedule candidate = candidateSchedules.poll();
+                if (bestSchedule == null || candidate.getOverallTime() < bestSchedule.getOverallTime()) {
+                    // Only continue if this schedule hasn't been considered before
+                    if (!existingSchedules.contains(candidate.toString())) {
+                        calculateScheduleRecursive(candidate);
+                    } else {
+                        branchesKilled++; // drop this branch
+                    }
+                } else {
+                    branchesKilled+=candidateSchedules.size()+1;
+                    break; // It's a priority queue, so we can just drop the rest
                 }
             }
         }
