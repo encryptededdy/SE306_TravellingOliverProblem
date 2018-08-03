@@ -41,10 +41,10 @@ public class DotReader implements GraphFileReader {
                 Integer weight = Integer.parseInt(edge.getAttribute("Weight").toString());
                 Node source = convertedNodes.get(edge.getNode1().getId());
                 Node dest = convertedNodes.get(edge.getNode2().getId());
-                Integer distance = source.getLevel() + 1;
-                if (distance > dest.getLevel()) {
-                    dest.setLevel(distance);
-                    calculateChildLevel(dest, distance);
+                Integer level = source.getLevel() + 1;
+                if (level > dest.getLevel()) {
+                    dest.setLevel(level);
+                    calculateChildLevel(dest, level);
                 }
                 source.addChild(dest, weight);
                 dest.addParent(source, weight);
