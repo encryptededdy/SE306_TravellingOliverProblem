@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /*
 This class describes a section of a schedule for a given input graph
  */
-public class Schedule {
+public class Schedule implements Comparable<Schedule>{
     private Set<Node> unAddedNodes = new HashSet<>();
     private Set<Node> availableNodes = new HashSet<>();
     private int overallTime = 0;
@@ -50,6 +50,11 @@ public class Schedule {
     // Return a set containing the set of the string
     private Set<String> processorStringSet() {
         return Arrays.stream(processors).map(ScheduledProcessor::toString).collect(Collectors.toSet());
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.stream(processors).map(ScheduledProcessor::toString).sorted().collect(Collectors.joining());
     }
 
     @Override
@@ -108,5 +113,10 @@ public class Schedule {
     public boolean checkValidity() {
         // TODO: Implement Schedule validity check (i.e. no overlaps etc.)
         return true;
+    }
+
+    @Override
+    public int compareTo(Schedule o) {
+        return Integer.compare(overallTime, o.overallTime);
     }
 }
