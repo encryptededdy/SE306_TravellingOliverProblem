@@ -33,6 +33,10 @@ public class GraphDrawer {
         parentPane.getChildren().add(new StackPane(backgroundPane, vbox));
     }
 
+    public Map<Node, GraphNode> getGraphNodes() {
+        return visited;
+    }
+
     public void drawGraph() {
         HashSet<Node> currentLevel = new HashSet<>(graph.getStartingNodes()); // start with... starting nodes
         drawLevel(currentLevel);

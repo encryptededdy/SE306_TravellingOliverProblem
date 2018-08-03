@@ -1,22 +1,28 @@
 package uoa.se306.travellingoliverproblem.visualiser.schedule;
 
-import javafx.geometry.Insets;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
+import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
+import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
+
+import java.lang.reflect.Field;
 
 public class ScheduleNode extends Pane {
     private String name;
 
     // normal schedule
-    public ScheduleNode(String name, Integer cost, double width) {
+    public ScheduleNode(double width, ScheduleEntry schedule, GraphNode graphNode) {
         super();
 
-        this.name = name;
+        this.name = schedule.getNode().toString();
 
         Rectangle rect = new Rectangle();
         rect.setHeight(ScheduleDrawer.ROW_HEIGHT);
@@ -35,6 +41,20 @@ public class ScheduleNode extends Pane {
         StackPane stack = new StackPane();
         stack.getChildren().addAll(rect, nameLabel);
         // stack.setPadding(new Insets(20));
+
+        this.setOnMouseEntered(event -> {
+            graphNode.highlight();
+            rect.setFill(Color.ORANGERED);
+        });
+
+        this.setOnMouseExited(event -> {
+            graphNode.unHighlight();
+            rect.setFill(Color.SKYBLUE);
+        });
+
+        Tooltip t = new Tooltip(String.format("Start time: %s, End time: %s, Cost: %s", schedule.getStartTime(), schedule.getEndTime(), schedule.getLength()));
+        hackTooltipStartTiming(t);
+        Tooltip.install(this, t);
 
         // set view
         getChildren().add(stack);
@@ -78,6 +98,25 @@ public class ScheduleNode extends Pane {
 
         // set view
         getChildren().add(stack);
+    }
+
+    // Reduce the tooltip delay
+    // Source: https://stackoverflow.com/questions/26854301/how-to-control-the-javafx-tooltips-delay
+    public void hackTooltipStartTiming(Tooltip tooltip) {
+        try {
+            Field fieldBehavior = tooltip.getClass().getDeclaredField("BEHAVIOR");
+            fieldBehavior.setAccessible(true);
+            Object objBehavior = fieldBehavior.get(tooltip);
+
+            Field fieldTimer = objBehavior.getClass().getDeclaredField("activationTimer");
+            fieldTimer.setAccessible(true);
+            Timeline objTimer = (Timeline) fieldTimer.get(objBehavior);
+
+            objTimer.getKeyFrames().clear();
+            objTimer.getKeyFrames().add(new KeyFrame(new Duration(50)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
