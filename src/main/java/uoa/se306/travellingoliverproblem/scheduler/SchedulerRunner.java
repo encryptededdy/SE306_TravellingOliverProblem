@@ -27,7 +27,6 @@ public class SchedulerRunner {
     public void startScheduler(Graph inputGraph, int noProcessors) {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
-      
         scheduler = new DFSScheduler(inputGraph, noProcessors);
 
         // create task to run on a separate thread
@@ -44,7 +43,6 @@ public class SchedulerRunner {
         // run scheduleTask on a new thread
         Thread scheduleThread = new Thread(scheduleTask);
         scheduleThread.start();
-
     }
 
     public void printResult() {
