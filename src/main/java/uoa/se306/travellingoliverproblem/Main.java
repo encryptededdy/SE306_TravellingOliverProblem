@@ -74,10 +74,7 @@ public class Main extends Application {
                 System.err.println("Couldn't open file.\nType -h or --help for help.");
                 System.exit(1);
             }
-            final long startTime = System.nanoTime();
             Graph inputGraph = reader.readFile();
-            final long endTime = System.nanoTime();
-            System.out.println("Total execution time: " + (endTime - startTime)/1000000);
 
             File file = new File(fileName);
             //gets the file name of the provided file path, gets rid of the file type and appends output.dot to it.
