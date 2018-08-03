@@ -55,7 +55,7 @@ public class ScheduleDrawer {
         for (ScheduledProcessor p : schedule.getProcessors()) {
             HBox row = new HBox();
             row.setMinHeight(30);
-            row.setPadding(new Insets(10, 0, 0, 0));
+            row.setPadding(new Insets(15, 0, 0, 0));
             processorRows.add(processorNo, row);
 
             // draw header
@@ -97,7 +97,7 @@ public class ScheduleDrawer {
         // draw scale
         HBox row = new HBox();
         row.setPrefHeight(30);
-        row.setPadding(new Insets(50, 0, 0, 0));
+        row.setPadding(new Insets(5, 0, 0, 0));
 
         double width = ((1 / (double) totalTime) * dividableWidth); // width for each "1" time unit
 

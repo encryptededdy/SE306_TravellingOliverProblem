@@ -20,6 +20,10 @@ public class SchedulerRunner {
         return ourInstance;
     }
 
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
     private SchedulerRunner() {
     }
 
