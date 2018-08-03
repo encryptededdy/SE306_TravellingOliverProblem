@@ -93,11 +93,14 @@ public class DotReader implements GraphFileReader {
 
         // create the graph
         Set<Node> startNodes = new HashSet<>();
-
+        int levels = 0;
         // find parentless nodes
         for (Node node : foundNodes.values()) {
             if (node.getParents().isEmpty()) {
                 startNodes.add(node);
+            }
+            if (node.getChildren().isEmpty() && node.getLevel() > levels) {
+                levels = node.getLevel();
             }
         }
 
@@ -105,7 +108,7 @@ public class DotReader implements GraphFileReader {
             throw new InvalidFileFormatException("Cycle found in acyclic graph (or empty)");
         }
 
-        Graph graph = new Graph(startNodes, foundNodes.values(), graphName);
+        Graph graph = new Graph(startNodes, foundNodes.values(), levels, graphName);
         Integer depth = 0;
         for (Node node: graph.getAllNodes()) {
             if (node.getLevel() > depth) {
