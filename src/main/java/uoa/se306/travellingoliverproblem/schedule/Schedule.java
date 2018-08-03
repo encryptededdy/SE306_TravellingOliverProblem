@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /*
 This class describes a section of a schedule for a given input graph
  */
-public class Schedule {
+public class Schedule implements Comparable<Schedule>{
     private Set<Node> unAddedNodes = new HashSet<>();
     private Set<Node> availableNodes = new HashSet<>();
     private int overallTime = 0;
@@ -113,5 +113,10 @@ public class Schedule {
     public boolean checkValidity() {
         // TODO: Implement Schedule validity check (i.e. no overlaps etc.)
         return true;
+    }
+
+    @Override
+    public int compareTo(Schedule o) {
+        return Integer.compare(overallTime, o.overallTime);
     }
 }

@@ -4,6 +4,7 @@ import uoa.se306.travellingoliverproblem.graph.Node;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.TreeSet;
 
 /*
@@ -13,7 +14,7 @@ public class ScheduledProcessor {
     // Maps nodes to scheduled entries
     private Map<Node, ScheduleEntry> nodeMap = new HashMap<>();
     // For quick look up of scheduled entries
-    private TreeSet<ScheduleEntry> entrySet = new TreeSet<>();
+    private PriorityQueue<ScheduleEntry> entrySet = new PriorityQueue<>((x, y) -> -(x.compareTo(y)));
 
     ScheduledProcessor() {
         super();
@@ -22,7 +23,7 @@ public class ScheduledProcessor {
     // Copy constructor
     ScheduledProcessor(ScheduledProcessor toCopy) {
         this.nodeMap = new HashMap<>(toCopy.nodeMap);
-        this.entrySet = new TreeSet<>(toCopy.entrySet);
+        this.entrySet = new PriorityQueue<>(toCopy.entrySet);
     }
 
     // Add a node to the processor at a given start time
@@ -34,13 +35,13 @@ public class ScheduledProcessor {
 
     // Used for rendering schedules
     // TODO: Remove this and use listeners instead
-    public TreeSet<ScheduleEntry> getFullSchedule() {
+    public PriorityQueue<ScheduleEntry> getFullSchedule() {
         return entrySet;
     }
 
     // Get the latest end time
     public int endTime() {
-        return entrySet.last().getEndTime();
+        return entrySet.peek().getEndTime();
     }
 
     // Get the map of all the nodes in this processor
@@ -50,7 +51,7 @@ public class ScheduledProcessor {
 
     // Get the last scheduled entry
     public ScheduleEntry lastEntry() {
-        return entrySet.last();
+        return entrySet.peek();
     }
 
     // Check if the processor contains a scheduled node
@@ -82,7 +83,9 @@ public class ScheduledProcessor {
     // Return the earliest time after the specified start time that can fit the
     // nodes processing time on without collision
     public int getEarliestStartAfter(int startTime, int processTime) {
-        // If the processor doesn't have any entries/nodes, or if the first entry/node didn't start on 0
+        // TODO: Convert this to use Priority Queue
+        return 0;
+        /* If the processor doesn't have any entries/nodes, or if the first entry/node didn't start on 0
         // and it has a gap (before the node) large enough for the processTime, we can just return the startTime
         if (entrySet.isEmpty() || entrySet.first().getStartTime() - startTime >= processTime) {
             return startTime;
@@ -103,5 +106,6 @@ public class ScheduledProcessor {
             scheduleBefore = scheduleAfter; // Increment to the next node to test for a gap
         }
         return lastEntry().getEndTime() > startTime ? lastEntry().getEndTime() : startTime; // This gets returned when there is no gap large enough in the processor to fit the inputNode
+        */
     }
 }

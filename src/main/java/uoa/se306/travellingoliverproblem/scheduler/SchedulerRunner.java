@@ -5,6 +5,7 @@ import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
+import java.util.PriorityQueue;
 import java.util.TreeSet;
 
 public class SchedulerRunner {
@@ -14,6 +15,7 @@ public class SchedulerRunner {
     private Schedule schedule;
     private Scheduler scheduler;
     private ThreadListener tListener = null;
+
 
     public static SchedulerRunner getInstance() {
         return ourInstance;
@@ -25,7 +27,6 @@ public class SchedulerRunner {
     public void startScheduler(Graph inputGraph, int noProcessors) {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
-
         scheduler = new DFSScheduler(inputGraph, noProcessors);
 
         // create task to run on a separate thread
@@ -47,7 +48,7 @@ public class SchedulerRunner {
     public void printResult() {
         ScheduledProcessor[] pro = schedule.getProcessors();
         for (int i = 0; i < pro.length; i++) {
-            TreeSet<ScheduleEntry> nodeMap = pro[i].getFullSchedule();
+            PriorityQueue<ScheduleEntry> nodeMap = pro[i].getFullSchedule();
             System.out.println("Processor " + Integer.toString(i) + " has tasks:" + nodeMap.toString());
         }
         System.out.println("The best overall time was: " + schedule.getOverallTime());
