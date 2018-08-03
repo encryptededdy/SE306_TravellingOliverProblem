@@ -30,7 +30,7 @@ public class Graph {
 
     public String getGraphName() { return graphName; }
 
-    public int getLevels() {
+    public Integer getLevels() {
         return levels;
     }
 }
