@@ -45,7 +45,7 @@ public class TestGraphLevels {
         Graph output = reader.readFile();
         Map<String, Integer> nodeLevels = new HashMap<>(); //Done on pencil and paper
 
-        // All nodes
+        // All nodes added, which are calculated by hand
         nodeLevels.put("0", 1);
         nodeLevels.put("1", 1);
         nodeLevels.put("2", 2);
@@ -67,6 +67,7 @@ public class TestGraphLevels {
             if (nodeLevels.containsKey(node.toString())) {
                 assertEquals(nodeLevels.get(node.toString()), node.getLevel());
             } else {
+                // If it's not contained obv something went wrong
                 fail();
             }
         }
