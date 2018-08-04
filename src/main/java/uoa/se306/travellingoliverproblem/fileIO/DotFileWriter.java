@@ -31,11 +31,14 @@ public class DotFileWriter extends DotStandardOutput implements ScheduleOutputte
             writer.close();
             System.out.println("");
             System.out.println("File Written!");
-            //System.exit(1);
+
+            // TODO: This System will always exit when the file has been written, which means it will close the HUI right after
+            // TODO: Please fix this bug ?
+            System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Couldn't create/write to file: " + this.fileName +"\nType -h or --help for help.");
-            //System.exit(1);
+            System.exit(1);
         }
     }
 }
