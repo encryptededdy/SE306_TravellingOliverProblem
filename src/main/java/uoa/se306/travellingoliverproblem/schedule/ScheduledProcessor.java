@@ -29,10 +29,21 @@ public class ScheduledProcessor {
         ScheduleEntry entry = new ScheduleEntry(startTime, node);
         nodeMap.put(node, entry);
 
-        //TODO: please change this later to not use Collections.sort()
-        entryArray.add(entry);
-        Collections.sort(entryArray);
-
+        int arraySize = entryArray.size();
+        if (entryArray.isEmpty()){
+            entryArray.add(0,entry);
+        }else{
+            if (entry.getStartTime() > entryArray.get(arraySize - 1).getStartTime()){
+                entryArray.add(arraySize , entry);
+            }else {
+                for (int i = 0; i < arraySize; i++) {
+                    if (entryArray.get(i).getStartTime() > entry.getStartTime() ) {
+                        entryArray.add(i, entry);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     // Used for rendering schedules
