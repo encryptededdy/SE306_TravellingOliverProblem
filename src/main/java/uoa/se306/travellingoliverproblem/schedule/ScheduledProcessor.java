@@ -29,16 +29,11 @@ public class ScheduledProcessor {
         ScheduleEntry entry = new ScheduleEntry(startTime, node);
         nodeMap.put(node, entry);
 
-        int arraySize = entryArray.size();
-        if (entryArray.isEmpty()){
+        if (entryArray.isEmpty() || entry.getStartTime() > entryArray.get(entryArray.size() - 1).getStartTime()) {
             entryArray.add(entry);
-        }else{
-            if (entry.getStartTime() > entryArray.get(arraySize - 1).getStartTime()){
-                entryArray.add(arraySize , entry);
-            }else {
-                entryArray.add(entry);
-                Collections.sort(entryArray);
-            }
+        } else {
+            entryArray.add(entry);
+            Collections.sort(entryArray);
         }
     }
 
@@ -54,7 +49,7 @@ public class ScheduledProcessor {
     }
 
     // Get the map of all the nodes in this processor
-    public Map<Node, ScheduleEntry> getNodeMap(){
+    public Map<Node, ScheduleEntry> getNodeMap() {
         return nodeMap;
     }
 
@@ -100,9 +95,9 @@ public class ScheduledProcessor {
 
         ScheduleEntry scheduleBefore = entryArray.get(0);
         ScheduleEntry scheduleAfter;
-        for (int i = 0 ; i < entryArray.size() ; i++) {
+        for (int i = 0; i < entryArray.size(); i++) {
             scheduleAfter = entryArray.get(i);
-            if (scheduleAfter.getStartTime() >= startTime +  processTime) {
+            if (scheduleAfter.getStartTime() >= startTime + processTime) {
                 if (scheduleBefore.getEndTime() < startTime) {
                     return startTime;
                 } else {
