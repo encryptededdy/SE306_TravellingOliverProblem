@@ -43,7 +43,6 @@ public class TestOptimalSolutions {
         Scheduler scheduler = new DFSScheduler(inputGraph, 2);
 
         checkValidAndOptimal(scheduler.getBestSchedule(), 2);
-
     }
 
     @Test
