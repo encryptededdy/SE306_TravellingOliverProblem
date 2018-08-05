@@ -43,6 +43,7 @@ public class Main extends Application {
 
         if (args.length == 0) {
             System.err.println("Please provide input task graph and number of processors.\nType -h or --help for help.");
+            System.exit(1);
         } else if (args.length == 1) {
             String temp = args[0];
             if (temp.equals("-h") || temp.equals("--help")) {
