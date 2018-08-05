@@ -47,7 +47,7 @@ public class Main extends Application {
         } else if (args.length == 1) {
             String temp = args[0];
             if (temp.equals("-h") || temp.equals("--help")) {
-                System.out.println("java −jar scheduler.jar [INPUT.dot] [P] [OPTION]");
+                System.out.println("java -jar scheduler.jar [INPUT.dot] [P] [OPTION]");
                 System.out.println("INPUT.dot                   A path to the file with a task graph containing integer weights in dot format.");
                 System.out.println("P                           Number of processors to schedule the INPUT graph on.");
                 System.out.println();
