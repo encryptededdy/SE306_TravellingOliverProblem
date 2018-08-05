@@ -57,6 +57,7 @@ public class DotStandardOutput implements ScheduleOutputter {
 
     private void addScheduleEntryToOutput(ScheduleEntry entry, int processor) {
         Node node = entry.getNode();
+        processor++;
 
         this.dotOutputStringBuilder.append("\n\t");
         this.dotOutputStringBuilder.append(node);
