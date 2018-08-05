@@ -36,7 +36,6 @@ public class DotReader implements GraphFileReader {
                 Integer weight = Integer.parseInt(node.getAttribute("Weight").toString());
                 convertedNodes.put(node.getId(), new Node(node.getId(), weight));
             }
-
             for (GraphEdge edge : readEdges.values()) {
                 Integer weight = Integer.parseInt(edge.getAttribute("Weight").toString());
                 Node source = convertedNodes.get(edge.getNode1().getId());

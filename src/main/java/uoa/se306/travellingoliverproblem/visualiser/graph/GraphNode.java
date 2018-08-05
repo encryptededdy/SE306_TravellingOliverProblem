@@ -13,12 +13,13 @@ public class GraphNode extends Pane {
 
     private String name;
 
+    private Circle circle = new Circle();
+
     public GraphNode(String name, Integer cost) {
         super();
 
         this.name = name;
 
-        Circle circle = new Circle();
         circle.setRadius(30);
         circle.setFill(Color.SKYBLUE);
 
@@ -37,6 +38,14 @@ public class GraphNode extends Pane {
         // set view
         getChildren().add(stack);
 
+    }
+
+    public void highlight() {
+        circle.setFill(Color.ORANGERED);
+    }
+
+    public void unHighlight() {
+        circle.setFill(Color.SKYBLUE);
     }
 
     public String getName() {

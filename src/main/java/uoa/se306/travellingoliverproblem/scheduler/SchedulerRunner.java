@@ -1,10 +1,12 @@
 package uoa.se306.travellingoliverproblem.scheduler;
 
+import javafx.concurrent.Task;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
+import java.util.ArrayList;
 import java.util.TreeSet;
 
 public class SchedulerRunner {
@@ -17,6 +19,10 @@ public class SchedulerRunner {
     
     public static SchedulerRunner getInstance() {
         return ourInstance;
+    }
+
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 
     private SchedulerRunner() {
@@ -43,10 +49,32 @@ public class SchedulerRunner {
         scheduleThread.start();
     }
 
+    public Task<Void> startSchedulerJavaFXTask(Graph inputGraph, int noProcessors) {
+        this.inputGraph = inputGraph;
+        this.noProcessors = noProcessors;
+
+        scheduler = new DFSScheduler(inputGraph, noProcessors);
+        // create task to run on a separate thread
+        return new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                long startTime = System.nanoTime();
+                schedule = scheduler.getBestSchedule();
+                long endTime = System.nanoTime();
+                System.out.println("Took " + (endTime - startTime) / 1000000 + " ms");
+                // trigger the thread listener
+                if (tListener != null) {
+                    tListener.onScheduleFinish();
+                }
+                return null;
+            }
+        };
+    }
+
     public void printResult() {
         ScheduledProcessor[] pro = schedule.getProcessors();
         for (int i = 0; i < pro.length; i++) {
-            TreeSet<ScheduleEntry> nodeMap = pro[i].getFullSchedule();
+            ArrayList<ScheduleEntry> nodeMap = pro[i].getFullSchedule();
             System.out.println("Processor " + Integer.toString(i) + " has tasks:" + nodeMap.toString());
         }
         System.out.println("The best overall time was: " + schedule.getOverallTime());
