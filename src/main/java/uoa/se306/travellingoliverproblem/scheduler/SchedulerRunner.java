@@ -1,5 +1,6 @@
 package uoa.se306.travellingoliverproblem.scheduler;
 
+import javafx.concurrent.Task;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
@@ -17,6 +18,10 @@ public class SchedulerRunner {
     
     public static SchedulerRunner getInstance() {
         return ourInstance;
+    }
+
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 
     private SchedulerRunner() {
@@ -41,6 +46,28 @@ public class SchedulerRunner {
         // run scheduleTask on a new thread
         Thread scheduleThread = new Thread(scheduleTask);
         scheduleThread.start();
+    }
+
+    public Task<Void> startSchedulerJavaFXTask(Graph inputGraph, int noProcessors) {
+        this.inputGraph = inputGraph;
+        this.noProcessors = noProcessors;
+
+        scheduler = new DFSScheduler(inputGraph, noProcessors);
+        // create task to run on a separate thread
+        return new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                long startTime = System.nanoTime();
+                schedule = scheduler.getBestSchedule();
+                long endTime = System.nanoTime();
+                System.out.println("Took " + (endTime - startTime) / 1000000 + " ms");
+                // trigger the thread listener
+                if (tListener != null) {
+                    tListener.onScheduleFinish();
+                }
+                return null;
+            }
+        };
     }
 
     public void printResult() {
