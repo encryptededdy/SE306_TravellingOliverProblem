@@ -78,8 +78,8 @@ public class ScheduledProcessor {
                 // Insert Gap
                 builder.append(entry.getStartTime() - lastScheduleEnd);
             }
-            // Insert entry name
-            builder.append(entry.toString());
+            // Insert entry identifier
+            builder.append(entry.getNode().getIdentifier());
         }
         return builder.toString();
     }

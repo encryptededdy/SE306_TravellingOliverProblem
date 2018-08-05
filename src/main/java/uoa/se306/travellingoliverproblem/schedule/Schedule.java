@@ -55,10 +55,6 @@ public class Schedule implements Comparable<Schedule>{
         return Arrays.stream(processors).map(ScheduledProcessor::toString).sorted().collect(Collectors.joining());
     }
 
-    public HashableByteArray toStringAsBytes() {
-        return new HashableByteArray(toString().getBytes(StandardCharsets.US_ASCII));
-    }
-
     @Override
     public int hashCode() {
         String stringRep = Arrays.stream(processors).map(ScheduledProcessor::toString).sorted().collect(Collectors.joining());
