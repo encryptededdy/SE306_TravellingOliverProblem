@@ -17,6 +17,13 @@ public class DotStandardOutput implements ScheduleOutputter {
 
     public DotStandardOutput(Graph graph, Schedule schedule) {
         String outputGraphName = graph.getGraphName().substring(0,1).toUpperCase() + graph.getGraphName().substring(1);
+
+        if(outputGraphName.charAt(0) == '\"'){
+            outputGraphName = outputGraphName.substring(1);
+        }
+        if(outputGraphName.charAt(outputGraphName.length() - 1) == '\"'){
+            outputGraphName = outputGraphName.substring(0, outputGraphName.length() - 1);
+        }
         this.dotOutputStringBuilder = new StringBuilder("digraph \"output" + outputGraphName + "\" {");
         this.graph = graph;
         this.schedule = schedule;
