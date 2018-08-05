@@ -30,7 +30,7 @@ public class ScheduleEntry implements Comparable<ScheduleEntry> {
     public int getEndTime() { return startTime + node.getCost(); }
 
     // Returns the node the schedule entry is referring to
-    public Node getNode() {return this.node;}
+    public Node getNode() { return this.node; }
 
     // Node name followed by start time
     @Override

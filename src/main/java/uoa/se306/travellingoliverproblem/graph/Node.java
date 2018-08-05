@@ -51,7 +51,7 @@ public class Node implements Comparable<Node> {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Node) {
-            return (((Node) obj).name.equals(name) && ((Node) obj).children.equals(children));
+            return ((Node) obj).name.equals(name);
         }
         return false;
     }
