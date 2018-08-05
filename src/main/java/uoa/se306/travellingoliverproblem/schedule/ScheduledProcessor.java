@@ -2,8 +2,10 @@ package uoa.se306.travellingoliverproblem.schedule;
 
 import uoa.se306.travellingoliverproblem.graph.Node;
 
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
 Processor where Nodes are Scheduled on
