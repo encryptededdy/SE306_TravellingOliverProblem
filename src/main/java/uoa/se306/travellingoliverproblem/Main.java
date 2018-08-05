@@ -122,6 +122,7 @@ public class Main extends Application {
             // run the following after the scheduler has finished.
             SchedulerRunner.getInstance().setThreadListener(()-> {
                 SchedulerRunner.getInstance().printResult();
+                SchedulerRunner.getInstance().getSchedule().checkValidity();
                 DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), tempOutputFileName);
                 fileWriter.outputSchedule();
             });
