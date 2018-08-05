@@ -1,0 +1,44 @@
+digraph "OutTree-Balanced-MaxBf-3_Nodes_20_WeightType_Random" {
+    0	 [Weight=84];
+    1	 [Weight=48];
+    2	 [Weight=120];
+    3	 [Weight=84];
+    4	 [Weight=60];
+    5	 [Weight=60];
+    6	 [Weight=24];
+    7	 [Weight=60];
+    8	 [Weight=72];
+    9	 [Weight=48];
+    10	 [Weight=36];
+    11	 [Weight=24];
+    12	 [Weight=96];
+    13	 [Weight=24];
+    14	 [Weight=36];
+    15	 [Weight=24];
+    16	 [Weight=84];
+    17	 [Weight=24];
+    18	 [Weight=24];
+    19   [Weight=96];
+    1 -> 7   [Weight=5];
+    2 -> 8   [Weight=2];
+    2 -> 12   [Weight=10];
+    3 -> 9   [Weight=8];
+    3 -> 10   [Weight=2];
+    3 -> 12   [Weight=4];
+    4 -> 10   [Weight=9];
+    4 -> 19   [Weight=3];
+    5 -> 8   [Weight=10];
+    5 -> 19   [Weight=4];
+    6 -> 11   [Weight=4];
+    7 -> 15   [Weight=10];
+    8 -> 18   [Weight=2];
+    8 -> 19   [Weight=4];
+    9 -> 13   [Weight=4];
+    10 -> 15   [Weight=6];
+    10 -> 16   [Weight=3];
+    11 -> 16   [Weight=4];
+    13 -> 18   [Weight=9];
+    14 -> 16   [Weight=6];
+    16 -> 19   [Weight=10];
+
+}
