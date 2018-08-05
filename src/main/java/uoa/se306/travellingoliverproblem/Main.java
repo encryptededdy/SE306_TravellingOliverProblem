@@ -128,6 +128,7 @@ public class Main extends Application {
                     SchedulerRunner.getInstance().printResult();
                     DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), tempOutputFileName);
                     fileWriter.outputSchedule();
+                    System.exit(0);
                 });
             }
 

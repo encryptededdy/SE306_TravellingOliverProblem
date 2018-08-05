@@ -6,7 +6,6 @@ import eu.hansolo.tilesfx.chart.ChartData;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
@@ -23,7 +22,6 @@ import uoa.se306.travellingoliverproblem.visualiser.graph.GraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
 import uoa.se306.travellingoliverproblem.visualiser.schedule.ScheduleDrawer;
 
-import java.util.List;
 import java.util.Map;
 
 public class FXController {
@@ -75,13 +73,14 @@ public class FXController {
         Tile generatedBranches = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
                 .title("Branches Generated")
                 .decimals(0)
+                .chartData(new ChartData(0), new ChartData(0))
+                .animated(false)
                 .build();
 
         Tile boundedBranches = TileBuilder.create().skinType(Tile.SkinType.CIRCULAR_PROGRESS)
                 .title("Branches Bounded")
                 .decimals(2)
                 .build();
-
         tilesBox.getChildren().addAll(memoryTile, generatedBranches, boundedBranches);
         timeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
             // Update statistics
