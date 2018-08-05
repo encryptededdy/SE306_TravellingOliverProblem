@@ -2,6 +2,7 @@ package uoa.se306.travellingoliverproblem.schedule;
 
 import uoa.se306.travellingoliverproblem.graph.Node;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,10 @@ public class Schedule implements Comparable<Schedule>{
     @Override
     public String toString() {
         return Arrays.stream(processors).map(ScheduledProcessor::toString).sorted().collect(Collectors.joining());
+    }
+
+    public HashableByteArray toStringAsBytes() {
+        return new HashableByteArray(toString().getBytes(StandardCharsets.US_ASCII));
     }
 
     @Override

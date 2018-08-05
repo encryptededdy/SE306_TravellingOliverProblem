@@ -2,14 +2,17 @@ package uoa.se306.travellingoliverproblem.scheduler;
 
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
+import uoa.se306.travellingoliverproblem.schedule.HashableByteArray;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import uoa.se306.travellingoliverproblem.scheduler.heuristics.GreedyBFS;
 
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class DFSScheduler extends Scheduler {
 
@@ -18,7 +21,7 @@ public class DFSScheduler extends Scheduler {
     private boolean useGreedyInitialSchedule = false;
     private boolean useLocalPriorityQueue = true;
 
-    private Set<String> existingSchedules = new HashSet<>();
+    private Set<HashableByteArray> existingSchedules = new HashSet<>();
 
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors);
@@ -35,7 +38,7 @@ public class DFSScheduler extends Scheduler {
     }
 
     private void calculateScheduleRecursive(Schedule currentSchedule) {
-        existingSchedules.add(currentSchedule.toString()); // store this schedule as visited
+        existingSchedules.add(currentSchedule.toStringAsBytes()); // store this schedule as visited
         branchesConsidered++;
         // If the currentSchedule has no available nodes
         if (currentSchedule.getAvailableNodes().isEmpty()) {
@@ -93,7 +96,7 @@ public class DFSScheduler extends Scheduler {
                 Schedule candidate = candidateSchedules.poll();
                 if (bestSchedule == null || candidate.getOverallTime() < bestSchedule.getOverallTime()) {
                     // Only continue if this schedule hasn't been considered before
-                    if (!existingSchedules.contains(candidate.toString())) {
+                    if (!existingSchedules.contains(candidate.toStringAsBytes())) {
                         calculateScheduleRecursive(candidate);
                     } else {
                         branchesKilled++; // drop this branch
