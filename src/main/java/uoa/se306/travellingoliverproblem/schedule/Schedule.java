@@ -2,14 +2,16 @@ package uoa.se306.travellingoliverproblem.schedule;
 
 import uoa.se306.travellingoliverproblem.graph.Node;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /*
 This class describes a section of a schedule for a given input graph
  */
-public class Schedule {
+public class Schedule implements Comparable<Schedule>{
     private Set<Node> unAddedNodes = new HashSet<>();
     private Set<Node> availableNodes = new HashSet<>();
     private int overallTime = 0;
@@ -43,6 +45,31 @@ public class Schedule {
     // Returns all the processors
     public ScheduledProcessor[] getProcessors() {
         return processors;
+    }
+
+    // Return a set containing the set of the string
+    private Set<String> processorStringSet() {
+        return Arrays.stream(processors).map(ScheduledProcessor::toString).collect(Collectors.toSet());
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.stream(processors).map(ScheduledProcessor::toString).sorted().collect(Collectors.joining());
+    }
+
+    @Override
+    public int hashCode() {
+        String stringRep = Arrays.stream(processors).map(ScheduledProcessor::toString).sorted().collect(Collectors.joining());
+        return stringRep.hashCode();
+    }
+
+    // Compare equality of Schedule, including mirrored schedules
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Schedule) {
+            return processorStringSet().equals(((Schedule) obj).processorStringSet());
+        }
+        return false;
     }
 
     // Adds a node to a given processor
@@ -79,8 +106,17 @@ public class Schedule {
         return overallTime;
     }
 
+    public void setMaxOverallTime(){
+        overallTime = Integer.MAX_VALUE;
+    }
+
     public boolean checkValidity() {
         // TODO: Implement Schedule validity check (i.e. no overlaps etc.)
         return true;
+    }
+
+    @Override
+    public int compareTo(Schedule o) {
+        return Integer.compare(overallTime, o.overallTime);
     }
 }

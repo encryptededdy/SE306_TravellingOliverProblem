@@ -11,6 +11,7 @@ public class DotFileWriter extends DotStandardOutput implements ScheduleOutputte
     private String fileName;
 
 
+
     public DotFileWriter(Graph graph, Schedule schedule, String fileName) {
         super(graph, schedule);
         this.fileName = fileName;
@@ -30,6 +31,7 @@ public class DotFileWriter extends DotStandardOutput implements ScheduleOutputte
             writer.close();
             System.out.println("");
             System.out.println("File Written!");
+            System.exit(1);
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Couldn't create/write to file: " + this.fileName +"\nType -h or --help for help.");
