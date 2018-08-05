@@ -57,6 +57,7 @@ public class Main extends Application {
                 System.exit(0);
             } else {
                 System.err.println("Please provide input task graph and number of processors.\nType -h or --help for help.");
+                System.exit(1);
             }
         } else {
             String fileName = args[0];
