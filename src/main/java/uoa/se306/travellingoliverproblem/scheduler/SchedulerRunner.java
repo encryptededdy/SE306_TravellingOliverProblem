@@ -6,6 +6,7 @@ import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
+import java.util.ArrayList;
 import java.util.TreeSet;
 
 public class SchedulerRunner {
@@ -73,7 +74,7 @@ public class SchedulerRunner {
     public void printResult() {
         ScheduledProcessor[] pro = schedule.getProcessors();
         for (int i = 0; i < pro.length; i++) {
-            TreeSet<ScheduleEntry> nodeMap = pro[i].getFullSchedule();
+            ArrayList<ScheduleEntry> nodeMap = pro[i].getFullSchedule();
             System.out.println("Processor " + Integer.toString(i) + " has tasks:" + nodeMap.toString());
         }
         System.out.println("The best overall time was: " + schedule.getOverallTime());
