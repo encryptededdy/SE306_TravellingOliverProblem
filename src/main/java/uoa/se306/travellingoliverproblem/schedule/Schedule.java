@@ -145,7 +145,7 @@ public class Schedule implements Comparable<Schedule>{
                     // For each of the parents of the schedule entry
                     scheduleEntry.getNode().getParents().forEach((parentNode, cost) -> {
                         for (int j = 0; j < processors.length; j++) {
-                            if (processors[j].contains(parentNode)) {
+                            if (processors[j].contains(parentNode)) { // TODO: Change this to not use contains, and instead cache the output (faster)
 
                                 // If the parent is scheduled on the same processor
                                 if (j == processorIndex) {

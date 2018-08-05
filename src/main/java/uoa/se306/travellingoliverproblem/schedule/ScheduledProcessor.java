@@ -11,10 +11,8 @@ import java.util.Map;
 Processor where Nodes are Scheduled on
  */
 public class ScheduledProcessor {
-    // Maps nodes to scheduled entries
-    private Map<Node, ScheduleEntry> nodeMap = new HashMap<>();
     // For quick look up of scheduled entries
-    private ArrayList<ScheduleEntry> entryArray = new ArrayList<>(); // GOING TO TRY USE ARRAYLIST
+    private ArrayList<ScheduleEntry> entryArray = new ArrayList<>();
 
     ScheduledProcessor() {
         super();
@@ -22,15 +20,12 @@ public class ScheduledProcessor {
 
     // Copy constructor
     ScheduledProcessor(ScheduledProcessor toCopy) {
-        this.nodeMap = new HashMap<>(toCopy.nodeMap);
         this.entryArray = new ArrayList<>(toCopy.entryArray);
     }
 
     // Add a node to the processor at a given start time
     void add(Node node, Integer startTime) {
         ScheduleEntry entry = new ScheduleEntry(startTime, node);
-        nodeMap.put(node, entry);
-
         if (entryArray.isEmpty() || entry.getStartTime() > entryArray.get(entryArray.size() - 1).getStartTime()) {
             entryArray.add(entry);
         } else {
@@ -50,24 +45,27 @@ public class ScheduledProcessor {
         return entryArray.get(entryArray.size() - 1).getEndTime();
     }
 
-    // Get the map of all the nodes in this processor
-    public Map<Node, ScheduleEntry> getNodeMap() {
-        return nodeMap;
-    }
-
     // Get the last scheduled entry
     public ScheduleEntry lastEntry() {
         return entryArray.get(entryArray.size() - 1);
     }
 
-    // Check if the processor contains a scheduled node
+    /* Check if the processor contains a scheduled node
+    * Use discouraged, as using getEntry is just as fast, and in most use cases the entry is
+    * needed anyway, so two calls is slower than just getting the entry and checking
+    * if it's null
+     */
+    @Deprecated
     public boolean contains(Node node) {
-        return nodeMap.containsKey(node);
+        return getEntry(node) != null;
     }
 
     // Get the scheduled entry for a node
     public ScheduleEntry getEntry(Node node) {
-        return nodeMap.get(node);
+        for (ScheduleEntry entry : entryArray) {
+            if (entry.equals(node)) return entry;
+        }
+        return null;
     }
 
     // Convert schedule into a string representation

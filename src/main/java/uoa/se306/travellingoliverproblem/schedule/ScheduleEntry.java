@@ -16,6 +16,10 @@ public class ScheduleEntry implements Comparable<ScheduleEntry> {
         this.node = node;
     }
 
+    public boolean equals(Node node) {
+        return this.node.equals(node);
+    }
+
     // Returns the start time of the ScheduledEntry
     public int getStartTime() { return startTime; }
 
