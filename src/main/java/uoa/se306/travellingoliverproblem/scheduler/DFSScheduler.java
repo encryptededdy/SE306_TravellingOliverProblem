@@ -42,6 +42,7 @@ public class DFSScheduler extends Scheduler {
         if (currentSchedule.getAvailableNodes().isEmpty()) {
             // If our bestSchedule is null or the overall time for the bestSchedule is less than our current schedule
             if (bestSchedule == null || bestSchedule.getOverallTime() > currentSchedule.getOverallTime()) {
+                System.out.println("Found new best schedule: "+currentSchedule.getOverallTime());
                 bestSchedule = currentSchedule;
             }
             return;
