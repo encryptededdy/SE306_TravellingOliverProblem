@@ -99,6 +99,7 @@ public class DFSScheduler extends Scheduler {
                         calculateScheduleRecursive(candidate);
                     } else {
                         branchesKilled++; // drop this branch
+                        branchesKilledDuplication++;
                     }
                 } else {
                     branchesKilled+=candidateSchedules.size()+1;

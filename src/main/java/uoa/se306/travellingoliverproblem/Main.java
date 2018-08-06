@@ -31,7 +31,7 @@ public class Main extends Application {
         controller.startProcessing(inputGraph, processors, outputFileName);
         primaryStage.setTitle("Visualisation");
         primaryStage.setResizable(false);
-        primaryStage.setScene(new Scene(root, 1200, 800));
+        primaryStage.setScene(new Scene(root, 1200, 850));
         primaryStage.sizeToScene(); // JavaFX Bug RT-30647 workaround
         primaryStage.show();
     }
