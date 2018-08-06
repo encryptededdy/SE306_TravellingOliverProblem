@@ -36,6 +36,7 @@ public class FXController {
 
     private Map<Node, GraphNode> graphNodeMap;
     private Timeline timeline;
+    private long lastBranches = 0;
 
     private void drawGraph(Graph graph) {
         GraphDrawer drawer = new GraphDrawer(graphPane, graph);
@@ -75,19 +76,32 @@ public class FXController {
                 .decimals(0)
                 .chartData(new ChartData(0), new ChartData(0))
                 .animated(false)
+                .smoothing(true)
                 .build();
 
         Tile boundedBranches = TileBuilder.create().skinType(Tile.SkinType.CIRCULAR_PROGRESS)
                 .title("Branches Bounded")
                 .decimals(2)
                 .build();
-        tilesBox.getChildren().addAll(memoryTile, generatedBranches, boundedBranches);
+
+        Tile branchRate = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
+                .title("Branches/sec")
+                .decimals(0)
+                .chartData(new ChartData(0), new ChartData(0))
+                .animated(false)
+                .smoothing(true)
+                .build();
+
+        tilesBox.getChildren().addAll(memoryTile, generatedBranches, boundedBranches, branchRate);
         timeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
             // Update statistics
             double memoryUse = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1000000d;
+            long totalBranches = SchedulerRunner.getInstance().getScheduler().getBranchesConsidered() + SchedulerRunner.getInstance().getScheduler().getBranchesKilled();
             memoryTile.setValue(memoryUse);
-            generatedBranches.addChartData(new ChartData(SchedulerRunner.getInstance().getScheduler().getBranchesConsidered() + SchedulerRunner.getInstance().getScheduler().getBranchesKilled()));
+            generatedBranches.addChartData(new ChartData(totalBranches));
             boundedBranches.setValue(SchedulerRunner.getInstance().getScheduler().proportionKilled() * 100);
+            branchRate.addChartData(new ChartData(totalBranches - lastBranches));
+            lastBranches = totalBranches;
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
