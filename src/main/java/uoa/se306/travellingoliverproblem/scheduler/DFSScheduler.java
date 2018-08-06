@@ -2,6 +2,7 @@ package uoa.se306.travellingoliverproblem.scheduler;
 
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
+import uoa.se306.travellingoliverproblem.schedule.MinimalSchedule;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
@@ -18,7 +19,7 @@ public class DFSScheduler extends Scheduler {
     private boolean useGreedyInitialSchedule = false;
     private boolean useLocalPriorityQueue = true;
 
-    private Set<String> existingSchedules = new HashSet<>();
+    private Set<MinimalSchedule> existingSchedules = new HashSet<>();
 
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors);
@@ -35,12 +36,13 @@ public class DFSScheduler extends Scheduler {
     }
 
     private void calculateScheduleRecursive(Schedule currentSchedule) {
-        existingSchedules.add(currentSchedule.toString()); // store this schedule as visited
+        existingSchedules.add(new MinimalSchedule(currentSchedule)); // store this schedule as visited
         branchesConsidered++;
         // If the currentSchedule has no available nodes
         if (currentSchedule.getAvailableNodes().isEmpty()) {
             // If our bestSchedule is null or the overall time for the bestSchedule is less than our current schedule
             if (bestSchedule == null || bestSchedule.getOverallTime() > currentSchedule.getOverallTime()) {
+                System.out.println("Found new best schedule: "+currentSchedule.getOverallTime());
                 bestSchedule = currentSchedule;
             }
             return;
@@ -93,7 +95,7 @@ public class DFSScheduler extends Scheduler {
                 Schedule candidate = candidateSchedules.poll();
                 if (bestSchedule == null || candidate.getOverallTime() < bestSchedule.getOverallTime()) {
                     // Only continue if this schedule hasn't been considered before
-                    if (!existingSchedules.contains(candidate.toString())) {
+                    if (!existingSchedules.contains(new MinimalSchedule(candidate))) {
                         calculateScheduleRecursive(candidate);
                     } else {
                         branchesKilled++; // drop this branch
