@@ -6,45 +6,39 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
 public class CostFunction {
     private Schedule partialSchedule;
-    private long currentCost;
-    private long totalIdleTime;
-    private long dataReadyTime;
+    private long maxStartTimeAndBottomLevel;
+    private double idleTimeAndComputation;
+    private long maxDataReadyTimeAndBottomLevel;
+
 
     public CostFunction(Schedule partialSchedule){
         this.partialSchedule = partialSchedule;
     }
 
-    public long calculateCost(){
-        currentCost= calculateCurrentCost();
-        totalIdleTime = calculateTotalIdleTime();
-        dataReadyTime = calculateDataReadyTime();
-        return Math.max(currentCost, Math.max(totalIdleTime, dataReadyTime));
+    public double calculateCost(){
+        maxDataReadyTimeAndBottomLevel();
+        maxStartTimeAndBottomLevel();
+        idleTimeAndComputation();
+        return  Math.max(maxDataReadyTimeAndBottomLevel, Math.max(idleTimeAndComputation, maxStartTimeAndBottomLevel));
     }
 
-    public long calculateCurrentCost(){
-        partialSchedule.getOverallTime();
-        return currentCost;
+    public void maxStartTimeAndBottomLevel(){
+        maxStartTimeAndBottomLevel = 0;
     }
 
-    public long calculateTotalIdleTime(){
+    public void idleTimeAndComputation(){
         ScheduledProcessor[] processors = partialSchedule.getProcessors();
         for(ScheduledProcessor p : processors){
             // get idle time of each processor
         }
-        return totalIdleTime;
     }
 
-    public long calculateDataReadyTime(){
+    public void maxDataReadyTimeAndBottomLevel(){
         ScheduledProcessor[] processors = partialSchedule.getProcessors();
         for(ScheduledProcessor p : processors){
             // get the last end time
         }
-        return dataReadyTime;
     }
 
-    public long getBottomLevel(ScheduleEntry entry){
-
-        return 0;
-    }
 
 }
