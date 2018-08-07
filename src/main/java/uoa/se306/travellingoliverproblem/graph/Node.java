@@ -46,7 +46,6 @@ public class Node implements Comparable<Node> {
             return;
         }
         for(Map.Entry<Node, Integer> entry: children.entrySet()){
-            entry.getKey();
         }
         // create stack for visited nodes
         // loop through all nodes
