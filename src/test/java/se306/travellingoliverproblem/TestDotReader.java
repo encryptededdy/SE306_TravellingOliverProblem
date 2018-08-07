@@ -28,10 +28,10 @@ public class TestDotReader {
         assertEquals(startingNode.toString(), "0"); // check starting node
 
         // Build graph manually for comparison
-        Node node0 = new Node("0", 4);
-        Node node1 = new Node("1", 2);
-        Node node2 = new Node("2", 2);
-        Node node3 = new Node("3", 2);
+        Node node0 = new Node("0", 4, 0);
+        Node node1 = new Node("1", 2, 1);
+        Node node2 = new Node("2", 2, 2);
+        Node node3 = new Node("3", 2, 3);
 
         node0.addChild(node1, 1);
         node0.addChild(node2, 1);

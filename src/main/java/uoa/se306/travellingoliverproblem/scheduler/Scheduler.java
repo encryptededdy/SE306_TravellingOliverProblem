@@ -2,7 +2,6 @@ package uoa.se306.travellingoliverproblem.scheduler;
 
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
-import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
 /*
 Outlines signature for schedulers to adhere to
@@ -10,13 +9,14 @@ Outlines signature for schedulers to adhere to
 public abstract class Scheduler {
 
     // Best schedule found from all iterations
-    protected Schedule bestSchedule;
-    protected int amountOfProcessors;
+    Schedule bestSchedule;
+    private int amountOfProcessors;
     // Graph of all nodes
     protected Graph graph;
 
-    protected long branchesConsidered = 0;
-    protected long branchesKilled = 0;
+    long branchesConsidered = 0;
+    long branchesKilled = 0;
+    long branchesKilledDuplication = 0;
 
     // constructor to initialize the input graph and the amount of processors to use
     Scheduler(Graph graph, int amountOfProcessors){
@@ -33,6 +33,10 @@ public abstract class Scheduler {
 
     public long getBranchesConsidered() {
         return branchesConsidered;
+    }
+
+    public long getBranchesKilledDuplication() {
+        return branchesKilledDuplication;
     }
 
     public long getBranchesKilled() {

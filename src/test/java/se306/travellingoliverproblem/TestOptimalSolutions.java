@@ -27,7 +27,7 @@ public class TestOptimalSolutions {
 
         assertEquals(startingNode.toString(), "a"); // check starting node
 
-        Node nodeA = new Node("a", 1);
+        Node nodeA = new Node("a", 1, 0);
         assertEquals(nodeA, startingNode);
 
         Scheduler scheduler = new DFSScheduler(inputGraph, 1);
