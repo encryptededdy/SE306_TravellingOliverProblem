@@ -1,12 +1,11 @@
 package uoa.se306.travellingoliverproblem.graph;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Node implements Comparable<Node> {
     private String name;
     private Integer cost = 0;
+    private int currentBottomLevel = 0;
 
     // Integers for parents and children in hash map are the edge weight costs
     private Map<Node, Integer> children = new HashMap<>();
@@ -19,6 +18,7 @@ public class Node implements Comparable<Node> {
     public Node(String name, int cost) {
         this.name = name;
         this.cost = cost;
+        calculateCurrentBottomLevel();
     }
 
     public void addChild(Node node, int cost) {
@@ -28,6 +28,40 @@ public class Node implements Comparable<Node> {
     public void addParent(Node node, int cost) {
         parents.put(node, cost);
     }
+
+    /*
+    This method will calculate the bottom level of this Node
+    it is done by a recursive method
+     */
+    public void calculateCurrentBottomLevel(){
+        // set of children that have been marked as visited
+        Set<Node> visitedChildren = new HashSet<>();
+
+        int bottomLevel = 0;
+        // if it's at the leaf node(bottom level node)
+        if(this.children.isEmpty()){
+            if(this.currentBottomLevel < bottomLevel){
+                currentBottomLevel = bottomLevel;
+            }
+            return;
+        }
+        for(Map.Entry<Node, Integer> entry: children.entrySet()){
+            entry.getKey();
+        }
+        // create stack for visited nodes
+        // loop through all nodes
+
+        //recursiveFunction (Node child)
+        // add weight to global counter (totalCost)
+        //if this child node, has no more children nodes
+        //  if (currentGlobalBottomLevel < totalCost)
+        //  currentGlobalLevel = totalCost
+        //  return;
+        //else
+        //  get map child.getChildren()
+        //  get any one of those children nodes and pass into this recursiveFunction()
+    }
+
 
     public Map<Node, Integer> getParents() {
         return parents;
@@ -39,6 +73,10 @@ public class Node implements Comparable<Node> {
 
     public Integer getCost() {
         return cost;
+    }
+
+    public int getBottomLevel(){
+        return currentBottomLevel;
     }
 
     @Override

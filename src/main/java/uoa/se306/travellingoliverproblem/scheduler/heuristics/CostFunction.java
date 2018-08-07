@@ -7,7 +7,7 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 public class CostFunction {
     private Schedule partialSchedule;
     private long maxStartTimeAndBottomLevel;
-    private double idleTimeAndComputation;
+    private float idleTimeAndComputation;
     private long maxDataReadyTimeAndBottomLevel;
 
 
@@ -15,7 +15,7 @@ public class CostFunction {
         this.partialSchedule = partialSchedule;
     }
 
-    public double calculateCost(){
+    public float calculateCost(){
         maxDataReadyTimeAndBottomLevel();
         maxStartTimeAndBottomLevel();
         idleTimeAndComputation();

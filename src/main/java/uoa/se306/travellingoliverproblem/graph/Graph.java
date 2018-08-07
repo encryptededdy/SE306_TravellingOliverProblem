@@ -9,8 +9,6 @@ public class Graph {
 
     private Set<Node> allNodes = new TreeSet<>(); // same as above
 
-    private Map<Node, Integer> nodesBottomLevelMap= new HashMap<>();
-
     public Graph(Collection<Node> startingNodes, Collection<Node> allNodes, String graphName) {
         this.startingNodes.addAll(startingNodes);
         this.allNodes.addAll(allNodes);
@@ -26,4 +24,6 @@ public class Graph {
     }
 
     public String getGraphName() { return graphName; }
+
+
 }
