@@ -1,9 +1,6 @@
 package uoa.se306.travellingoliverproblem.graph;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class Graph {
     private String graphName;
@@ -11,6 +8,8 @@ public class Graph {
     private Set<Node> startingNodes = new HashSet<>(); // should this be made unmodifiable?
 
     private Set<Node> allNodes = new TreeSet<>(); // same as above
+
+    private Map<Node, Integer> nodesBottomLevelMap= new HashMap<>();
 
     public Graph(Collection<Node> startingNodes, Collection<Node> allNodes, String graphName) {
         this.startingNodes.addAll(startingNodes);
