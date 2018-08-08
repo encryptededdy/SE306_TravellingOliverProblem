@@ -80,7 +80,7 @@ public class Node implements Comparable<Node> {
         if(node.children.isEmpty()){
             if(currentBottomLevel < totalCost){
                 currentBottomLevel = totalCost;
-                System.out.println(this.toString() + "has bottom level of: " + Integer.toString(currentBottomLevel));
+               // System.out.println(this.toString() + "has bottom level of: " + Integer.toString(currentBottomLevel));
             }
             return;
         }
