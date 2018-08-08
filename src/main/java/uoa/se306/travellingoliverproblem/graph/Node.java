@@ -12,6 +12,9 @@ public class Node implements Comparable<Node> {
     private Map<Node, Integer> children = new HashMap<>();
     private Map<Node, Integer> parents = new HashMap<>();
 
+    // map of visited children for calculating bottom level
+    private ArrayList<Node> visitedChildren = new ArrayList<>();
+
     public Node(String name) {
         this.name = name;
     }
@@ -19,7 +22,7 @@ public class Node implements Comparable<Node> {
     public Node(String name, int cost, int id) {
         this.name = name;
         this.cost = cost;
-        calculateCurrentBottomLevel();
+
         if (id > 65) {
             throw new RuntimeException("Max 65 nodes supported");
         } else {
@@ -55,39 +58,39 @@ public class Node implements Comparable<Node> {
         return currentBottomLevel;
     }
 
+    public void setBottomLevel(){
+        calculateCurrentBottomLevel(this, currentBottomLevel);
+    }
+
     /*
     This method will calculate the bottom level of this Node
     it is done by a recursive method
     */
-    public void calculateCurrentBottomLevel(){
-        // set of children that have been marked as visited
-        Set<Node> visitedChildren = new HashSet<>();
+    private void calculateCurrentBottomLevel(Node node, int totalCost){
+        visitedChildren.add(node);
+        totalCost += node.getCost();
+        Map<Node, Integer> mapOfChildren = node.getChildren();
 
-        int bottomLevel = 0;
-        // if it's at the leaf node(bottom level node)
-        if(this.children.isEmpty()){
-            if(this.currentBottomLevel < bottomLevel){
-                currentBottomLevel = bottomLevel;
+        //for each child of this node
+        //  if this child is not in visited list
+        //      pass this child into this recursive function
+        //  else
+        //      do nothing, and check next child
+        //return
+        if(node.children.isEmpty()){
+            if(currentBottomLevel < totalCost){
+                currentBottomLevel = totalCost;
+                System.out.println(this.toString() + "has bottom level of: " + Integer.toString(currentBottomLevel));
             }
             return;
         }
-        for(Map.Entry<Node, Integer> entry: children.entrySet()){
-            entry.getValue();
+        for (Node child: mapOfChildren.keySet()) {
+            if (!visitedChildren.contains(child)){
+                this.calculateCurrentBottomLevel(child, totalCost);
+            }
+
         }
-        // create stack for visited nodes
-        // loop through all nodes
-
-        //recursiveFunction (Node child)
-        // add weight to global counter (totalCost)
-        //if this child node, has no more children nodes
-        //  if (currentGlobalBottomLevel < totalCost)
-        //  currentGlobalLevel = totalCost
-        //  return;
-        //else
-        //  get map child.getChildren()
-        //  get any one of those children nodes and pass into this recursiveFunction()
     }
-
 
 
     @Override
