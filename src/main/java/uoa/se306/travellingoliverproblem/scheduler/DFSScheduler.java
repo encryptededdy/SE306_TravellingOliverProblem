@@ -19,7 +19,7 @@ public class DFSScheduler extends Scheduler {
     private boolean useLocalPriorityQueue = true;
     private Set<String> existingSchedules = new HashSet<>();
 
-    DFSScheduler(Graph graph, int amountOfProcessors) {
+    public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors);
     }
 
