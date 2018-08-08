@@ -17,23 +17,27 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Text>
-            <Text layoutX="407.0" layoutY="34.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Optimal Schedule">
+             <Text layoutX="385.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Optimal Schedule">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
             </Text>
          </children>
       </AnchorPane>
-      <HBox prefHeight="600.0">
+        <HBox prefHeight="550.0">
          <children>
-            <ScrollPane maxHeight="600.0" prefHeight="600.0" prefWidth="400.0">
+             <ScrollPane maxHeight="550.0" prefHeight="550.0" prefWidth="380.0">
                <content>
                     <Pane fx:id="graphPane" />
                </content>
             </ScrollPane>
-            <Pane fx:id="schedulePane" maxHeight="600.0" prefHeight="600.0" prefWidth="800.0" />
+             <ScrollPane prefHeight="550.0" prefWidth="820.0">
+                 <content>
+                     <Pane fx:id="schedulePane" prefWidth="800.0" />
+                 </content>
+             </ScrollPane>
          </children>
       </HBox>
-      <HBox prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: #bebebe;" />
+        <HBox fx:id="tilesBox" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #bebebe;" />
     </children>
 </VBox>

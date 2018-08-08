@@ -33,6 +33,10 @@ public class GraphDrawer {
         parentPane.getChildren().add(new StackPane(backgroundPane, vbox));
     }
 
+    public Map<Node, GraphNode> getGraphNodes() {
+        return visited;
+    }
+
     public void drawGraph() {
         HashSet<Node> currentLevel = new HashSet<>(graph.getStartingNodes()); // start with... starting nodes
         drawLevel(currentLevel);
@@ -69,9 +73,6 @@ public class GraphDrawer {
                 // get bounds relative to ParentPane, where we'll be drawing the lines
                 Bounds sourceBounds = backgroundPane.sceneToLocal(source.localToScene(source.getBoundsInLocal()));
                 Bounds destnBounds = backgroundPane.sceneToLocal(dest.localToScene(dest.getBoundsInLocal()));
-
-                System.out.println("Drawing "+source.getName()+" to "+dest.getName());
-                System.out.println("Drew line from "+sourceBounds+" to "+destnBounds);
 
                 Line line = new Line();
                 //Line line = new Line(sourceBounds.getMaxX(), sourceBounds.getMaxY(), destnBounds.getMaxX(), destnBounds.getMaxY());

@@ -88,6 +88,12 @@
         </plugins>
     </build>
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/eu.hansolo/tilesfx -->
+        <dependency>
+            <groupId>eu.hansolo</groupId>
+            <artifactId>tilesfx</artifactId>
+            <version>1.6.4</version>
+        </dependency>
         <dependency>
             <groupId>com.paypal.digraph</groupId>
             <artifactId>digraph-parser</artifactId>

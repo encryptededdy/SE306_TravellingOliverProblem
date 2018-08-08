@@ -17,7 +17,6 @@ public class DFSScheduler extends Scheduler {
     private boolean useCurrentBestCulling = true;
     private boolean useGreedyInitialSchedule = false;
     private boolean useLocalPriorityQueue = true;
-
     private Set<String> existingSchedules = new HashSet<>();
 
     DFSScheduler(Graph graph, int amountOfProcessors) {
@@ -52,7 +51,6 @@ public class DFSScheduler extends Scheduler {
         for (Node node: tempSet) {
             // Get the amount of processors in the current schedule
             ScheduledProcessor[] processors = currentSchedule.getProcessors();
-
             int[] processorEarliestAvailable = new int[processors.length];
 
             // First, calculate the next available time on all nodes, taking into account parents

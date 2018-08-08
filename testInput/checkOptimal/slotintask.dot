@@ -1,0 +1,8 @@
+digraph slotInTask {
+    a [Weight=4];
+    b [Weight=5];
+    c [Weight=5];
+    d [Weight=2];
+	a -> b [Weight=1];
+	a -> d   [Weight=8];
+}
