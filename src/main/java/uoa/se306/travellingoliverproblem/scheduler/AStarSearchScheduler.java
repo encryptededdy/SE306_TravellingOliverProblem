@@ -12,9 +12,10 @@ Scheduler for the A Star Algorithm
  */
 public class AStarSearchScheduler extends Scheduler {
 
-    boolean foundOptimal = false;
+    private boolean foundOptimal = false;
 
-    private Set<String> existingSchedules;
+    private Set<MinimalSchedule> existingSchedules;
+    private PriorityQueue<ScheduleAStar> candidateSchedules = new PriorityQueue<>();
 
     public AStarSearchScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors);
@@ -32,22 +33,21 @@ public class AStarSearchScheduler extends Scheduler {
 
     private void solveAStar(ScheduleAStar currentSchedule) {
 
-
-        PriorityQueue<ScheduleAStar> candidateSchedules = new PriorityQueue<>();
-        ArrayList<ScheduleAStar> visitedList = new ArrayList<>();
         candidateSchedules.add(currentSchedule);
 
-        while (foundOptimal == false) {
+
+        while (!foundOptimal) {
 
             ScheduleAStar partial = candidateSchedules.poll();
+
             if (partial.getAvailableNodes().isEmpty()){
                 foundOptimal = true;
                 bestSchedule = partial;
             }else {
                 // Get all the available nodes in the schedule
-                Set<Node> availableNodes = new HashSet<>(currentSchedule.getAvailableNodes());
+                Set<Node> availableNodes = new HashSet<>(partial.getAvailableNodes());
                 for (Node node : availableNodes) {
-                    ScheduledProcessor[] processors = currentSchedule.getProcessors();
+                    ScheduledProcessor[] processors = partial.getProcessors();
 
                     for (int i = 0; i < processors.length; i++) {
                         ScheduledProcessor processor = processors[i];
@@ -58,7 +58,7 @@ public class AStarSearchScheduler extends Scheduler {
                             // for all the processors of this current schedule
                             // if any of the processors contains the parentNode
                             // get the endTime of when this parentNode finishes inside that processor
-                            for (ScheduledProcessor checkProcessor : currentSchedule.getProcessors()) {
+                            for (ScheduledProcessor checkProcessor : partial.getProcessors()) {
                                 ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
                                 if (sEntry != null) {
                                     processorStartTime = sEntry.getEndTime();
@@ -76,11 +76,17 @@ public class AStarSearchScheduler extends Scheduler {
                         //get the earliestStartTime that this available node can be scheduled (In this processor)
                         startTime = processor.getEarliestStartAfter(startTime, node.getCost());
                         //create a copy of our partialSchedule
-                        ScheduleAStar tempSchedule = new ScheduleAStar(currentSchedule);
+                        ScheduleAStar tempSchedule = new ScheduleAStar(partial);
                         //add the availableNode into processor i at time startTime in the schedule
                         tempSchedule.addToSchedule(node, i, startTime);
                         tempSchedule.getCostFunction();
+                        //================================ debugging mode=====================================
+                        //System.out.println("tempSchedule function cost = " + tempSchedule.getCost() + " tempSchedule available nodes = " + tempSchedule.getAvailableNodes());
+
+
+                        //====================================================================================
                         candidateSchedules.add(tempSchedule);
+
                     }
                 }
             }

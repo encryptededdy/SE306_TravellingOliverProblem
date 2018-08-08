@@ -10,6 +10,10 @@ public class MinimalSchedule {
         this.byteArray = schedule.toString().getBytes(StandardCharsets.US_ASCII);
     }
 
+    public MinimalSchedule(ScheduleAStar schedule){
+        this.byteArray = schedule.toString().getBytes(StandardCharsets.US_ASCII);
+    }
+
     @Override
     public int hashCode() {
         return Arrays.hashCode(byteArray);

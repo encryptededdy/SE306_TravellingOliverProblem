@@ -14,15 +14,15 @@ public class CostFunction {
     private Set<Node> availableNodes;
 
 
-    private long maxStartTimeAndBottomLevel;
+    private int maxStartTimeAndBottomLevel;
     private float idleTimeAndComputation;
-    private long maxDataReadyTimeAndBottomLevel;
+    private int maxDataReadyTimeAndBottomLevel;
 
 
     public CostFunction(Schedule partialSchedule){
         this.partialSchedule = partialSchedule;
         maxStartTimeAndBottomLevel = 0;
-        idleTimeAndComputation = 0;
+        idleTimeAndComputation = 0.0f;
         maxDataReadyTimeAndBottomLevel =0;
         processors = partialSchedule.getProcessors();
         availableNodes = partialSchedule.getAvailableNodes();
@@ -32,10 +32,17 @@ public class CostFunction {
     This method calls all heuristic methods and returns the maximum cost of those methods
      */
     public float calculateCost(){
-        maxDataReadyTimeAndBottomLevel();
         maxStartTimeAndBottomLevel();
         idleTimeAndComputation();
-        return  Math.max(idleTimeAndComputation, Math.max(maxDataReadyTimeAndBottomLevel, maxStartTimeAndBottomLevel));
+        maxDataReadyTimeAndBottomLevel();
+        int max = Math.max(maxDataReadyTimeAndBottomLevel, maxStartTimeAndBottomLevel);
+
+        if (max > idleTimeAndComputation){
+            return idleTimeAndComputation;
+        }else{
+            return (float)max;
+        }
+
     }
 
     /*
@@ -92,8 +99,8 @@ public class CostFunction {
                 }
             }
         }
-        idleTimeAndComputation = (totalIdleTime + partialSchedule.getCOMPUTATIONAL_LOAD()) / processors.length;
 
+        idleTimeAndComputation = ((float)totalIdleTime + (float)partialSchedule.getCOMPUTATIONAL_LOAD()) / (float)processors.length ;;
     }
 
     /*
