@@ -6,9 +6,12 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class CostFunction {
     private Schedule partialSchedule;
+    ScheduledProcessor[] processors;
+    Set<Node> availableNodes;
     // we don't need this
     HashMap<Node, Integer> bottomLevelMap;
     // From the partial schedule
@@ -22,6 +25,11 @@ public class CostFunction {
     public CostFunction(Schedule partialSchedule , HashMap<Node, Integer> bottomLevelMap){
         this.partialSchedule = partialSchedule;
         this.bottomLevelMap = bottomLevelMap;
+        maxStartTimeAndBottomLevel = 0;
+        idleTimeAndComputation = 0;
+        maxDataReadyTimeAndBottomLevel =0;
+        processors = partialSchedule.getProcessors();
+        availableNodes = partialSchedule.getAvailableNodes();
     }
 
     /*
@@ -40,7 +48,23 @@ public class CostFunction {
     This method saves this value as maxStartTimeAndBottomLevel.
      */
     private void maxStartTimeAndBottomLevel(){
-        maxStartTimeAndBottomLevel = 0;
+        //For processors in partialSchedule
+        //  For each Node in the processor
+        //      get its startTime
+        //      get its bottomLevel
+        //      Add startTime + bottomLevel
+        //      if startTime + bottomLevel > maxStartTimeAndBottomLevel
+        //          maxStartTimeAndBottomLevel = startTime + bottomLevel
+        int tempCost;
+        for (ScheduledProcessor pro : processors ){
+            for (ScheduleEntry node : pro.getFullSchedule()){
+                tempCost = node.getStartTime() + node.getNode().getBottomLevel();
+                if (tempCost > maxStartTimeAndBottomLevel){
+                    maxStartTimeAndBottomLevel = tempCost;
+                }
+            }
+        }
+
     }
 
     /*
@@ -49,23 +73,82 @@ public class CostFunction {
      */
     private void idleTimeAndComputation(){
         int totalIdelTime = 0;
-        int totalComputationTime = 0;
-        ScheduledProcessor[] processors = partialSchedule.getProcessors();
-        for(ScheduledProcessor p : processors){
-            // for each processor,
-        }
+        int totalComputationalTime = 0;
+        int currentTimeCounter = 0;
 
+        //For each processor p
+        //  For each scheduleEntry node in p
+        //      if (node start time is LARGER than currentTimeCounter) {
+        //          get idle time: is between currentTimeCounter and startTime of this node
+        //          update the currentTimeCounter to be the nodes endTime
+        //          add the nodes (execution time, weight, cost, length) to the totalComputationalTime
+        //      else
+        //          update the currentTimeCounter to be the nodes endTime
+        //          add the nodes (execution time, weight, cost, length) to the totalComputationalTime
+        //idleTimeAndComputation = totalIdleTime + (totalComputationalTime / processors.size())
+        for(ScheduledProcessor p : processors){
+            for (ScheduleEntry node : p.getFullSchedule()){
+                if (node.getStartTime() > currentTimeCounter){
+                    totalIdelTime = totalIdelTime + node.getStartTime() - currentTimeCounter;
+                    currentTimeCounter = node.getEndTime();
+                    totalComputationalTime += node.getLength();
+                }else{
+                    currentTimeCounter = node.getEndTime();
+                    totalComputationalTime += node.getLength();
+                }
+            }
+        }
+        idleTimeAndComputation = totalIdelTime + (totalComputationalTime / processors.length);
 
     }
 
     /*
     The third cost function principle is to find the node (available to be scheduled)
     that has the maximum (starting time of node + bottom level)
+    NOTE: this algorithm only considers available nodes at this moment
      */
     private void maxDataReadyTimeAndBottomLevel(){
-        ScheduledProcessor[] processors = partialSchedule.getProcessors();
-        for(ScheduledProcessor p : processors){
-            // get the last end time
+        //For each node in the availableNodes set
+
+        for (Node node : availableNodes){
+            int largestNodeStartTime = 0;
+
+            for (int i = 0; i < processors.length; i++) {
+                ScheduledProcessor processor = processors[i];
+                int processorStartTime;
+                int startTime = 0;
+                // iterate over all the parent nodes
+                for (Node parentNode : node.getParents().keySet()) {
+                    // for all the processors of this current schedule
+                    // if any of the processors contains the parentNode
+                    // get the endTime of when this parentNode finishes inside that processor
+                    for (ScheduledProcessor checkProcessor : partialSchedule.getProcessors()) {
+                        ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
+                        if (sEntry != null) {
+                            processorStartTime = sEntry.getEndTime();
+                            // add the communication cost between childNode and parentNode if not on same processor
+                            processorStartTime += processor != checkProcessor ? parentNode.getChildren().get(node) : 0;
+                            // if the processorStartTime is larger than the current startTime
+                            // update the current startTime
+                            if (processorStartTime > startTime) {
+                                startTime = processorStartTime;
+                                break;
+                            }
+                        }
+                    }
+                }
+                //get the earliestStartTime that this available node can be scheduled (In this processor)
+                startTime = processor.getEarliestStartAfter(startTime, node.getCost());
+
+                // record the biggest startTime for this node, in an processor
+                if (startTime > largestNodeStartTime){
+                    largestNodeStartTime = startTime;
+                }
+            }
+            int tempTempCost= largestNodeStartTime + node.getBottomLevel();
+            if (tempTempCost > maxDataReadyTimeAndBottomLevel) {
+                maxDataReadyTimeAndBottomLevel = tempTempCost;
+            }
         }
     }
 
