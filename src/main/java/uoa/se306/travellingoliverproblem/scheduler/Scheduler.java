@@ -2,6 +2,7 @@ package uoa.se306.travellingoliverproblem.scheduler;
 
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
+import uoa.se306.travellingoliverproblem.schedule.ScheduleAStar;
 
 /*
 Outlines signature for schedulers to adhere to
@@ -27,7 +28,9 @@ public abstract class Scheduler {
     // Initial call to the recursive function, returns a Schedule object
     // Template method pattern
     public Schedule getBestSchedule() {
-        calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes() , graph.getComputationalLoad()));
+        //calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes() , graph.getComputationalLoad()));
+        calculateSchedule(new ScheduleAStar(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes() , graph.getComputationalLoad()));
+
         return bestSchedule;
     }
 
@@ -49,4 +52,5 @@ public abstract class Scheduler {
 
     // Recursive function, to be implemented by children
     protected abstract void calculateSchedule(Schedule currentSchedule);
+
 }

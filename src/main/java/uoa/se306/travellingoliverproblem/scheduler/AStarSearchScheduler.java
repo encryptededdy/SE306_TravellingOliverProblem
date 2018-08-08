@@ -2,20 +2,17 @@ package uoa.se306.travellingoliverproblem.scheduler;
 
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
-import uoa.se306.travellingoliverproblem.schedule.Schedule;
-import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
-import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
+import uoa.se306.travellingoliverproblem.schedule.*;
 import uoa.se306.travellingoliverproblem.scheduler.heuristics.CostFunction;
 
-import java.util.HashSet;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 /*
 Scheduler for the A Star Algorithm
  */
 public class AStarSearchScheduler extends Scheduler {
+
+    boolean foundOptimal = false;
 
     private Set<String> existingSchedules;
 
@@ -24,33 +21,69 @@ public class AStarSearchScheduler extends Scheduler {
     }
 
     @Override
-    protected void calculateSchedule(Schedule currentSchedule) {
-
-
-//        existingSchedules.add(currentSchedule.toString()); // store this schedule as visited
-//        branchesConsidered++;
-//
-//        // if there are no more nodes to schedule
-//        if(currentSchedule.getAvailableNodes().isEmpty()){
-//            if(bestSchedule == null || bestSchedule.getOverallTime() > currentSchedule.getOverallTime()){
-//                bestSchedule = currentSchedule;
-//            }
-//            return;
-//        }
-//
-//        Stack<Schedule> optimalSchedules = new Stack<>(); // stack containing the partial schedules that are a part of optimal schedule
-//        PriorityQueue<Schedule> aStarQueue = new PriorityQueue<>();
-//
-//        Set<Node> currentAvailableNodes = new HashSet<>(currentSchedule.getAvailableNodes());
-//        for(Node node : currentAvailableNodes){
-//            // get all the processors
-//            ScheduledProcessor[] processors = currentSchedule.getProcessors();
-//
-//
-//
-//        }
-
+    protected void calculateSchedule(Schedule currentSchedule){
+        if (currentSchedule instanceof ScheduleAStar){
+            solveAStar((ScheduleAStar)currentSchedule);
+        }else{
+            throw new InvalidScheduleException("currentSchedule is not an instance of ScheduleAStar");
+        }
     }
 
 
+    private void solveAStar(ScheduleAStar currentSchedule) {
+
+
+        PriorityQueue<ScheduleAStar> candidateSchedules = new PriorityQueue<>();
+        ArrayList<ScheduleAStar> visitedList = new ArrayList<>();
+        candidateSchedules.add(currentSchedule);
+
+        while (foundOptimal == false) {
+
+            ScheduleAStar partial = candidateSchedules.poll();
+            if (partial.getAvailableNodes().isEmpty()){
+                foundOptimal = true;
+                bestSchedule = partial;
+            }else {
+                // Get all the available nodes in the schedule
+                Set<Node> availableNodes = new HashSet<>(currentSchedule.getAvailableNodes());
+                for (Node node : availableNodes) {
+                    ScheduledProcessor[] processors = currentSchedule.getProcessors();
+
+                    for (int i = 0; i < processors.length; i++) {
+                        ScheduledProcessor processor = processors[i];
+                        int processorStartTime;
+                        int startTime = 0;
+                        // iterate over all the parent nodes
+                        for (Node parentNode : node.getParents().keySet()) {
+                            // for all the processors of this current schedule
+                            // if any of the processors contains the parentNode
+                            // get the endTime of when this parentNode finishes inside that processor
+                            for (ScheduledProcessor checkProcessor : currentSchedule.getProcessors()) {
+                                ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
+                                if (sEntry != null) {
+                                    processorStartTime = sEntry.getEndTime();
+                                    // add the communication cost between childNode and parentNode if not on same processor
+                                    processorStartTime += processor != checkProcessor ? parentNode.getChildren().get(node) : 0;
+                                    // if the processorStartTime is larger than the current startTime
+                                    // update the current startTime
+                                    if (processorStartTime > startTime) {
+                                        startTime = processorStartTime;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        //get the earliestStartTime that this available node can be scheduled (In this processor)
+                        startTime = processor.getEarliestStartAfter(startTime, node.getCost());
+                        //create a copy of our partialSchedule
+                        ScheduleAStar tempSchedule = new ScheduleAStar(currentSchedule);
+                        //add the availableNode into processor i at time startTime in the schedule
+                        tempSchedule.addToSchedule(node, i, startTime);
+                        tempSchedule.getCostFunction();
+                        candidateSchedules.add(tempSchedule);
+                    }
+                }
+            }
+        }
+    }
 }

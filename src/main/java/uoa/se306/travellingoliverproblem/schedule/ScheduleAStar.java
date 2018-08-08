@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public class ScheduleAStar extends Schedule{
 
-    float costFunction;
+    private float cost; // does this work with private ?
 
     public ScheduleAStar(int processorCount, Collection<Node> availableNodes, Collection<Node> allNodes , int COMPUTATIONAL_LOAD) {
         super(processorCount, availableNodes, allNodes, COMPUTATIONAL_LOAD);
@@ -18,17 +18,20 @@ public class ScheduleAStar extends Schedule{
         super(toCopy);
     }
 
-    public float getCostFunction(){
+    public void getCostFunction(){
         CostFunction costFunction = new CostFunction(this);
-        return costFunction.calculateCost();
+        cost = costFunction.calculateCost();
     }
 
+    public float getCost(){
+        return cost;
+    }
 
     public int compareTo(ScheduleAStar otherSchedule) {
 
-        if (costFunction < otherSchedule.getCostFunction()){
+        if (cost < otherSchedule.getCost()){
             return -1;
-        }else if (costFunction == otherSchedule.getCostFunction()){
+        }else if (cost == otherSchedule.getCost()){
             return 1;
         }else{
             return 0;

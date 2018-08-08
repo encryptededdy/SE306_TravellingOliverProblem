@@ -3,6 +3,7 @@ package uoa.se306.travellingoliverproblem.scheduler;
 import javafx.concurrent.Task;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
+import uoa.se306.travellingoliverproblem.schedule.ScheduleAStar;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
@@ -32,7 +33,8 @@ public class SchedulerRunner {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
-        scheduler = new DFSScheduler(inputGraph, noProcessors);
+        //scheduler = new DFSScheduler(inputGraph, noProcessors);
+        scheduler = new AStarSearchScheduler(inputGraph, noProcessors);
         // create task to run on a separate thread
         Runnable scheduleTask = () -> {
             long startTime = System.nanoTime();
@@ -53,7 +55,8 @@ public class SchedulerRunner {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
-        scheduler = new DFSScheduler(inputGraph, noProcessors);
+        //scheduler = new DFSScheduler(inputGraph, noProcessors);
+        scheduler = new AStarSearchScheduler(inputGraph, noProcessors);
         // create task to run on a separate thread
         return new Task<Void>() {
             @Override
