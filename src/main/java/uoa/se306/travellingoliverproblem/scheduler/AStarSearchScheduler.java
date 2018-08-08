@@ -17,7 +17,6 @@ Scheduler for the A Star Algorithm
  */
 public class AStarSearchScheduler extends Scheduler {
 
-    private long totalCost;
     private Set<String> existingSchedules;
 
     public AStarSearchScheduler(Graph graph, int amountOfProcessors) {
@@ -26,34 +25,31 @@ public class AStarSearchScheduler extends Scheduler {
 
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
-        existingSchedules.add(currentSchedule.toString()); // store this schedule as visited
-        branchesConsidered++;
-
-        // if there are no more nodes to schedule
-        if(currentSchedule.getAvailableNodes().isEmpty()){
-            if(bestSchedule == null || bestSchedule.getOverallTime() > currentSchedule.getOverallTime()){
-                bestSchedule = currentSchedule;
-            }
-            return;
-        }
-
-        Stack<Schedule> optimalSchedules = new Stack<>(); // stack containing the partial schedules that are a part of optimal schedule
-        PriorityQueue<Schedule> aStarQueue = new PriorityQueue<>();
-
-        Set<Node> currentAvailableNodes = new HashSet<>(currentSchedule.getAvailableNodes());
-        for(Node node : currentAvailableNodes){
-            // get all the processors
-            ScheduledProcessor[] processors = currentSchedule.getProcessors();
 
 
+//        existingSchedules.add(currentSchedule.toString()); // store this schedule as visited
+//        branchesConsidered++;
+//
+//        // if there are no more nodes to schedule
+//        if(currentSchedule.getAvailableNodes().isEmpty()){
+//            if(bestSchedule == null || bestSchedule.getOverallTime() > currentSchedule.getOverallTime()){
+//                bestSchedule = currentSchedule;
+//            }
+//            return;
+//        }
+//
+//        Stack<Schedule> optimalSchedules = new Stack<>(); // stack containing the partial schedules that are a part of optimal schedule
+//        PriorityQueue<Schedule> aStarQueue = new PriorityQueue<>();
+//
+//        Set<Node> currentAvailableNodes = new HashSet<>(currentSchedule.getAvailableNodes());
+//        for(Node node : currentAvailableNodes){
+//            // get all the processors
+//            ScheduledProcessor[] processors = currentSchedule.getProcessors();
+//
+//
+//
+//        }
 
-        }
-
-
-
-
-//        CostFunction costFunction = new CostFunction(currentSchedule);
-//        totalCost = costFunction.calculateCost();
     }
 
 

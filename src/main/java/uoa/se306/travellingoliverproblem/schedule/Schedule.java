@@ -13,13 +13,15 @@ public class Schedule implements Comparable<Schedule>{
     private Set<Node> unAddedNodes = new HashSet<>();
     private Set<Node> availableNodes = new HashSet<>();
     private int overallTime = 0;
+    private int COMPUTATIONAL_LOAD;
+
 
     private ScheduledProcessor[] processors;
 
     // Constructor
-    public Schedule(int processorCount, Collection<Node> availableNodes, Collection<Node> allNodes) {
-        unAddedNodes.addAll(allNodes); // Why is this adding all the nodes to the unAdded set ?
-                                        //because initially, none of the nodes have been added the schedule
+    public Schedule(int processorCount, Collection<Node> availableNodes, Collection<Node> allNodes ,int COMPUTATIONAL_LOAD) {
+        unAddedNodes.addAll(allNodes);
+        this.COMPUTATIONAL_LOAD = COMPUTATIONAL_LOAD;
         this.availableNodes.addAll(availableNodes); // Keeps track of which nodes becomes available to be added in a processor
 
         processors = new ScheduledProcessor[processorCount];
@@ -32,6 +34,7 @@ public class Schedule implements Comparable<Schedule>{
     public Schedule(Schedule toCopy) {
         processors = new ScheduledProcessor[toCopy.processors.length];
         overallTime = toCopy.overallTime;
+        COMPUTATIONAL_LOAD = toCopy.COMPUTATIONAL_LOAD;
         unAddedNodes = new HashSet<>(toCopy.unAddedNodes);
         availableNodes = new HashSet<>(toCopy.availableNodes);
         // Copy the ScheduledProcessors within using copy constructor
@@ -102,6 +105,10 @@ public class Schedule implements Comparable<Schedule>{
 
     public int getOverallTime() {
         return overallTime;
+    }
+
+    public int getCOMPUTATIONAL_LOAD(){
+        return COMPUTATIONAL_LOAD;
     }
 
     public void setMaxOverallTime(){

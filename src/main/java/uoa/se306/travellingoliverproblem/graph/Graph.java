@@ -26,4 +26,14 @@ public class Graph {
     public String getGraphName() { return graphName; }
 
 
+    /*
+    This method gets the total weights of all the nodes in the graph
+     */
+    public int getComputationalLoad() {
+        int load = 0;
+        for (Node node : allNodes){
+            load += node.getCost();
+        }
+        return load;
+    }
 }

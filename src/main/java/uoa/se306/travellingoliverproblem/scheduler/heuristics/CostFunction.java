@@ -10,21 +10,17 @@ import java.util.Set;
 
 public class CostFunction {
     private Schedule partialSchedule;
-    ScheduledProcessor[] processors;
-    Set<Node> availableNodes;
-    // we don't need this
-    HashMap<Node, Integer> bottomLevelMap;
-    // From the partial schedule
-    // we can get the node.getBottomLevel()
+    private ScheduledProcessor[] processors;
+    private Set<Node> availableNodes;
+
 
     private long maxStartTimeAndBottomLevel;
     private float idleTimeAndComputation;
     private long maxDataReadyTimeAndBottomLevel;
 
 
-    public CostFunction(Schedule partialSchedule , HashMap<Node, Integer> bottomLevelMap){
+    public CostFunction(Schedule partialSchedule){
         this.partialSchedule = partialSchedule;
-        this.bottomLevelMap = bottomLevelMap;
         maxStartTimeAndBottomLevel = 0;
         idleTimeAndComputation = 0;
         maxDataReadyTimeAndBottomLevel =0;
@@ -68,12 +64,11 @@ public class CostFunction {
     }
 
     /*
-    The second cost function principle is to calculate the total idle time of the given schedule
-    plus (total computational load / processors)
+    The second cost function principle is to calculate the
+    (total idle time + total computational load ) / processors
      */
     private void idleTimeAndComputation(){
-        int totalIdelTime = 0;
-        int totalComputationalTime = 0;
+        int totalIdleTime = 0;
         int currentTimeCounter = 0;
 
         //For each processor p
@@ -86,19 +81,18 @@ public class CostFunction {
         //          update the currentTimeCounter to be the nodes endTime
         //          add the nodes (execution time, weight, cost, length) to the totalComputationalTime
         //idleTimeAndComputation = totalIdleTime + (totalComputationalTime / processors.size())
+
         for(ScheduledProcessor p : processors){
             for (ScheduleEntry node : p.getFullSchedule()){
                 if (node.getStartTime() > currentTimeCounter){
-                    totalIdelTime = totalIdelTime + node.getStartTime() - currentTimeCounter;
+                    totalIdleTime = totalIdleTime + node.getStartTime() - currentTimeCounter;
                     currentTimeCounter = node.getEndTime();
-                    totalComputationalTime += node.getLength();
                 }else{
                     currentTimeCounter = node.getEndTime();
-                    totalComputationalTime += node.getLength();
                 }
             }
         }
-        idleTimeAndComputation = totalIdelTime + (totalComputationalTime / processors.length);
+        idleTimeAndComputation = (totalIdleTime + partialSchedule.getCOMPUTATIONAL_LOAD()) / processors.length;
 
     }
 

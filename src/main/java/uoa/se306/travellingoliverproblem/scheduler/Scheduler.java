@@ -27,7 +27,7 @@ public abstract class Scheduler {
     // Initial call to the recursive function, returns a Schedule object
     // Template method pattern
     public Schedule getBestSchedule() {
-        calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes()));
+        calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes() , graph.getComputationalLoad()));
         return bestSchedule;
     }
 
