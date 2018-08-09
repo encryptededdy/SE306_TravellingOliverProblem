@@ -182,6 +182,7 @@ public class Schedule implements Comparable<Schedule>{
 
     @Override
     public int compareTo(Schedule o) {
+        if ((this instanceof ScheduleAStar) && (o instanceof ScheduleAStar)) return ((ScheduleAStar) this).compareTo((ScheduleAStar) o);
         return Integer.compare(overallTime, o.overallTime);
     }
 }

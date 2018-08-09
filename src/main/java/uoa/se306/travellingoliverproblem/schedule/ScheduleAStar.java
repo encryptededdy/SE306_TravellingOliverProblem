@@ -5,7 +5,7 @@ import uoa.se306.travellingoliverproblem.scheduler.heuristics.CostFunction;
 
 import java.util.Collection;
 
-public class ScheduleAStar extends Schedule{
+public class ScheduleAStar extends Schedule {
 
     private float cost =0;
 
@@ -27,16 +27,18 @@ public class ScheduleAStar extends Schedule{
         return cost;
     }
 
-    public int compareTo(ScheduleAStar otherSchedule) {
 
+    public int compareTo(ScheduleAStar otherSchedule) {
+        //System.out.println("this cost: " + cost + " that cost: "+ otherSchedule.getCost());
         if (cost < otherSchedule.getCost()){
             return -1;
         }else if (cost == otherSchedule.getCost()){
-            return 1;
-        }else{
             return 0;
+        }else{
+            return 1;
         }
     }
+
 
 
 }

@@ -32,7 +32,7 @@ public class AStarSearchScheduler extends Scheduler {
     private void solveAStar(ScheduleAStar currentSchedule) {
 
         branchesConsidered++;
-        //currentSchedule.getCostFunction();
+        currentSchedule.getCostFunction();
         candidateSchedules.add(currentSchedule);
         existingSchedules.add(new MinimalSchedule(currentSchedule)); // store this schedule as visited
 
@@ -82,23 +82,12 @@ public class AStarSearchScheduler extends Scheduler {
                         ScheduleAStar tempSchedule = new ScheduleAStar(partial);
                         //add the availableNode into processor i at time startTime in the schedule
                         tempSchedule.addToSchedule(node, i, startTime);
-                        //================================ debugging mode=====================================
-                        //System.out.println("tempSchedule function cost = " + tempSchedule.getCost() + " tempSchedule available nodes = " + tempSchedule.getAvailableNodes());
-
-
-                        //====================================================================================
-
-
-                        //if the HashSet already contains this MinimalSchedule(tempSchedule)
-                        //  don't add it into the candidateSchedules priority queue
-                        //else
-                        //  add this schedule in the candidateSchedules priority queue
-                        //  add this MinimalSchedule into the HashSet
                         MinimalSchedule m = new MinimalSchedule(tempSchedule);
 
                         if (!existingSchedules.contains(m)){
-                            existingSchedules.add(m);
                             tempSchedule.getCostFunction();
+                            existingSchedules.add(m);
+
                             candidateSchedules.add(tempSchedule);
                         }else{
                             branchesKilled++;

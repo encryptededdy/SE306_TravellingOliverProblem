@@ -34,12 +34,15 @@ public class CostFunction {
         maxStartTimeAndBottomLevel();
         idleTimeAndComputation();
         maxDataReadyTimeAndBottomLevel();
+        //System.out.println("startTime: "+ maxStartTimeAndBottomLevel + "-----idle: "+ idleTimeAndComputation + "-----dataready: "+ maxDataReadyTimeAndBottomLevel);
         int max = Math.max(maxDataReadyTimeAndBottomLevel, maxStartTimeAndBottomLevel);
 
         if (max > idleTimeAndComputation){
-            return idleTimeAndComputation;
-        }else{
             return (float)max;
+
+        }else{
+
+            return idleTimeAndComputation;
         }
 
     }
