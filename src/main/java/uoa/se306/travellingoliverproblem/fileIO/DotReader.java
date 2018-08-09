@@ -41,6 +41,11 @@ public class DotReader implements GraphFileReader {
                 Integer weight = Integer.parseInt(edge.getAttribute("Weight").toString());
                 Node source = convertedNodes.get(edge.getNode1().getId());
                 Node dest = convertedNodes.get(edge.getNode2().getId());
+                Integer level = source.getLevel() + 1;
+                if (level > dest.getLevel()) {
+                    dest.setLevel(level);
+                    calculateChildLevel(dest, level);
+                }
                 source.addChild(dest, weight);
                 dest.addParent(source, weight);
             }
@@ -50,11 +55,14 @@ public class DotReader implements GraphFileReader {
 
         // create the graph
         Set<Node> startNodes = new HashSet<>();
-
+        int levels = 0;
         // find parentless nodes
         for (Node node : convertedNodes.values()) {
             if (node.getParents().isEmpty()) {
                 startNodes.add(node);
+            }
+            if (node.getChildren().isEmpty() && node.getLevel() > levels) {
+                levels = node.getLevel();
             }
         }
 
@@ -62,6 +70,15 @@ public class DotReader implements GraphFileReader {
             throw new InvalidFileFormatException("Cycle found in acyclic graph (or empty)");
         }
 
-        return new Graph(startNodes, convertedNodes.values(), graphName);
+        return new Graph(startNodes, convertedNodes.values(), levels, graphName);
+    }
+
+    private void calculateChildLevel(Node currentNode, Integer level) {
+        for (Node childrenNodes: currentNode.getChildren().keySet()) {
+            if (level > childrenNodes.getLevel()) {
+                childrenNodes.setLevel(level);
+                calculateChildLevel(childrenNodes, level++);
+            }
+        }
     }
 }

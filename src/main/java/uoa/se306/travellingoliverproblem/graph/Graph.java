@@ -9,12 +9,14 @@ public class Graph {
     private String graphName;
 
     private Set<Node> startingNodes = new HashSet<>(); // should this be made unmodifiable?
-
     private Set<Node> allNodes = new TreeSet<>(); // same as above
 
-    public Graph(Collection<Node> startingNodes, Collection<Node> allNodes, String graphName) {
+    private Integer levels;
+
+    public Graph(Collection<Node> startingNodes, Collection<Node> allNodes, Integer levels, String graphName) {
         this.startingNodes.addAll(startingNodes);
         this.allNodes.addAll(allNodes);
+        this.levels = levels;
         this.graphName = graphName;
     }
 
@@ -27,4 +29,8 @@ public class Graph {
     }
 
     public String getGraphName() { return graphName; }
+
+    public Integer getLevels() {
+        return levels;
+    }
 }
