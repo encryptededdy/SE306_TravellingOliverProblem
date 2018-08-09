@@ -106,11 +106,8 @@ public class DFSScheduler extends Scheduler {
                         branchesKilled++; // drop this branch
                     }
                 } else {
-                    branchesKilled++; // drop this branch
-                }
-            } else {
-                branchesKilled += candidateSchedules.size() + 1;
-                break; // It's a priority queue, so we can just drop the rest
+                    branchesKilled += candidateSchedules.size() + 1;
+                    break; // It's a priority queue, so we can just drop the rest
             }
         }
     }
