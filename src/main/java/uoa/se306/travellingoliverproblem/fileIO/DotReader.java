@@ -32,11 +32,11 @@ public class DotReader implements GraphFileReader {
         Map<String, Node> convertedNodes = new HashMap<>();
 
         try {
+            int currentid = 0;
             for (GraphNode node : readNodes.values()) {
                 Integer weight = Integer.parseInt(node.getAttribute("Weight").toString());
-                convertedNodes.put(node.getId(), new Node(node.getId(), weight));
+                convertedNodes.put(node.getId(), new Node(node.getId(), weight, currentid++));
             }
-
             for (GraphEdge edge : readEdges.values()) {
                 Integer weight = Integer.parseInt(edge.getAttribute("Weight").toString());
                 Node source = convertedNodes.get(edge.getNode1().getId());

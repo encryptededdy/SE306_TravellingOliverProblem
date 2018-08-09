@@ -17,6 +17,7 @@ public class DotStandardOutput implements ScheduleOutputter {
 
     public DotStandardOutput(Graph graph, Schedule schedule) {
         String outputGraphName = graph.getGraphName().substring(0,1).toUpperCase() + graph.getGraphName().substring(1);
+        outputGraphName = removeQuotes(outputGraphName);
         this.dotOutputStringBuilder = new StringBuilder("digraph \"output" + outputGraphName + "\" {");
         this.graph = graph;
         this.schedule = schedule;
@@ -33,8 +34,10 @@ public class DotStandardOutput implements ScheduleOutputter {
                     addScheduleEntryToOutput(processor.getEntry(node), i);
                 }
             }
-            this.addEdgesToOutput(node);
         });
+        for (Node node: graph.getAllNodes()){
+            addEdgesToOutput(node);
+        }
         this.dotOutputStringBuilder.append("\n}"); // Adding Final Line
 
         //System.out.print(this.dotOutputStringBuilder.toString());
@@ -57,6 +60,7 @@ public class DotStandardOutput implements ScheduleOutputter {
 
     private void addScheduleEntryToOutput(ScheduleEntry entry, int processor) {
         Node node = entry.getNode();
+        processor++;
 
         this.dotOutputStringBuilder.append("\n\t");
         this.dotOutputStringBuilder.append(node);
@@ -64,5 +68,15 @@ public class DotStandardOutput implements ScheduleOutputter {
         this.dotOutputStringBuilder.append("[Weight=" + node.getCost() + ",");
         this.dotOutputStringBuilder.append("Start=" + entry.getStartTime() + ",");
         this.dotOutputStringBuilder.append("Processor=" + processor + "];");
+    }
+
+    private String removeQuotes(String title){
+        if(title.charAt(0) == '\"'){
+            title = title.substring(1);
+        }
+        if(title.charAt(title.length() - 1) == '\"'){
+            title = title.substring(0, title.length() - 1);
+        }
+        return title;
     }
 }

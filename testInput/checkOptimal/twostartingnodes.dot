@@ -1,0 +1,7 @@
+digraph MultipleStartingNodes {
+    a [Weight=1];
+    b [Weight=1];
+    c [Weight=1];
+	a -> c	 [Weight=1];
+	b -> c	 [Weight=2];
+}

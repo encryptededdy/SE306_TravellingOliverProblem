@@ -2,10 +2,8 @@ package uoa.se306.travellingoliverproblem.schedule;
 
 import uoa.se306.travellingoliverproblem.graph.Node;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /*
@@ -110,8 +108,68 @@ public class Schedule implements Comparable<Schedule>{
         overallTime = Integer.MAX_VALUE;
     }
 
-    public boolean checkValidity() {
+    public boolean checkValidity() throws InvalidScheduleException {
         // TODO: Implement Schedule validity check (i.e. no overlaps etc.)
+
+        try {
+            // Check that there are no unadded nodes in the schedule.
+            if (unAddedNodes.size() > 0) {
+                throw new InvalidScheduleException("There are " + unAddedNodes.size() + " nodes that have not" +
+                        " been added to a schedule");
+            }
+        /*
+        Check that for each Schedule Entry in each processor, each parent has a schedule entry where the EndTime
+        is before the start time of the original schedule entry if it is on the same processor
+        or if it is on a different processor, add the communication cost to the parents end time.
+        */
+
+
+
+            for (int i = 0; i < processors.length; i++) {
+                ScheduledProcessor processor = processors[i];
+                int processorIndex = i; // For use in lambda expression
+
+                ArrayList<ScheduleEntry> scheduleEntries = new ArrayList<>();
+                processor.getFullSchedule().forEach(scheduleEntry -> {
+                    // put all the schedule entries in an arraylist so the can be sorted
+                    scheduleEntries.add(scheduleEntry);
+                });
+                Collections.sort(scheduleEntries);
+
+                int prevNodeFinishTime = 0;
+                scheduleEntries.forEach(scheduleEntry -> {
+                    // Check for no overlaps on the same processor
+                    if (scheduleEntry.getStartTime() < prevNodeFinishTime) {
+                        throw new InvalidScheduleException("Invalid Schedule Exception: Schedule Entry Overlap");
+                    }
+
+                    // For each of the parents of the schedule entry
+                    scheduleEntry.getNode().getParents().forEach((parentNode, cost) -> {
+                        for (int j = 0; j < processors.length; j++) {
+                            if (processors[j].contains(parentNode)) { // TODO: Change this to not use contains, and instead cache the output (faster)
+
+                                // If the parent is scheduled on the same processor
+                                if (j == processorIndex) {
+                                    if (processors[j].getEntry(parentNode).getEndTime() > scheduleEntry.getStartTime()) {
+                                        // Check the parent task is completed before the child task starts
+                                        throw new InvalidScheduleException("Child task started before Parent task completed on the same processor");
+                                    }
+
+                                } else if (processors[j].getEntry(parentNode).getEndTime() + cost > scheduleEntry.getStartTime()){
+                                    // Check the parent task is completed + communication time before the child task starts
+                                    throw new InvalidScheduleException("Child task started before Parent task completed + communication cost on another processor");
+                                }
+                            }
+                        }
+                    });
+                });
+
+
+            }
+        } catch (InvalidScheduleException e) {
+            return false;
+        }
+
         return true;
     }
 
