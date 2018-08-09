@@ -12,7 +12,7 @@ Scheduler for the A Star Algorithm
  */
 public class AStarSearchScheduler extends Scheduler {
 
-    private Set<MinimalSchedule> existingSchedules;
+    private Set<MinimalSchedule> existingSchedules = new HashSet<>();
     private PriorityQueue<ScheduleAStar> candidateSchedules = new PriorityQueue<>();
 
     public AStarSearchScheduler(Graph graph, int amountOfProcessors) {
@@ -31,11 +31,15 @@ public class AStarSearchScheduler extends Scheduler {
 
     private void solveAStar(ScheduleAStar currentSchedule) {
 
+        branchesConsidered++;
+        //currentSchedule.getCostFunction();
         candidateSchedules.add(currentSchedule);
+        existingSchedules.add(new MinimalSchedule(currentSchedule)); // store this schedule as visited
 
         while (true) {
 
             ScheduleAStar partial = candidateSchedules.poll();
+            branchesConsidered++;
 
             // If the first partial schedule in the priority queue is complete
             // It is an optimal schedule
@@ -78,14 +82,28 @@ public class AStarSearchScheduler extends Scheduler {
                         ScheduleAStar tempSchedule = new ScheduleAStar(partial);
                         //add the availableNode into processor i at time startTime in the schedule
                         tempSchedule.addToSchedule(node, i, startTime);
-                        tempSchedule.getCostFunction();
                         //================================ debugging mode=====================================
                         //System.out.println("tempSchedule function cost = " + tempSchedule.getCost() + " tempSchedule available nodes = " + tempSchedule.getAvailableNodes());
 
 
                         //====================================================================================
-                        candidateSchedules.add(tempSchedule);
 
+
+                        //if the HashSet already contains this MinimalSchedule(tempSchedule)
+                        //  don't add it into the candidateSchedules priority queue
+                        //else
+                        //  add this schedule in the candidateSchedules priority queue
+                        //  add this MinimalSchedule into the HashSet
+                        MinimalSchedule m = new MinimalSchedule(tempSchedule);
+
+                        if (!existingSchedules.contains(m)){
+                            existingSchedules.add(m);
+                            tempSchedule.getCostFunction();
+                            candidateSchedules.add(tempSchedule);
+                        }else{
+                            branchesKilled++;
+                            branchesKilledDuplication++;
+                        }
                     }
                 }
             }

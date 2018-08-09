@@ -35,6 +35,7 @@ public class SchedulerRunner {
 
         //scheduler = new DFSScheduler(inputGraph, noProcessors);
         scheduler = new AStarSearchScheduler(inputGraph, noProcessors);
+
         // create task to run on a separate thread
         Runnable scheduleTask = () -> {
             long startTime = System.nanoTime();
@@ -57,6 +58,7 @@ public class SchedulerRunner {
 
         //scheduler = new DFSScheduler(inputGraph, noProcessors);
         scheduler = new AStarSearchScheduler(inputGraph, noProcessors);
+
         // create task to run on a separate thread
         return new Task<Void>() {
             @Override

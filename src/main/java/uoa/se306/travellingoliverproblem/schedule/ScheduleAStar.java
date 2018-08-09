@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public class ScheduleAStar extends Schedule{
 
-    private float cost;
+    private float cost =0;
 
     public ScheduleAStar(int processorCount, Collection<Node> availableNodes, Collection<Node> allNodes , int COMPUTATIONAL_LOAD) {
         super(processorCount, availableNodes, allNodes, COMPUTATIONAL_LOAD);

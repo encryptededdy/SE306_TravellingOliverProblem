@@ -5,7 +5,6 @@ import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
-import java.util.HashMap;
 import java.util.Set;
 
 public class CostFunction {
