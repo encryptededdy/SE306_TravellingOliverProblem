@@ -12,8 +12,6 @@ Scheduler for the A Star Algorithm
  */
 public class AStarSearchScheduler extends Scheduler {
 
-    private boolean foundOptimal = false;
-
     private Set<MinimalSchedule> existingSchedules;
     private PriorityQueue<ScheduleAStar> candidateSchedules = new PriorityQueue<>();
 
@@ -35,14 +33,15 @@ public class AStarSearchScheduler extends Scheduler {
 
         candidateSchedules.add(currentSchedule);
 
-
-        while (!foundOptimal) {
+        while (true) {
 
             ScheduleAStar partial = candidateSchedules.poll();
 
+            // If the first partial schedule in the priority queue is complete
+            // It is an optimal schedule
             if (partial.getAvailableNodes().isEmpty()){
-                foundOptimal = true;
                 bestSchedule = partial;
+                break;
             }else {
                 // Get all the available nodes in the schedule
                 Set<Node> availableNodes = new HashSet<>(partial.getAvailableNodes());
