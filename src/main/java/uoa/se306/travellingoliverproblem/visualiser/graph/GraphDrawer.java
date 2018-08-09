@@ -14,9 +14,7 @@ import javafx.util.Duration;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 public class GraphDrawer {
     private Pane parentPane;
@@ -39,7 +37,7 @@ public class GraphDrawer {
 
     public void drawGraph() {
         HashSet<Node> currentLevel = new HashSet<>(graph.getStartingNodes()); // start with... starting nodes
-        drawLevel(currentLevel);
+        drawLevel(currentLevel, new HashSet<>());
 
         // hacky delay
         PauseTransition pt = new PauseTransition(Duration.seconds(0.5));
@@ -47,20 +45,46 @@ public class GraphDrawer {
         pt.play();
     }
 
-    private void drawLevel(HashSet<Node> currentLevel) {
+    private void drawLevel(HashSet<Node> currentLevel, HashSet<Node> postponed) {
+        HashSet<Node> thisLevel = new HashSet<>();
         HashSet<Node> subLevel = new HashSet<>();
         HBox horizBox = new HBox();
         horizBox.setAlignment(Pos.CENTER);
-        for (Node n : currentLevel) {
-            if (!visited.containsKey(n)) {
+
+        Iterator<Node> postponedIterator = postponed.iterator(); // use iterator to prevent concurrentModification when removing from inside loop
+        while (postponedIterator.hasNext()) { // consider postponed nodes first
+            Node n = postponedIterator.next();
+            if (!visited.containsKey(n) &&
+                    Collections.disjoint(n.getChildren().keySet(), thisLevel) &&
+                    Collections.disjoint(n.getParents().keySet(), thisLevel) &&
+                    (thisLevel.size() <= 5)) { // if there are no parents/children on this level
                 GraphNode graphNode = new GraphNode(n.toString(), n.getCost());
                 horizBox.getChildren().add(graphNode);
                 visited.put(n, graphNode);
                 subLevel.addAll(n.getChildren().keySet());
+                postponedIterator.remove();
+                thisLevel.add(n); // but add this to thisLevel
+            }
+        }
+        for (Node n : currentLevel) { // ...then consider the "normal" nodes
+            if (thisLevel.size() >= 5) {
+                postponed.add(n); // max width of each row is 5
+            } else if (!visited.containsKey(n)) {
+                if (Collections.disjoint(n.getChildren().keySet(), thisLevel) &&
+                        Collections.disjoint(n.getParents().keySet(), thisLevel)) { // if there are no parents/children on this level
+                    GraphNode graphNode = new GraphNode(n.toString(), n.getCost());
+                    horizBox.getChildren().add(graphNode);
+                    visited.put(n, graphNode);
+                    thisLevel.add(n);
+                    subLevel.addAll(n.getChildren().keySet());
+                } else {
+                    // Postpone this node
+                    postponed.add(n);
+                }
             }
         }
         vbox.getChildren().add(horizBox);
-        if (subLevel.size() > 0) drawLevel(subLevel);
+        if (subLevel.size() > 0) drawLevel(subLevel, postponed);
     }
 
     public void drawLines() {

@@ -20,14 +20,14 @@ public class GraphNode extends Pane {
 
         this.name = name;
 
-        circle.setRadius(30);
+        circle.setRadius(25);
         circle.setFill(Color.SKYBLUE);
 
         Text nameLabel = new Text(name);
         Text costLabel = new Text(cost.toString());
         nameLabel.setFill(Color.WHITE);
-        nameLabel.setFont(new Font(25));
-        costLabel.setFont(new Font(38));
+        nameLabel.setFont(new Font(20));
+        costLabel.setFont(new Font(34));
         costLabel.setOpacity(0.4);
         costLabel.setFill(Color.WHITE);
 
