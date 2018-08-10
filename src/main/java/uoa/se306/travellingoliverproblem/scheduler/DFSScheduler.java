@@ -15,7 +15,6 @@ import java.util.Set;
 public class DFSScheduler extends Scheduler {
 
     // useEquivalentScheduleCulling always enabled.
-    private boolean useCurrentBestCulling = true;
     private boolean useGreedyInitialSchedule = false;
     private boolean useLocalPriorityQueue = true;
 
@@ -83,7 +82,7 @@ public class DFSScheduler extends Scheduler {
                 tempSchedule.addToSchedule(node, j, startTime);
                 // Only continue if sub-schedule time is under upper bound
                 // i.e. skip this branch if its overall time is already longer than the currently known best overall time
-                if (!useCurrentBestCulling || bestSchedule == null || tempSchedule.getOverallTime() < bestSchedule.getOverallTime()) {
+                if (bestSchedule == null || tempSchedule.getCost() < bestSchedule.getOverallTime()) {
                     candidateSchedules.add(tempSchedule);
                 } else {
                     branchesKilled++; // drop this branch
@@ -93,7 +92,7 @@ public class DFSScheduler extends Scheduler {
         if (useLocalPriorityQueue) {
             while (!candidateSchedules.isEmpty()) {
                 Schedule candidate = candidateSchedules.poll();
-                if (bestSchedule == null || candidate.getOverallTime() < bestSchedule.getOverallTime()) {
+                if (bestSchedule == null || candidate.getCost() < bestSchedule.getOverallTime()) {
                     // Only continue if this schedule hasn't been considered before
                     if (!existingSchedules.contains(new MinimalSchedule(candidate))) {
                         calculateScheduleRecursive(candidate);

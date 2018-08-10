@@ -17,6 +17,9 @@ public class Schedule implements Comparable<Schedule>{
     private float cost = 0;
     private int overallTime = 0;
 
+    public float getCost() {
+        return cost;
+    }
 
     private ScheduledProcessor[] processors;
 

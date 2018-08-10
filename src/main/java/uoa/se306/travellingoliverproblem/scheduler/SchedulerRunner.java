@@ -31,8 +31,8 @@ public class SchedulerRunner {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
-        //scheduler = new DFSScheduler(inputGraph, noProcessors);
-        scheduler = new AStarSearchScheduler(inputGraph, noProcessors);
+        scheduler = new DFSScheduler(inputGraph, noProcessors);
+        //scheduler = new AStarSearchScheduler(inputGraph, noProcessors);
 
         // create task to run on a separate thread
         Runnable scheduleTask = () -> {
@@ -54,8 +54,8 @@ public class SchedulerRunner {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
-        //scheduler = new DFSScheduler(inputGraph, noProcessors);
-        scheduler = new AStarSearchScheduler(inputGraph, noProcessors);
+        scheduler = new DFSScheduler(inputGraph, noProcessors);
+        //scheduler = new AStarSearchScheduler(inputGraph, noProcessors);
 
         // create task to run on a separate thread
         return new Task<Void>() {
