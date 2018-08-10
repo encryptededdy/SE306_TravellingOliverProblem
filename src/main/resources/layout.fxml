@@ -35,7 +35,7 @@
       </AnchorPane>
         <HBox prefHeight="550.0">
          <children>
-             <ScrollPane maxHeight="550.0" prefHeight="550.0" prefWidth="380.0">
+             <ScrollPane fx:id="graphScrollPane" maxHeight="550.0" prefHeight="550.0" prefWidth="380.0">
                <content>
                     <Pane fx:id="graphPane" />
                </content>

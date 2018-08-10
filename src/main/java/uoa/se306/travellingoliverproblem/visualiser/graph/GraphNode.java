@@ -33,7 +33,7 @@ public class GraphNode extends Pane {
 
         StackPane stack = new StackPane();
         stack.getChildren().addAll(circle, costLabel, nameLabel);
-        stack.setPadding(new Insets(10));
+        stack.setPadding(new Insets(5));
 
         // set view
         getChildren().add(stack);

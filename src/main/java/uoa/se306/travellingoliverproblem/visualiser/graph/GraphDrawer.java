@@ -87,7 +87,7 @@ public class GraphDrawer {
         if (subLevel.size() > 0) drawLevel(subLevel, postponed);
     }
 
-    public void drawLines() {
+    private void drawLines() {
         for (Map.Entry<Node, GraphNode> node : visited.entrySet()) {
             for (Map.Entry<Node, Integer> child : node.getKey().getChildren().entrySet()) {
                 // Draw a line!

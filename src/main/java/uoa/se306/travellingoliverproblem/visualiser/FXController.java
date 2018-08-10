@@ -10,6 +10,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
@@ -19,8 +20,8 @@ import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.SchedulerRunner;
-import uoa.se306.travellingoliverproblem.visualiser.graph.GraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
+import uoa.se306.travellingoliverproblem.visualiser.graph.SequentialGraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.schedule.ScheduleDrawer;
 
 import java.util.Map;
@@ -41,12 +42,15 @@ public class FXController {
     @FXML
     private Text statusText;
 
+    @FXML
+    private ScrollPane graphScrollPane;
+
     private Map<Node, GraphNode> graphNodeMap;
     private Timeline timeline;
     private long lastBranches = 0;
 
     private void drawGraph(Graph graph) {
-        GraphDrawer drawer = new GraphDrawer(graphPane, graph);
+        SequentialGraphDrawer drawer = new SequentialGraphDrawer(graphPane, graph, graphScrollPane);
         drawer.drawGraph();
         graphNodeMap = drawer.getGraphNodes();
     }
