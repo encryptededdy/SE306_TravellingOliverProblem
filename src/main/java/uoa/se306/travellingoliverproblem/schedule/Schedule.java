@@ -1,6 +1,8 @@
 package uoa.se306.travellingoliverproblem.schedule;
 
 import uoa.se306.travellingoliverproblem.graph.Node;
+import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
+import uoa.se306.travellingoliverproblem.scheduler.heuristics.CostFunction;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -12,16 +14,15 @@ This class describes a section of a schedule for a given input graph
 public class Schedule implements Comparable<Schedule>{
     private Set<Node> unAddedNodes = new HashSet<>();
     private Set<Node> availableNodes = new HashSet<>();
+    private float cost = 0;
     private int overallTime = 0;
-    private int COMPUTATIONAL_LOAD;
 
 
     private ScheduledProcessor[] processors;
 
     // Constructor
-    public Schedule(int processorCount, Collection<Node> availableNodes, Collection<Node> allNodes ,int COMPUTATIONAL_LOAD) {
+    public Schedule(int processorCount, Collection<Node> availableNodes, Collection<Node> allNodes) {
         unAddedNodes.addAll(allNodes);
-        this.COMPUTATIONAL_LOAD = COMPUTATIONAL_LOAD;
         this.availableNodes.addAll(availableNodes); // Keeps track of which nodes becomes available to be added in a processor
 
         processors = new ScheduledProcessor[processorCount];
@@ -33,14 +34,19 @@ public class Schedule implements Comparable<Schedule>{
     // Copy constructor
     public Schedule(Schedule toCopy) {
         processors = new ScheduledProcessor[toCopy.processors.length];
+        cost = toCopy.cost;
         overallTime = toCopy.overallTime;
-        COMPUTATIONAL_LOAD = toCopy.COMPUTATIONAL_LOAD;
         unAddedNodes = new HashSet<>(toCopy.unAddedNodes);
         availableNodes = new HashSet<>(toCopy.availableNodes);
         // Copy the ScheduledProcessors within using copy constructor
         for (int i = 0; i < processors.length; i++) {
             processors[i] = new ScheduledProcessor(toCopy.processors[i]);
         }
+    }
+
+    private void calculateCostFunction(){
+        CostFunction costFunction = new CostFunction(this, Scheduler.COMPUTATIONAL_LOAD);
+        cost = costFunction.calculateCost();
     }
 
     // Returns all the processors
@@ -73,6 +79,13 @@ public class Schedule implements Comparable<Schedule>{
         return false;
     }
 
+    public MinimalSchedule testAddToSchedule(Node node, int processorNo, int startTime) {
+        ScheduledProcessor[] processorsCopy = processors.clone();
+        processorsCopy[processorNo] = new ScheduledProcessor(processorsCopy[processorNo]); // copy appropriate proc
+        processorsCopy[processorNo].add(node, startTime);
+        return new MinimalSchedule(processorsCopy);
+    }
+
     // Adds a node to a given processor
     public void addToSchedule(Node node, int processorNo, int startTime) {
         processors[processorNo].add(node, startTime);
@@ -91,6 +104,7 @@ public class Schedule implements Comparable<Schedule>{
             // If the child has had all its dependencies fulfilled, add the child to the available set
             if (available) availableNodes.add(child);
         }
+        calculateCostFunction();
     }
 
     // Returns all nodes that have not been added to the schedule
@@ -105,10 +119,6 @@ public class Schedule implements Comparable<Schedule>{
 
     public int getOverallTime() {
         return overallTime;
-    }
-
-    public int getCOMPUTATIONAL_LOAD(){
-        return COMPUTATIONAL_LOAD;
     }
 
     public void setMaxOverallTime(){
@@ -181,8 +191,9 @@ public class Schedule implements Comparable<Schedule>{
     }
 
     @Override
-    public int compareTo(Schedule o) {
-        if ((this instanceof ScheduleAStar) && (o instanceof ScheduleAStar)) return ((ScheduleAStar) this).compareTo((ScheduleAStar) o);
-        return Integer.compare(overallTime, o.overallTime);
+    public int compareTo(Schedule otherSchedule) {
+        //System.out.println("this cost: " + cost + " that cost: "+ otherSchedule.getCost());
+        return Float.compare(cost, otherSchedule.cost);
     }
+
 }

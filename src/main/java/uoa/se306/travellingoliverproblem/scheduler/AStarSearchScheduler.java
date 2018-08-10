@@ -13,7 +13,7 @@ Scheduler for the A Star Algorithm
 public class AStarSearchScheduler extends Scheduler {
 
     private Set<MinimalSchedule> existingSchedules = new HashSet<>();
-    private PriorityQueue<ScheduleAStar> candidateSchedules = new PriorityQueue<>();
+    private PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
 
     public AStarSearchScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors);
@@ -21,24 +21,18 @@ public class AStarSearchScheduler extends Scheduler {
 
     @Override
     protected void calculateSchedule(Schedule currentSchedule){
-        if (currentSchedule instanceof ScheduleAStar){
-            solveAStar((ScheduleAStar)currentSchedule);
-        }else{
-            throw new InvalidScheduleException("currentSchedule is not an instance of ScheduleAStar");
-        }
+        solveAStar(currentSchedule);
     }
 
 
-    private void solveAStar(ScheduleAStar currentSchedule) {
-
+    private void solveAStar(Schedule currentSchedule) {
         branchesConsidered++;
-        currentSchedule.getCostFunction();
         candidateSchedules.add(currentSchedule);
         existingSchedules.add(new MinimalSchedule(currentSchedule)); // store this schedule as visited
 
         while (true) {
 
-            ScheduleAStar partial = candidateSchedules.poll();
+            Schedule partial = candidateSchedules.poll();
             branchesConsidered++;
 
             // If the first partial schedule in the priority queue is complete
@@ -78,16 +72,15 @@ public class AStarSearchScheduler extends Scheduler {
                         }
                         //get the earliestStartTime that this available node can be scheduled (In this processor)
                         startTime = processor.getEarliestStartAfter(startTime, node.getCost());
-                        //create a copy of our partialSchedule
-                        ScheduleAStar tempSchedule = new ScheduleAStar(partial);
-                        //add the availableNode into processor i at time startTime in the schedule
-                        tempSchedule.addToSchedule(node, i, startTime);
-                        MinimalSchedule m = new MinimalSchedule(tempSchedule);
+
+                        MinimalSchedule m = partial.testAddToSchedule(node, i, startTime);
 
                         if (!existingSchedules.contains(m)){
-                            tempSchedule.getCostFunction();
+                            //create a copy of our partialSchedule
+                            //add the availableNode into processor i at time startTime in the schedule
+                            Schedule tempSchedule = new Schedule(partial);
+                            tempSchedule.addToSchedule(node, i, startTime);
                             existingSchedules.add(m);
-
                             candidateSchedules.add(tempSchedule);
                         }else{
                             branchesKilled++;

@@ -17,8 +17,11 @@ public class CostFunction {
     private float idleTimeAndComputation;
     private int maxDataReadyTimeAndBottomLevel;
 
+    private int computationalLoad;
 
-    public CostFunction(Schedule partialSchedule){
+
+    public CostFunction(Schedule partialSchedule, int computationalLoad){
+        this.computationalLoad = computationalLoad;
         this.partialSchedule = partialSchedule;
         maxStartTimeAndBottomLevel = 0;
         idleTimeAndComputation = 0.0f;
@@ -102,7 +105,7 @@ public class CostFunction {
             }
         }
 
-        idleTimeAndComputation = ((float)totalIdleTime + (float)partialSchedule.getCOMPUTATIONAL_LOAD()) / (float)processors.length ;;
+        idleTimeAndComputation = (float)totalIdleTime + (float)computationalLoad / (float)processors.length;
     }
 
     /*

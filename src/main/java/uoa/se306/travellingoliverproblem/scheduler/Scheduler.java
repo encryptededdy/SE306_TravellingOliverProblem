@@ -2,7 +2,6 @@ package uoa.se306.travellingoliverproblem.scheduler;
 
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
-import uoa.se306.travellingoliverproblem.schedule.ScheduleAStar;
 
 /*
 Outlines signature for schedulers to adhere to
@@ -15,6 +14,8 @@ public abstract class Scheduler {
     // Graph of all nodes
     protected Graph graph;
 
+    public static int COMPUTATIONAL_LOAD;
+
     long branchesConsidered = 0;
     long branchesKilled = 0;
     long branchesKilledDuplication = 0;
@@ -22,14 +23,14 @@ public abstract class Scheduler {
     // constructor to initialize the input graph and the amount of processors to use
     Scheduler(Graph graph, int amountOfProcessors){
         this.graph = graph;
+        COMPUTATIONAL_LOAD = graph.getComputationalLoad();
         this.amountOfProcessors = amountOfProcessors;
     }
 
     // Initial call to the recursive function, returns a Schedule object
     // Template method pattern
     public Schedule getBestSchedule() {
-        //calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes() , graph.getComputationalLoad()));
-        calculateSchedule(new ScheduleAStar(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes() , graph.getComputationalLoad()));
+        calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes()));
 
         return bestSchedule;
     }
