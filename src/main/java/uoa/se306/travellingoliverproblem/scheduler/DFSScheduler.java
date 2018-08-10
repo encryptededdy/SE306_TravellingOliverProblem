@@ -1,5 +1,6 @@
 package uoa.se306.travellingoliverproblem.scheduler;
 
+import gnu.trove.set.hash.THashSet;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.MinimalSchedule;
@@ -9,6 +10,7 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import uoa.se306.travellingoliverproblem.scheduler.heuristics.GreedyBFS;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -16,9 +18,11 @@ public class DFSScheduler extends Scheduler {
 
     // useEquivalentScheduleCulling always enabled.
     private boolean useGreedyInitialSchedule = false;
-    private boolean useLocalPriorityQueue = true;
+    private boolean useExistingScheduleCleaner = true;
 
-    private Set<MinimalSchedule> existingSchedules = new HashSet<>();
+    private Set<MinimalSchedule> existingSchedules = new THashSet<>();
+
+    private long startTime;
 
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors);
@@ -31,11 +35,20 @@ public class DFSScheduler extends Scheduler {
             greedyScheduler.calculateGreedySchedule(new Schedule(currentSchedule));
             bestSchedule = greedyScheduler.getBestSchedule();
         }
+        startTime = System.currentTimeMillis();
         calculateScheduleRecursive(currentSchedule);
     }
 
+    private void cleanExistingSchedules() {
+        long startTime = System.nanoTime();
+        int previousSize = existingSchedules.size();
+        existingSchedules.removeIf(minimalSchedule -> minimalSchedule.getCost() >= bestSchedule.getOverallTime());
+        int cleaned = previousSize - existingSchedules.size();
+        long endTime = System.nanoTime();
+        System.out.println("Cleaning Took " + (endTime - startTime) / 1000000 + " ms, cleaned "+cleaned+" entries ("+(cleaned*100/previousSize)+"%)");
+    }
+
     private void calculateScheduleRecursive(Schedule currentSchedule) {
-        existingSchedules.add(new MinimalSchedule(currentSchedule)); // store this schedule as visited
         branchesConsidered++;
         // If the currentSchedule has no available nodes
         if (currentSchedule.getAvailableNodes().isEmpty()) {
@@ -43,6 +56,8 @@ public class DFSScheduler extends Scheduler {
             if (bestSchedule == null || bestSchedule.getOverallTime() > currentSchedule.getOverallTime()) {
                 System.out.println("Found new best schedule: "+currentSchedule.getOverallTime());
                 bestSchedule = currentSchedule;
+                // Only run cleaner if it's been at least 5 seconds since we started, otherwise there's no point
+                if (useExistingScheduleCleaner && System.currentTimeMillis() > startTime + 5000) cleanExistingSchedules();
             }
             return;
         }
@@ -89,21 +104,21 @@ public class DFSScheduler extends Scheduler {
                 }
             }
         }
-        if (useLocalPriorityQueue) {
-            while (!candidateSchedules.isEmpty()) {
-                Schedule candidate = candidateSchedules.poll();
-                if (bestSchedule == null || candidate.getCost() < bestSchedule.getOverallTime()) {
-                    // Only continue if this schedule hasn't been considered before
-                    if (!existingSchedules.contains(new MinimalSchedule(candidate))) {
-                        calculateScheduleRecursive(candidate);
-                    } else {
-                        branchesKilled++; // drop this branch
-                        branchesKilledDuplication++;
-                    }
+        while (!candidateSchedules.isEmpty()) {
+            Schedule candidate = candidateSchedules.poll();
+            if (bestSchedule == null || candidate.getCost() < bestSchedule.getOverallTime()) {
+                // Only continue if this schedule hasn't been considered before
+                MinimalSchedule minimal = new MinimalSchedule(candidate);
+                if (!existingSchedules.contains(minimal)) {
+                    existingSchedules.add(minimal);
+                    calculateScheduleRecursive(candidate);
                 } else {
-                    branchesKilled+=candidateSchedules.size()+1;
-                    break; // It's a priority queue, so we can just drop the rest
+                    branchesKilled++; // drop this branch
+                    branchesKilledDuplication++;
                 }
+            } else {
+                branchesKilled+=candidateSchedules.size()+1;
+                break; // It's a priority queue, so we can just drop the rest
             }
         }
     }

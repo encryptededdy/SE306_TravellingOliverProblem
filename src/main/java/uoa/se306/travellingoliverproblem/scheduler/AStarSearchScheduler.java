@@ -1,5 +1,6 @@
 package uoa.se306.travellingoliverproblem.scheduler;
 
+import gnu.trove.set.hash.THashSet;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.*;
@@ -12,7 +13,7 @@ Scheduler for the A Star Algorithm
  */
 public class AStarSearchScheduler extends Scheduler {
 
-    private Set<MinimalSchedule> existingSchedules = new HashSet<>();
+    private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
 
     public AStarSearchScheduler(Graph graph, int amountOfProcessors) {
@@ -81,7 +82,7 @@ public class AStarSearchScheduler extends Scheduler {
                             //add the availableNode into processor i at time startTime in the schedule
                             Schedule tempSchedule = new Schedule(partial);
                             tempSchedule.addToSchedule(node, j, startTime);
-                            existingSchedules.add(m);
+                            existingSchedules.add(new MinimalSchedule(tempSchedule)); // existingSchedules needs cost data
                             candidateSchedules.add(tempSchedule);
                         } else {
                             branchesKilled++;

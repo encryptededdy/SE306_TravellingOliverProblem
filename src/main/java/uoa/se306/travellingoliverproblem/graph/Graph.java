@@ -1,11 +1,13 @@
 package uoa.se306.travellingoliverproblem.graph;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.*;
 
 public class Graph {
     private String graphName;
 
-    private Set<Node> startingNodes = new HashSet<>(); // should this be made unmodifiable?
+    private Set<Node> startingNodes = new THashSet<>(); // should this be made unmodifiable?
 
     private Set<Node> allNodes = new TreeSet<>(); // same as above
 

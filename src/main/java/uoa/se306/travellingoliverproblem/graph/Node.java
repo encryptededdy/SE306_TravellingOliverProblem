@@ -1,5 +1,7 @@
 package uoa.se306.travellingoliverproblem.graph;
 
+import gnu.trove.map.hash.THashMap;
+
 import java.util.*;
 
 public class Node implements Comparable<Node> {
@@ -9,8 +11,8 @@ public class Node implements Comparable<Node> {
     private char identifier;
 
     // Integers for parents and children in hash map are the edge weight costs
-    private Map<Node, Integer> children = new HashMap<>();
-    private Map<Node, Integer> parents = new HashMap<>();
+    private Map<Node, Integer> children = new THashMap<>();
+    private Map<Node, Integer> parents = new THashMap<>();
 
     // map of visited children for calculating bottom level
     private ArrayList<Node> visitedChildren = new ArrayList<>();
