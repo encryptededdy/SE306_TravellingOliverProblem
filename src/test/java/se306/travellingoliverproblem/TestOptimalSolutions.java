@@ -145,7 +145,7 @@ public class TestOptimalSolutions {
 
         Graph inputGraph = getGraphFromInput("Nodes_10_Random.dot");
 
-        Scheduler scheduler = new DFSScheduler(inputGraph, 2);
+        Scheduler scheduler = new DFSScheduler(inputGraph, 4);
 
         checkValidAndOptimal(scheduler.getBestSchedule(), 50);
     }
