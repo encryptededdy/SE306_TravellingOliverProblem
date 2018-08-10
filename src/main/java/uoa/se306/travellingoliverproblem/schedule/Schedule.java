@@ -1,11 +1,9 @@
 package uoa.se306.travellingoliverproblem.schedule;
 
-import gnu.trove.set.hash.THashSet;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
 import uoa.se306.travellingoliverproblem.scheduler.heuristics.CostFunction;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -13,8 +11,8 @@ import java.util.stream.Collectors;
 This class describes a section of a schedule for a given input graph
  */
 public class Schedule implements Comparable<Schedule>{
-    private Set<Node> unAddedNodes = new THashSet<>();
-    private Set<Node> availableNodes = new THashSet<>();
+    private Set<Node> unAddedNodes = new HashSet<>();
+    private Set<Node> availableNodes = new HashSet<>();
     private float cost = 0;
     private int overallTime = 0;
 
