@@ -37,52 +37,53 @@ public class AStarSearchScheduler extends Scheduler {
 
             // If the first partial schedule in the priority queue is complete
             // It is an optimal schedule
-            if (partial.getAvailableNodes().isEmpty()){
+            if (partial.getAvailableNodes().isEmpty()) {
                 bestSchedule = partial;
                 break;
-            }else {
+            } else {
                 // Get all the available nodes in the schedule
                 Set<Node> availableNodes = new HashSet<>(partial.getAvailableNodes());
                 for (Node node : availableNodes) {
                     ScheduledProcessor[] processors = partial.getProcessors();
+                    int[] processorEarliestAvailable = new int[processors.length];
+                    // First, calculate the next available time on all nodes, taking into account parents
+                    for (Node parentNode : node.getParents().keySet()) {
+                        for (int i = 0; i < processors.length; i++) {
+                            ScheduleEntry sEntry = processors[i].getEntry(parentNode);
+                            if (sEntry != null) { // if this parent
+                                // Get end time of parent, and the communication cost
+                                int endTime = sEntry.getEndTime();
+                                int communication = sEntry.getNode().getChildren().get(node);
 
-                    for (int i = 0; i < processors.length; i++) {
-                        ScheduledProcessor processor = processors[i];
-                        int processorStartTime;
-                        int startTime = 0;
-                        // iterate over all the parent nodes
-                        for (Node parentNode : node.getParents().keySet()) {
-                            // for all the processors of this current schedule
-                            // if any of the processors contains the parentNode
-                            // get the endTime of when this parentNode finishes inside that processor
-                            for (ScheduledProcessor checkProcessor : partial.getProcessors()) {
-                                ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
-                                if (sEntry != null) {
-                                    processorStartTime = sEntry.getEndTime();
-                                    // add the communication cost between childNode and parentNode if not on same processor
-                                    processorStartTime += processor != checkProcessor ? parentNode.getChildren().get(node) : 0;
-                                    // if the processorStartTime is larger than the current startTime
-                                    // update the current startTime
-                                    if (processorStartTime > startTime) {
-                                        startTime = processorStartTime;
-                                        break;
+                                for (int j = 0; j < processors.length; j++) { // for each entry in the processorEarliestAvailable array
+                                    if (j == i) { // If same proc (no comm cost)
+                                        if (processorEarliestAvailable[j] < endTime) {
+                                            processorEarliestAvailable[j] = endTime;
+                                        }
+                                    } else { // not same proc (comm cost!)
+                                        if (processorEarliestAvailable[j] < endTime + communication) {
+                                            processorEarliestAvailable[j] = endTime + communication;
+                                        }
                                     }
                                 }
+                                break; // A node cannot be scheduled in multiple processors
                             }
                         }
-                        //get the earliestStartTime that this available node can be scheduled (In this processor)
-                        startTime = processor.getEarliestStartAfter(startTime, node.getCost());
+                    }
 
-                        MinimalSchedule m = partial.testAddToSchedule(node, i, startTime);
+                    // Then, for each processor we can put this node on, actually put it on.
+                    for (int j = 0; j < processors.length; j++) {
+                        int startTime = processors[j].getEarliestStartAfter(processorEarliestAvailable[j], node.getCost());
+                        MinimalSchedule m = partial.testAddToSchedule(node, j, startTime);
 
                         if (!existingSchedules.contains(m)){
                             //create a copy of our partialSchedule
                             //add the availableNode into processor i at time startTime in the schedule
                             Schedule tempSchedule = new Schedule(partial);
-                            tempSchedule.addToSchedule(node, i, startTime);
+                            tempSchedule.addToSchedule(node, j, startTime);
                             existingSchedules.add(m);
                             candidateSchedules.add(tempSchedule);
-                        }else{
+                        } else {
                             branchesKilled++;
                             branchesKilledDuplication++;
                         }

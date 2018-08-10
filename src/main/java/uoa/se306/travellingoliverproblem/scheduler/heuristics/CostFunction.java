@@ -42,9 +42,7 @@ public class CostFunction {
 
         if (max > idleTimeAndComputation){
             return (float)max;
-
-        }else{
-
+        } else {
             return idleTimeAndComputation;
         }
 
@@ -110,53 +108,58 @@ public class CostFunction {
 
     /*
     The third cost function principle is to find the node (available to be scheduled)
-    that has the maximum (starting time of node + bottom level)
+    that has the maximum (minimal starting time of node + bottom level)
     NOTE: this algorithm only considers available nodes at this moment
      */
     private void maxDataReadyTimeAndBottomLevel(){
         //For each node in the availableNodes set
 
-        for (Node node : availableNodes){
-            int largestNodeStartTime = 0;
+        for (Node node: availableNodes) {
+            int[] processorEarliestAvailable = new int[processors.length];
 
-            for (int i = 0; i < processors.length; i++) {
-                ScheduledProcessor processor = processors[i];
-                int processorStartTime;
-                int startTime = 0;
-                // iterate over all the parent nodes
-                for (Node parentNode : node.getParents().keySet()) {
-                    // for all the processors of this current schedule
-                    // if any of the processors contains the parentNode
-                    // get the endTime of when this parentNode finishes inside that processor
-                    for (ScheduledProcessor checkProcessor : partialSchedule.getProcessors()) {
-                        ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
-                        if (sEntry != null) {
-                            processorStartTime = sEntry.getEndTime();
-                            // add the communication cost between childNode and parentNode if not on same processor
-                            processorStartTime += processor != checkProcessor ? parentNode.getChildren().get(node) : 0;
-                            // if the processorStartTime is larger than the current startTime
-                            // update the current startTime
-                            if (processorStartTime > startTime) {
-                                startTime = processorStartTime;
-                                break;
+            // First, calculate the next available time on all nodes, taking into account parents
+            for (Node parentNode : node.getParents().keySet()) {
+                for (int i = 0; i < processors.length; i++) {
+                    ScheduleEntry sEntry = processors[i].getEntry(parentNode);
+
+                    //if there is a parent node in this processor
+                    if (sEntry != null) {
+                        // Get end time of parent, and the communication cost
+                        int endTime = sEntry.getEndTime();
+                        int communication = sEntry.getNode().getChildren().get(node);
+
+                        // for each entry in the processorEarliestAvailable array
+                        for (int j = 0; j < processors.length; j++) {
+                            if (j == i) { // If same processor (no communication cost)
+                                if (processorEarliestAvailable[j] < endTime) {
+                                    processorEarliestAvailable[j] = endTime;
+                                }
+                            } else { // not same processor (communication cost!)
+                                if (processorEarliestAvailable[j] < endTime + communication) {
+                                    processorEarliestAvailable[j] = endTime + communication;
+                                }
                             }
                         }
+                        break; // A node cannot be scheduled in multiple processors
                     }
                 }
-                //get the earliestStartTime that this available node can be scheduled (In this processor)
-                startTime = processor.getEarliestStartAfter(startTime, node.getCost());
-
-                // record the biggest startTime for this node, in an processor
-                if (startTime > largestNodeStartTime){
-                    largestNodeStartTime = startTime;
-                }
             }
-            int tempTempCost= largestNodeStartTime + node.getBottomLevel();
-            if (tempTempCost > maxDataReadyTimeAndBottomLevel) {
-                maxDataReadyTimeAndBottomLevel = tempTempCost;
+            //we not have an array, index represents which processor, element represents earliestStartTime
+            int smallest = 0;
+            for (int j = 0; j < processors.length; j++) {
+                int temp = processorEarliestAvailable[j];
+                //get the earliestStartTime that this available node can be scheduled (In this processor)
+                int startTime = processors[j].getEarliestStartAfter(temp , node.getCost());
+                if (startTime < smallest){
+                    smallest = startTime;
+                }
+                //System.out.println("temp is: "+ temp +" startTime is: "+ startTime);
+            }
+
+            int tempCost = smallest + node.getBottomLevel();
+            if (tempCost > maxDataReadyTimeAndBottomLevel){
+                maxDataReadyTimeAndBottomLevel = tempCost;
             }
         }
     }
-
-
 }
