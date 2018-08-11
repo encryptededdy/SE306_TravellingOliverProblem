@@ -8,6 +8,7 @@ import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
+import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -15,9 +16,18 @@ public class DFSScheduler extends Scheduler {
 
     // useEquivalentScheduleCulling always enabled.
     private boolean useExistingScheduleCleaner = true;
+    private boolean localDuplicateDetectionOnly = false;
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private long startTime;
+    private int[] duplicateStats;
+    private int[] generatedStats;
 
+    // DEV ONLY REMOVE LATER
+    public void printDuplicateStats() {
+        for (int i = 0; i < duplicateStats.length; i++) {
+            System.out.println((i + 1) + " nodes: " + duplicateStats[i] + " generated: " + generatedStats[i]);
+        }
+    }
 
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors, true);
@@ -26,7 +36,10 @@ public class DFSScheduler extends Scheduler {
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
         startTime = System.currentTimeMillis();
+        duplicateStats = new int[graph.getAllNodes().size()];
+        generatedStats = new int[graph.getAllNodes().size()];
         calculateScheduleRecursive(currentSchedule);
+        printDuplicateStats();
     }
 
     private void cleanExistingSchedules() {
@@ -35,7 +48,7 @@ public class DFSScheduler extends Scheduler {
         existingSchedules.removeIf(minimalSchedule -> minimalSchedule.getCost() >= bestSchedule.getCost());
         int cleaned = previousSize - existingSchedules.size();
         long endTime = System.nanoTime();
-        System.out.println("Cleaning Took " + (endTime - startTime) / 1000000 + " ms, cleaned "+cleaned+" entries ("+(cleaned*100/previousSize)+"%)");
+        System.out.println("Cleaning Took " + (endTime - startTime) / 1000000 + " ms, cleaned " + cleaned + " entries (" + (cleaned * 100 / previousSize) + "%)");
     }
 
     private void calculateScheduleRecursive(Schedule currentSchedule) {
@@ -44,17 +57,18 @@ public class DFSScheduler extends Scheduler {
         if (currentSchedule.getAvailableNodes().isEmpty()) {
             // If our bestSchedule is null or the overall time for the bestSchedule is less than our current schedule
             if (bestSchedule == null || bestSchedule.getCost() > currentSchedule.getCost()) {
-                System.out.println("Found new best schedule: "+currentSchedule.getOverallTime());
+                System.out.println("Found new best schedule: " + currentSchedule.getOverallTime());
                 bestSchedule = currentSchedule;
                 // Only run cleaner if it's been at least 5 seconds since we started, otherwise there's no point
-                if (useExistingScheduleCleaner && System.currentTimeMillis() > startTime + 5000) cleanExistingSchedules();
+                if (!localDuplicateDetectionOnly && useExistingScheduleCleaner && System.currentTimeMillis() > startTime + 5000)
+                    cleanExistingSchedules();
             }
             return;
         }
 
         PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
 
-        for (Node node: currentSchedule.getAvailableNodes()) {
+        for (Node node : currentSchedule.getAvailableNodes()) {
             // Get the amount of processors in the current schedule
             ScheduledProcessor[] processors = currentSchedule.getProcessors();
             int[] processorEarliestAvailable = new int[processors.length];
@@ -99,22 +113,31 @@ public class DFSScheduler extends Scheduler {
             }
         }
 
+        // used for local duplicate detection
+        Set<MinimalSchedule> consideredThisRound = new HashSet<>();
+
         while (!candidateSchedules.isEmpty()) {
             Schedule candidate = candidateSchedules.poll();
             if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
                 // Only continue if this schedule hasn't been considered before
                 MinimalSchedule minimal = new MinimalSchedule(candidate);
-                if (!existingSchedules.contains(minimal)) {
-                    existingSchedules.add(minimal);
+                if (localDuplicateDetectionOnly && !consideredThisRound.contains(minimal)) {
+                    consideredThisRound.add(minimal);
+                    calculateScheduleRecursive(candidate);
+                } else if (!localDuplicateDetectionOnly && !existingSchedules.contains(minimal)) {
+                    if (existingSchedules.size() < 25000000) existingSchedules.add(minimal);
+                    generatedStats[graph.getAllNodes().size() - candidate.getUnAddedNodes().size() - 1]++;
                     calculateScheduleRecursive(candidate);
                 } else {
+                    duplicateStats[graph.getAllNodes().size() - candidate.getUnAddedNodes().size() - 1]++;
                     branchesKilled++; // drop this branch
                     branchesKilledDuplication++;
                 }
             } else {
-                branchesKilled+=candidateSchedules.size()+1;
+                branchesKilled += candidateSchedules.size() + 1;
                 break; // It's a priority queue, so we can just drop the rest
             }
         }
     }
 }
+
