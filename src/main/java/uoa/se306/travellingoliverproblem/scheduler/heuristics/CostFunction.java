@@ -112,7 +112,7 @@ public class CostFunction {
     NOTE: this algorithm only considers available nodes at this moment
      */
     private void maxDataReadyTimeAndBottomLevel(){
-        //For each node in the availableNodes set
+        // For each node in the availableNodes set
 
         for (Node node: availableNodes) {
             int[] processorEarliestAvailable = new int[processors.length];
@@ -144,16 +144,16 @@ public class CostFunction {
                     }
                 }
             }
-            //we not have an array, index represents which processor, element represents earliestStartTime
+            // we now have an array, index represents which processor, element represents earliestStartTime
             int smallest = 0;
             for (int j = 0; j < processors.length; j++) {
                 int temp = processorEarliestAvailable[j];
-                //get the earliestStartTime that this available node can be scheduled (In this processor)
+                // get the earliestStartTime that this available node can be scheduled (In this processor)
                 int startTime = processors[j].getEarliestStartAfter(temp , node.getCost());
                 if (startTime < smallest){
                     smallest = startTime;
                 }
-                //System.out.println("temp is: "+ temp +" startTime is: "+ startTime);
+                // System.out.println("temp is: "+ temp +" startTime is: "+ startTime);
             }
 
             int tempCost = smallest + node.getBottomLevel();

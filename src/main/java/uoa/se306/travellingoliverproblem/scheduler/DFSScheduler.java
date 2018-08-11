@@ -10,7 +10,6 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import uoa.se306.travellingoliverproblem.scheduler.heuristics.GreedyBFS;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -55,6 +54,7 @@ public class DFSScheduler extends Scheduler {
             // If our bestSchedule is null or the overall time for the bestSchedule is less than our current schedule
             if (bestSchedule == null || bestSchedule.getOverallTime() > currentSchedule.getOverallTime()) {
                 System.out.println("Found new best schedule: "+currentSchedule.getOverallTime());
+                System.out.println(currentSchedule.toString());
                 bestSchedule = currentSchedule;
                 // Only run cleaner if it's been at least 5 seconds since we started, otherwise there's no point
                 if (useExistingScheduleCleaner && System.currentTimeMillis() > startTime + 5000) cleanExistingSchedules();
@@ -68,45 +68,50 @@ public class DFSScheduler extends Scheduler {
         for (Node node: tempSet) {
             // Get the amount of processors in the current schedule
             ScheduledProcessor[] processors = currentSchedule.getProcessors();
+            int[] processorEarliestAvailable = new int[processors.length];
 
-            for (int j = 0; j < processors.length; j++) {
+            // First, calculate the next available time on all nodes, taking into account parents
+            for (Node parentNode : node.getParents().keySet()) {
+                for (int i = 0; i < processors.length; i++) {
+                    ScheduleEntry sEntry = processors[i].getEntry(parentNode);
+                    if (sEntry != null) { // if this parent
+                        // Get end time of parent, and the communication cost
+                        int endTime = sEntry.getEndTime();
+                        int communication = sEntry.getNode().getChildren().get(node);
 
-                int processorStartTime;
-                ScheduledProcessor processor = processors[j];
-                int startTime = 0;
-
-                for (Node parentNode: node.getParents().keySet()) {
-
-                    for (ScheduledProcessor checkProcessor: currentSchedule.getProcessors()) {
-
-                        ScheduleEntry sEntry = checkProcessor.getEntry(parentNode);
-                        if (sEntry != null) {
-                            processorStartTime = sEntry.getEndTime();
-                            // if the current processor doesn't have the parent node
-                            processorStartTime += (processor != checkProcessor) ? parentNode.getChildren().get(node) : 0;
-                            // if processor does not have a task yet, add the this node as the first task.
-                            if (processorStartTime > startTime) {
-                                startTime = processorStartTime;
-                                break;
+                        for (int j = 0; j < processors.length; j++) { // for each entry in the processorEarliestAvailable array
+                            if (j == i) { // If same proc (no comm cost)
+                                if (processorEarliestAvailable[j] < endTime) {
+                                    processorEarliestAvailable[j] = endTime;
+                                }
+                            } else { // not same proc (comm cost!)
+                                if (processorEarliestAvailable[j] < endTime + communication) {
+                                    processorEarliestAvailable[j] = endTime + communication;
+                                }
                             }
                         }
+                        break; // A node cannot be scheduled in multiple processors
                     }
                 }
-                startTime = processor.getEarliestStartAfter(startTime, node.getCost());
+            }
+
+            for (int j = 0; j < processors.length; j++) {
+                int startTime = processors[j].getEarliestStartAfter(processorEarliestAvailable[j], node.getCost());
                 Schedule tempSchedule = new Schedule(currentSchedule);
                 tempSchedule.addToSchedule(node, j, startTime);
                 // Only continue if sub-schedule time is under upper bound
                 // i.e. skip this branch if its overall time is already longer than the currently known best overall time
-                if (bestSchedule == null || tempSchedule.getCost() < bestSchedule.getOverallTime()) {
+                if (bestSchedule == null || tempSchedule.getCost() < bestSchedule.getCost()) {
                     candidateSchedules.add(tempSchedule);
                 } else {
                     branchesKilled++; // drop this branch
                 }
+
             }
         }
         while (!candidateSchedules.isEmpty()) {
             Schedule candidate = candidateSchedules.poll();
-            if (bestSchedule == null || candidate.getCost() < bestSchedule.getOverallTime()) {
+            if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
                 // Only continue if this schedule hasn't been considered before
                 MinimalSchedule minimal = new MinimalSchedule(candidate);
                 if (!existingSchedules.contains(minimal)) {
