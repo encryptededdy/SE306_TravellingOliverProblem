@@ -29,7 +29,7 @@ public class TestGraphLevels {
 
         assertEquals(startingNode.getLevel(), new Integer(1));
 
-        for (Node node: startingNode.getChildren().keySet()) {
+        for (Node node : startingNode.getChildren().keySet()) {
             // Check all children nodes of a starting node are at level 2
             assertEquals(new Integer(2), node.getLevel());
         }
@@ -63,7 +63,7 @@ public class TestGraphLevels {
         assertEquals(new Integer(6), output.getLevels()); // Check level of graph is correct
 
         //Check that all nodes have the correct level
-        for (Node node: output.getAllNodes()) {
+        for (Node node : output.getAllNodes()) {
             if (nodeLevels.containsKey(node.toString())) {
                 assertEquals(nodeLevels.get(node.toString()), node.getLevel());
             } else {

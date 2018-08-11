@@ -18,6 +18,9 @@ public class Graph {
         this.allNodes.addAll(allNodes);
         this.levels = levels;
         this.graphName = graphName;
+        for (Node node : allNodes) {
+            node.calculateBottomLevel();
+        }
     }
 
     public Set<Node> getAllNodes() {
@@ -29,6 +32,18 @@ public class Graph {
     }
 
     public String getGraphName() { return graphName; }
+
+
+    /*
+    This method gets the total weights of all the nodes in the graph
+     */
+    public int getComputationalLoad() {
+        int load = 0;
+        for (Node node : allNodes) { //TODO: Stream this
+            load += node.getCost();
+        }
+        return load;
+    }
 
     public Integer getLevels() {
         return levels;

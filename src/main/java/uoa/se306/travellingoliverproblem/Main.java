@@ -31,13 +31,13 @@ public class Main extends Application {
         controller.startProcessing(inputGraph, processors, outputFileName);
         primaryStage.setTitle("Visualisation");
         primaryStage.setResizable(false);
-        primaryStage.setScene(new Scene(root, 1200, 800));
+        primaryStage.setScene(new Scene(root, 1200, 850));
         primaryStage.sizeToScene(); // JavaFX Bug RT-30647 workaround
         primaryStage.show();
     }
 
     public static void main(String[] args) {
-
+        long totalStartTime = System.currentTimeMillis();
         int numOfCores = 1; //default 1 means that the code will run in sequential
         boolean useVisuals = false;
 
@@ -131,6 +131,7 @@ public class Main extends Application {
                     SchedulerRunner.getInstance().getSchedule().checkValidity();
                     DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), tempOutputFileName);
                     fileWriter.outputSchedule();
+                    System.out.println("Total time (incl startup, I/O etc.): " + (System.currentTimeMillis()-totalStartTime) + " ms");
                     System.exit(0);
                 });
             }

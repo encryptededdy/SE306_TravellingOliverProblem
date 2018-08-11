@@ -1,12 +1,14 @@
 package uoa.se306.travellingoliverproblem.graph;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class Node implements Comparable<Node> {
     private String name;
-    private Integer cost = 0;
+    private int cost = 0;
+    private int currentBottomLevel = 0;
     private Integer level = 1;
     private char identifier;
 
@@ -21,6 +23,7 @@ public class Node implements Comparable<Node> {
     public Node(String name, int cost, int id) {
         this.name = name;
         this.cost = cost;
+
         if (id > 65) {
             throw new RuntimeException("Max 65 nodes supported");
         } else {
@@ -56,8 +59,40 @@ public class Node implements Comparable<Node> {
         this.level = level;
     }
 
-    public Integer getCost() {
+    public int getCost() {
         return cost;
+    }
+
+    public int getBottomLevel(){
+        return currentBottomLevel;
+    }
+
+    public void calculateBottomLevel() {
+        // Make sure this is run-once
+        if (currentBottomLevel == 0) calculateCurrentBottomLevel(this, currentBottomLevel, new ArrayList<>());
+    }
+
+    /*
+    This method will calculate the bottom level of this Node
+    it is done by a recursive method
+    */
+    private void calculateCurrentBottomLevel(Node node, int totalCost, ArrayList<Node> visitedChildren) {
+        visitedChildren.add(node);
+        totalCost += node.getCost();
+        Map<Node, Integer> mapOfChildren = node.getChildren();
+
+        if(node.children.isEmpty()){
+            if(currentBottomLevel < totalCost){
+                currentBottomLevel = totalCost;
+            }
+            return;
+        }
+        for (Node child: mapOfChildren.keySet()) {
+            if (!visitedChildren.contains(child)){
+                this.calculateCurrentBottomLevel(child, totalCost, visitedChildren);
+            }
+
+        }
     }
 
     @Override
@@ -66,11 +101,10 @@ public class Node implements Comparable<Node> {
     }
 
     // Check equality by name and children comparison
-    // TODO: Find a way to check parents(?) - currently causes loop
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Node) {
-            return ((Node) obj).name.equals(name);
+            return (((Node) obj).name.equals(name) && ((Node) obj).children.equals(children));
         }
         return false;
     }
