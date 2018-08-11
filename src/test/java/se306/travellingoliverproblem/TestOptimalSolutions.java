@@ -6,6 +6,7 @@ import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
+import uoa.se306.travellingoliverproblem.scheduler.AStarSearchScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
 
@@ -27,6 +28,9 @@ public class TestOptimalSolutions {
         assertEquals(nodeA, startingNode);
         Scheduler scheduler = new DFSScheduler(inputGraph, 1);
         checkValidAndOptimal(scheduler.getBestSchedule(), 1);
+        scheduler = new AStarSearchScheduler(inputGraph, 1);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 1);
+
     }
 
     @Test
@@ -34,6 +38,8 @@ public class TestOptimalSolutions {
         Graph inputGraph = getGraphFromInput("straightline.dot");
         assertEquals(inputGraph.getStartingNodes().size(), 1); // Only one starting node (0)
         Scheduler scheduler = new DFSScheduler(inputGraph, 2);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 2);
+        scheduler = new AStarSearchScheduler(inputGraph, 2);
         checkValidAndOptimal(scheduler.getBestSchedule(), 2);
     }
 
@@ -44,6 +50,8 @@ public class TestOptimalSolutions {
         assertEquals(inputGraph.getStartingNodes().size(), 2);
         Scheduler scheduler = new DFSScheduler(inputGraph, 2);
         checkValidAndOptimal(scheduler.getBestSchedule(), 3);
+        scheduler = new AStarSearchScheduler(inputGraph, 2);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 3);
     }
 
     @Test
@@ -53,12 +61,16 @@ public class TestOptimalSolutions {
         assertEquals(inputGraph.getStartingNodes().size(), 2);
         Scheduler scheduler = new DFSScheduler(inputGraph, 2);
         checkValidAndOptimal(scheduler.getBestSchedule(), 10);
+        scheduler = new AStarSearchScheduler(inputGraph, 2);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 10);
     }
 
     @Test
     public void test7OutTree2Processors() throws FileNotFoundException {
         Graph inputGraph = getGraphFromInput("Nodes_7_OutTree.dot");
         Scheduler scheduler = new DFSScheduler(inputGraph, 2);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 28);
+        scheduler = new AStarSearchScheduler(inputGraph, 2);
         checkValidAndOptimal(scheduler.getBestSchedule(), 28);
     }
 
@@ -67,6 +79,8 @@ public class TestOptimalSolutions {
         Graph inputGraph = getGraphFromInput("Nodes_7_OutTree.dot");
         Scheduler scheduler = new DFSScheduler(inputGraph, 4);
         checkValidAndOptimal(scheduler.getBestSchedule(), 22);
+        scheduler = new AStarSearchScheduler(inputGraph, 4);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 22);
     }
 
     @Test
@@ -74,12 +88,16 @@ public class TestOptimalSolutions {
         Graph inputGraph = getGraphFromInput("Nodes_8_Random.dot");
         Scheduler scheduler = new DFSScheduler(inputGraph, 2);
         checkValidAndOptimal(scheduler.getBestSchedule(), 581);
+        scheduler = new AStarSearchScheduler(inputGraph, 2);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 581);
     }
 
     @Test
     public void test8Random4Processors() throws FileNotFoundException {
         Graph inputGraph = getGraphFromInput("Nodes_8_Random.dot");
         Scheduler scheduler = new DFSScheduler(inputGraph, 4);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 581);
+        scheduler = new AStarSearchScheduler(inputGraph, 4);
         checkValidAndOptimal(scheduler.getBestSchedule(), 581);
     }
 
@@ -89,12 +107,16 @@ public class TestOptimalSolutions {
         Graph inputGraph = getGraphFromInput("Nodes_9_SeriesParallel.dot");
         Scheduler scheduler = new DFSScheduler(inputGraph, 2);
         checkValidAndOptimal(scheduler.getBestSchedule(), 55);
+        scheduler = new AStarSearchScheduler(inputGraph, 2);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 55);
     }
 
     @Test
     public void test9SeriesParallel4Processors() throws FileNotFoundException {
         Graph inputGraph = getGraphFromInput("Nodes_9_SeriesParallel.dot");
         Scheduler scheduler = new DFSScheduler(inputGraph, 4);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 55);
+        scheduler = new AStarSearchScheduler(inputGraph, 4);
         checkValidAndOptimal(scheduler.getBestSchedule(), 55);
     }
 
@@ -103,12 +125,16 @@ public class TestOptimalSolutions {
         Graph inputGraph = getGraphFromInput("Nodes_10_Random.dot");
         Scheduler scheduler = new DFSScheduler(inputGraph, 2);
         checkValidAndOptimal(scheduler.getBestSchedule(), 50);
+        scheduler = new AStarSearchScheduler(inputGraph, 2);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 50);
     }
 
     @Test
     public void test10NodesRandom4Processors() throws FileNotFoundException {
         Graph inputGraph = getGraphFromInput("Nodes_10_Random.dot");
         Scheduler scheduler = new DFSScheduler(inputGraph, 4);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 50);
+        scheduler = new AStarSearchScheduler(inputGraph, 4);
         checkValidAndOptimal(scheduler.getBestSchedule(), 50);
     }
 
@@ -117,12 +143,16 @@ public class TestOptimalSolutions {
         Graph inputGraph = getGraphFromInput("Nodes_11_OutTree.dot");
         Scheduler scheduler = new DFSScheduler(inputGraph, 2);
         checkValidAndOptimal(scheduler.getBestSchedule(), 350);
+        scheduler = new AStarSearchScheduler(inputGraph, 2);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 350);
     }
 
     @Test
     public void test11OutTree4Processors() throws FileNotFoundException {
         Graph inputGraph = getGraphFromInput("Nodes_11_OutTree.dot");
         Scheduler scheduler = new DFSScheduler(inputGraph, 4);
+        checkValidAndOptimal(scheduler.getBestSchedule(), 227);
+        scheduler = new AStarSearchScheduler(inputGraph, 4);
         checkValidAndOptimal(scheduler.getBestSchedule(), 227);
     }
 
