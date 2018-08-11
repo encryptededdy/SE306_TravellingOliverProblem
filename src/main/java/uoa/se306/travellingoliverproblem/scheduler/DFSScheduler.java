@@ -7,16 +7,13 @@ import uoa.se306.travellingoliverproblem.schedule.MinimalSchedule;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
-import uoa.se306.travellingoliverproblem.scheduler.heuristics.GreedyBFS;
 
-import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 
 public class DFSScheduler extends Scheduler {
 
     // useEquivalentScheduleCulling always enabled.
-    private boolean useGreedyInitialSchedule = false; // Do we even need this anymore ?
     private boolean useExistingScheduleCleaner = true;
 
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
@@ -24,16 +21,11 @@ public class DFSScheduler extends Scheduler {
     private long startTime;
 
     public DFSScheduler(Graph graph, int amountOfProcessors) {
-        super(graph, amountOfProcessors);
+        super(graph, amountOfProcessors, true);
     }
 
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
-        if (useGreedyInitialSchedule) {
-            GreedyBFS greedyScheduler = new GreedyBFS();
-            greedyScheduler.calculateGreedySchedule(new Schedule(currentSchedule));
-            bestSchedule = greedyScheduler.getBestSchedule();
-        }
         startTime = System.currentTimeMillis();
         calculateScheduleRecursive(currentSchedule);
     }
@@ -52,9 +44,8 @@ public class DFSScheduler extends Scheduler {
         // If the currentSchedule has no available nodes
         if (currentSchedule.getAvailableNodes().isEmpty()) {
             // If our bestSchedule is null or the overall time for the bestSchedule is less than our current schedule
-            if (bestSchedule == null || bestSchedule.getOverallTime() > currentSchedule.getOverallTime()) {
+            if (bestSchedule == null || bestSchedule.getCost() > currentSchedule.getCost()) {
                 System.out.println("Found new best schedule: "+currentSchedule.getOverallTime());
-                System.out.println(currentSchedule.toString());
                 bestSchedule = currentSchedule;
                 // Only run cleaner if it's been at least 5 seconds since we started, otherwise there's no point
                 if (useExistingScheduleCleaner && System.currentTimeMillis() > startTime + 5000) cleanExistingSchedules();
@@ -100,13 +91,6 @@ public class DFSScheduler extends Scheduler {
                 tempSchedule.addToSchedule(node, j, startTime);
                 // Only continue if sub-schedule time is under upper bound
                 // i.e. skip this branch if its overall time is already longer than the currently known best overall time
-
-                //TODO: Im not sure if it's correct to drop  partial schedules just because it's cost is HIGHER than the current bestSchedules cost.
-                //TODO: At this moment in time, a partial schedules cost might be bit higher than the current bestSchedule,
-                //TODO: but later on, this partialSchedules (that we dropped) cost might get lower than our current bestSchedules cost.
-                //TODO: Before, it was CORRECT to use the partial schedules overallTime against the current bestSchedule overallTime
-                //TODO: This is because overallTime can only increase in value, while cost *might* decrease in value
-                //TODO: If you expand a partial Schedule into its children partial Schedules, those children might have a lower cost than our current bestSchedule
                 if (bestSchedule == null || tempSchedule.getCost() < bestSchedule.getCost()) {
                     candidateSchedules.add(tempSchedule);
                 } else {
@@ -115,23 +99,9 @@ public class DFSScheduler extends Scheduler {
                 }
             }
         }
-        /*
-        while the local priorityQueue is not empty
-            get first partialSchedule in the queue
-            if the current bestSchedule is null OR partialSchedule.cost if smaller than bestSchedule.cost
-                if the existingSchedules doesn't have the partialSchedule
-                    add it to existingSchedule and call this recursiveMethod(partialSchedule)
-                else
-                    drop this partialSchedule because it's already been visited (duplicated)
-            else
-                break the while loop
-         */
+
         while (!candidateSchedules.isEmpty()) {
             Schedule candidate = candidateSchedules.poll();
-            //TODO: The way cost functions work is that, it is an estimate of how far away our partial schedule is from optimal.
-            //TODO: If we keep dropping partial schedules because its current cost is a bit higher than our current bestSchedule,
-            //TODO: we might accidentally drop a partial schedule that might become an optimal schedule later on (its children).
-            //TODO: It's not as simple as checking if the candidate schedules cost is lower than current bestSchedules cost
             if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
                 // Only continue if this schedule hasn't been considered before
                 MinimalSchedule minimal = new MinimalSchedule(candidate);

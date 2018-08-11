@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TestOptimalSolutions {
 
@@ -158,8 +157,7 @@ public class TestOptimalSolutions {
 
 
     private void checkValidAndOptimal(Schedule scheduleToCheck, int optimalTime) {
-        //TODO implement this method
-        assertTrue(scheduleToCheck.checkValidity());
+        scheduleToCheck.checkValidity();
         assertEquals(optimalTime, scheduleToCheck.getOverallTime());
     }
 
