@@ -16,6 +16,7 @@ public class Schedule implements Comparable<Schedule> {
     private float cost = 0;
     private int overallTime = 0;
     private int maxStartTimeBottomLevel = 0;
+    private int idleTime = 0;
 
     public float getCost() {
         return cost;
@@ -49,9 +50,8 @@ public class Schedule implements Comparable<Schedule> {
         }
     }
 
-    private void calculateCostFunction(Node node, int processorNo, int startTime) {
+    private void calculateCostFunction(Node node, int processorNo, int startTime, float idleTimeAndComputation) {
         maxStartTimeAndBottomLevel(node, startTime);
-        float idleTimeAndComputation = idleTimeAndComputation();
         if (useDFSCostFunction) {
             cost = Math.max(maxStartTimeBottomLevel, idleTimeAndComputation);
         } else {
@@ -105,6 +105,9 @@ public class Schedule implements Comparable<Schedule> {
 
     // Adds a node to a given processor
     public void addToSchedule(Node node, int processorNo, int startTime) {
+        // We need to calculate idleTime BEFORE we add the new node, as it needs to know what the previous state was
+        float idleTimeAndComputation = idleTimeAndComputation(node, processorNo, startTime);
+        // Add the new node...
         processors[processorNo].add(node, startTime);
         if (node.getCost() + startTime > overallTime) {
             overallTime = node.getCost() + startTime;
@@ -121,7 +124,7 @@ public class Schedule implements Comparable<Schedule> {
             // If the child has had all its dependencies fulfilled, add the child to the available set
             if (available) availableNodes.add(child);
         }
-        calculateCostFunction(node, processorNo, startTime);
+        calculateCostFunction(node, processorNo, startTime, idleTimeAndComputation);
     }
 
     // Returns all nodes that have not been added to the schedule
@@ -152,23 +155,16 @@ public class Schedule implements Comparable<Schedule> {
     /*
     The second cost function principle is to calculate the
     (total idle time + total computational load ) / processors
+    Run BEFORE adding the new node
      */
-    private float idleTimeAndComputation() {
-        int totalIdleTime = 0;
-        int currentTimeCounter = 0;
-
-        for (ScheduledProcessor p : processors) {
-            for (ScheduleEntry node : p.getFullSchedule()) {
-                if (node.getStartTime() > currentTimeCounter) {
-                    totalIdleTime = totalIdleTime + node.getStartTime() - currentTimeCounter;
-                    currentTimeCounter = node.getEndTime();
-                } else {
-                    currentTimeCounter = node.getEndTime();
-                }
-            }
-        }
-
-        return (float) totalIdleTime + (float) Scheduler.COMPUTATIONAL_LOAD / (float) processors.length;
+    private float idleTimeAndComputation(Node node, int processorNo, int startTime) {
+        int endTime = processors[processorNo].endTime();
+        if (startTime > endTime) {
+            idleTime += (startTime - endTime); // if we start after the last node, with a gap
+        } else if (startTime < endTime) {
+            idleTime -= node.getCost(); // if we start before last node
+        } // if we start on the last node; no change to idle time
+        return (float) idleTime + (float) Scheduler.COMPUTATIONAL_LOAD / (float) processors.length;
     }
 
     /*

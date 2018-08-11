@@ -4,8 +4,6 @@ import uoa.se306.travellingoliverproblem.graph.Node;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /*
 Processor where Nodes are Scheduled on
@@ -42,6 +40,9 @@ public class ScheduledProcessor {
 
     // Get the latest end time
     public int endTime() {
+        if (entryArray.isEmpty()) {
+            return 0;
+        }
         return entryArray.get(entryArray.size() - 1).getEndTime();
     }
 
