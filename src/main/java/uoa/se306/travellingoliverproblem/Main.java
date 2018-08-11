@@ -132,11 +132,13 @@ public class Main extends Application {
                 launch();
             } else {
                 if (numOfCores > 1) {
+                    // Run AStar
                     forkJoinPool = new ForkJoinPool(numOfCores);
                     Set<Schedule> allStartingSchedules = new HashSet<>();
                     allStartingSchedules.add(new Schedule(processors, inputGraph.getStartingNodes(), inputGraph.getAllNodes()));
                     BranchAndBoundRecursiveAction bab = new BranchAndBoundRecursiveAction(allStartingSchedules);
                     bab.invoke();
+                    System.exit(0);
                 }
                 else {
                     SchedulerRunner.getInstance().startScheduler(inputGraph, processors);

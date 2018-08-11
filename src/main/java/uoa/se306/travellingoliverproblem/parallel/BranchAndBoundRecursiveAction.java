@@ -12,19 +12,24 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
+import java.util.logging.Logger;
 
 public class BranchAndBoundRecursiveAction extends RecursiveAction {
 
     private Set<Schedule> schedules;
+    private static Logger logger =
+            Logger.getAnonymousLogger();
+    // TODO check what optimal threshold is
     private static final int SEQUENTIAL_THRESHOLD = 8;
-    private static Schedule bestSchedule;
-    protected int amountOfProcessors = 2;//Change later
+    private static Schedule bestSchedule;//TODO sync issues
+    private int amountOfProcessors = 2;//TODO Change later
     private boolean useCurrentBestCulling = true;
-    private boolean useGreedyInitialSchedule = false;
     private boolean useLocalPriorityQueue = true;
 
     private long branchesConsidered = 0;
     private long branchesKilled = 0;
+
+    //TODO research creating a queue
     private ConcurrentLinkedQueue queuedSchedules = new ConcurrentLinkedQueue();
     //No concurrent set, have to derive from hashmap
     private ConcurrentHashMap<MinimalSchedule, Void> existingSchedules = new ConcurrentHashMap<>();
@@ -35,16 +40,29 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
 
     @Override
     protected void compute() {
+        // Split set into smaller sets to be worked on by threads
         if (schedules.size() > SEQUENTIAL_THRESHOLD) {
             List<BranchAndBoundRecursiveAction> subTasks = new ArrayList<>();
 
-
             // Split Set
-//            String partOne = schedules.substring(0, schedules.length() / 2);
-//            String partTwo = workLoad.substring(workLoad.length() / 2, workLoad.length());
+            //TODO change this as inefficient, and may need better load balancing
+            int index = 0;
+            int size = schedules.size();
+            Set<Schedule> firstPartitionedSet = new HashSet<>();
+            Set<Schedule> secondPartitionedSet = new HashSet<>();
 
-            subTasks.add(new BranchAndBoundRecursiveAction(schedules));
-            subTasks.add(new BranchAndBoundRecursiveAction(schedules));
+            for (Schedule schedule: schedules) {
+                if (index < size) {
+                    firstPartitionedSet.add(schedule);
+                } else {
+                    secondPartitionedSet.add(schedule);
+                }
+                index++;
+            }
+
+            subTasks.add(new BranchAndBoundRecursiveAction(firstPartitionedSet));
+            subTasks.add(new BranchAndBoundRecursiveAction(secondPartitionedSet));
+            //Fork then join 2 tasks, almost recursively iterate until set is split
             ForkJoinTask.invokeAll(subTasks);
         } else {
             processSchedule(schedules);
@@ -52,6 +70,9 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
     }
 
     private void processSchedule(Set<Schedule> schedules) {
+        logger.info("These schedules were processed by "
+                + Thread.currentThread().getName());
+        // Iterate through every schedule and work recursively on this
         for(Schedule schedule: schedules) {
             calculateScheduleRecursive(schedule);
         }
