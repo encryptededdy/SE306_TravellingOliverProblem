@@ -9,11 +9,17 @@ import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
 import uoa.se306.travellingoliverproblem.fileIO.DotReader;
 import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
 import uoa.se306.travellingoliverproblem.graph.Graph;
+import uoa.se306.travellingoliverproblem.parallel.BranchAndBoundRecursiveAction;
+import uoa.se306.travellingoliverproblem.schedule.Schedule;
+import uoa.se306.travellingoliverproblem.scheduler.BranchAndBoundScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.SchedulerRunner;
 import uoa.se306.travellingoliverproblem.visualiser.FXController;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
 
 public class Main extends Application {
 
@@ -35,6 +41,8 @@ public class Main extends Application {
         primaryStage.sizeToScene(); // JavaFX Bug RT-30647 workaround
         primaryStage.show();
     }
+
+    public static ForkJoinPool forkJoinPool;
 
     public static void main(String[] args) {
 
@@ -123,16 +131,25 @@ public class Main extends Application {
             if (useVisuals) {
                 launch();
             } else {
-                SchedulerRunner.getInstance().startScheduler(inputGraph, processors);
-                final String tempOutputFileName = outputFileName;
-                // run the following after the scheduler has finished.
-                SchedulerRunner.getInstance().setThreadListener(() -> {
-                    SchedulerRunner.getInstance().printResult();
-                    SchedulerRunner.getInstance().getSchedule().checkValidity();
-                    DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), tempOutputFileName);
-                    fileWriter.outputSchedule();
-                    System.exit(0);
-                });
+                if (numOfCores > 1) {
+                    forkJoinPool = new ForkJoinPool(numOfCores);
+                    Set<Schedule> allStartingSchedules = new HashSet<>();
+                    allStartingSchedules.add(new Schedule(processors, inputGraph.getStartingNodes(), inputGraph.getAllNodes()));
+                    BranchAndBoundRecursiveAction bab = new BranchAndBoundRecursiveAction(allStartingSchedules);
+                    bab.invoke();
+                }
+                else {
+                    SchedulerRunner.getInstance().startScheduler(inputGraph, processors);
+                    final String tempOutputFileName = outputFileName;
+                    // run the following after the scheduler has finished.
+                    SchedulerRunner.getInstance().setThreadListener(() -> {
+                        SchedulerRunner.getInstance().printResult();
+                        SchedulerRunner.getInstance().getSchedule().checkValidity();
+                        DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), tempOutputFileName);
+                        fileWriter.outputSchedule();
+                        System.exit(0);
+                    });
+                }
             }
         }
     }
