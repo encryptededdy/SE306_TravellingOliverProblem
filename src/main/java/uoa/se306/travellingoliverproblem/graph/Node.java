@@ -9,6 +9,7 @@ public class Node implements Comparable<Node> {
     private String name;
     private int cost = 0;
     private int currentBottomLevel = 0;
+    private Integer level = 1;
     private char identifier;
 
     // Integers for parents and children in hash map are the edge weight costs
@@ -48,6 +49,14 @@ public class Node implements Comparable<Node> {
 
     public Map<Node, Integer> getChildren() {
         return children;
+    }
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
     }
 
     public int getCost() {

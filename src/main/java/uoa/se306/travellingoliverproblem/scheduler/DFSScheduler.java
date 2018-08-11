@@ -15,10 +15,9 @@ public class DFSScheduler extends Scheduler {
 
     // useEquivalentScheduleCulling always enabled.
     private boolean useExistingScheduleCleaner = true;
-
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
-
     private long startTime;
+
 
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors, true);
