@@ -7,16 +7,13 @@ import java.util.Objects;
 
 public class Node implements Comparable<Node> {
     private String name;
-    private Integer cost = 0;
+    private int cost = 0;
     private int currentBottomLevel = 0;
     private char identifier;
 
     // Integers for parents and children in hash map are the edge weight costs
     private Map<Node, Integer> children = new HashMap<>();
     private Map<Node, Integer> parents = new HashMap<>();
-
-    // map of visited children for calculating bottom level
-    private ArrayList<Node> visitedChildren = new ArrayList<>();
 
     public Node(String name) {
         this.name = name;
@@ -53,7 +50,7 @@ public class Node implements Comparable<Node> {
         return children;
     }
 
-    public Integer getCost() {
+    public int getCost() {
         return cost;
     }
 
@@ -61,40 +58,33 @@ public class Node implements Comparable<Node> {
         return currentBottomLevel;
     }
 
-    public void setBottomLevel(){
-        calculateCurrentBottomLevel(this, currentBottomLevel);
+    public void calculateBottomLevel() {
+        // Make sure this is run-once
+        if (currentBottomLevel == 0) calculateCurrentBottomLevel(this, currentBottomLevel, new ArrayList<>());
     }
 
     /*
     This method will calculate the bottom level of this Node
     it is done by a recursive method
     */
-    private void calculateCurrentBottomLevel(Node node, int totalCost){
+    private void calculateCurrentBottomLevel(Node node, int totalCost, ArrayList<Node> visitedChildren) {
         visitedChildren.add(node);
         totalCost += node.getCost();
         Map<Node, Integer> mapOfChildren = node.getChildren();
 
-        //for each child of this node
-        //  if this child is not in visited list
-        //      pass this child into this recursive function
-        //  else
-        //      do nothing, and check next child
-        //return
         if(node.children.isEmpty()){
             if(currentBottomLevel < totalCost){
                 currentBottomLevel = totalCost;
-               // System.out.println(this.toString() + "has bottom level of: " + Integer.toString(currentBottomLevel));
             }
             return;
         }
         for (Node child: mapOfChildren.keySet()) {
             if (!visitedChildren.contains(child)){
-                this.calculateCurrentBottomLevel(child, totalCost);
+                this.calculateCurrentBottomLevel(child, totalCost, visitedChildren);
             }
 
         }
     }
-
 
     @Override
     public String toString() {
@@ -102,7 +92,6 @@ public class Node implements Comparable<Node> {
     }
 
     // Check equality by name and children comparison
-    // TODO: Find a way to check parents(?) - currently causes loop
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Node) {

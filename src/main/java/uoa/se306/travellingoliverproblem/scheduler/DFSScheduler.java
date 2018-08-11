@@ -33,7 +33,7 @@ public class DFSScheduler extends Scheduler {
     private void cleanExistingSchedules() {
         long startTime = System.nanoTime();
         int previousSize = existingSchedules.size();
-        existingSchedules.removeIf(minimalSchedule -> minimalSchedule.getCost() >= bestSchedule.getOverallTime()); // TODO: i don't know if checking the cost against end time is correct ?
+        existingSchedules.removeIf(minimalSchedule -> minimalSchedule.getCost() >= bestSchedule.getCost());
         int cleaned = previousSize - existingSchedules.size();
         long endTime = System.nanoTime();
         System.out.println("Cleaning Took " + (endTime - startTime) / 1000000 + " ms, cleaned "+cleaned+" entries ("+(cleaned*100/previousSize)+"%)");

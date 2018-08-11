@@ -9,9 +9,6 @@ import uoa.se306.travellingoliverproblem.graph.Node;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -27,19 +24,13 @@ public class TestNode {
     @Test
     public void testBottomLevelInput10(){
         Node node = input10Graph.getStartingNodes().iterator().next();
-        node.setBottomLevel();
         assertEquals(29, node.getBottomLevel());
     }
 
     @Test
     public void testBottomLevelInput3(){
         Node node = input3Graph.getStartingNodes().iterator().next();
-        node.setBottomLevel();
-        //System.out.println(node.getChildren());
-        //System.out.println(node.getBottomLevel());
-        //System.out.println(bottomLevel);
         assertEquals(21, node.getBottomLevel());
-
     }
 
 

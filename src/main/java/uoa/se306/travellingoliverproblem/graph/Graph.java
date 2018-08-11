@@ -16,6 +16,9 @@ public class Graph {
         this.startingNodes.addAll(startingNodes);
         this.allNodes.addAll(allNodes);
         this.graphName = graphName;
+        for (Node node : allNodes) {
+            node.calculateBottomLevel();
+        }
     }
 
     public Set<Node> getAllNodes() {

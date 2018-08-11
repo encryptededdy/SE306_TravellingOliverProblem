@@ -62,9 +62,6 @@ public class DotReader implements GraphFileReader {
             throw new InvalidFileFormatException("Cycle found in acyclic graph (or empty)");
         }
 
-        for(Node node: convertedNodes.values()){
-            node.setBottomLevel();
-        }
         return new Graph(startNodes, convertedNodes.values(), graphName);
     }
 }
