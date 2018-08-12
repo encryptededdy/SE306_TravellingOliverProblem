@@ -59,7 +59,7 @@ public class DFSScheduler extends Scheduler {
         // Independent Nodes
         boolean isAllIndependent = currentSchedule.getAvailableNodes().stream().allMatch(Node::isIndependent);
         if (isAllIndependent) {
-            System.out.println("everything is independent!");
+            //System.out.println("everything is independent!");
             Schedule newSchedule = new Schedule(currentSchedule);
             for (Node node : currentSchedule.getAvailableNodes()) {
                 // find processor with earliest available time

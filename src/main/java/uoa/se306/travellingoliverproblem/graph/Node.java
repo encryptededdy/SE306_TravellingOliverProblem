@@ -71,7 +71,7 @@ public class Node implements Comparable<Node> {
     public void calculateBottomLevel() {
         // Make sure this is run-once
         if (currentBottomLevel == 0) calculateCurrentBottomLevel(this, currentBottomLevel, new ArrayList<>());
-        if (children.isEmpty() && parents.isEmpty()) isIndependent = true;
+        isIndependent = (children.isEmpty() && parents.isEmpty());
     }
 
     /*
