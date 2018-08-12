@@ -38,6 +38,8 @@ public class Schedule implements Comparable<Schedule> {
 
     // Copy constructor
     public Schedule(Schedule toCopy) {
+        idleTime = toCopy.idleTime;
+        maxStartTimeBottomLevel = toCopy.maxStartTimeBottomLevel;
         useDFSCostFunction = toCopy.useDFSCostFunction;
         processors = new ScheduledProcessor[toCopy.processors.length];
         cost = toCopy.cost;
@@ -164,7 +166,7 @@ public class Schedule implements Comparable<Schedule> {
         } else if (startTime < endTime) {
             idleTime -= node.getCost(); // if we start before last node
         } // if we start on the last node; no change to idle time
-        return (float) idleTime + (float) Scheduler.COMPUTATIONAL_LOAD / (float) processors.length;
+        return ((float) idleTime + (float) Scheduler.COMPUTATIONAL_LOAD) / (float) processors.length;
     }
 
     /*
