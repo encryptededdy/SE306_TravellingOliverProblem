@@ -59,22 +59,35 @@ public class DFSScheduler extends Scheduler {
         // Independent Nodes
         boolean isAllIndependent = currentSchedule.getAvailableNodes().stream().allMatch(Node::isIndependent);
         if (isAllIndependent) {
-            //System.out.println("everything is independent!");
             Schedule newSchedule = new Schedule(currentSchedule);
             for (Node node : currentSchedule.getAvailableNodes()) {
                 // find processor with earliest available time
                 int endtime = Integer.MAX_VALUE;
                 int earliestProcessor = 0;
                 for (int i = 0; i < currentSchedule.getProcessors().length; i++) {
-                    int tempEndTime = currentSchedule.getProcessors()[i].endTime();
+                    int tempEndTime = newSchedule.getProcessors()[i].endTime();
                     if (tempEndTime < endtime) {
                         earliestProcessor = i;
                         endtime = tempEndTime;
                     }
                 }
+
                 newSchedule.addToSchedule(node, earliestProcessor, endtime);
             }
-            calculateScheduleRecursive(newSchedule);
+
+            if (bestSchedule == null || newSchedule.getCost() < bestSchedule.getCost()) {
+                // Only continue if this schedule hasn't been considered before
+                MinimalSchedule minimal = new MinimalSchedule(newSchedule);
+                if (!existingSchedules.contains(minimal)) {
+                    if (existingSchedules.size() < 25000000) existingSchedules.add(minimal);
+                    calculateScheduleRecursive(newSchedule);
+                } else {
+                    branchesKilled++; // drop this branch
+                    branchesKilledDuplication++;
+                }
+            } else {
+                branchesKilled++;
+            }
         } else {
             // Normal Scheduling
             for (Node node : currentSchedule.getAvailableNodes()) {
