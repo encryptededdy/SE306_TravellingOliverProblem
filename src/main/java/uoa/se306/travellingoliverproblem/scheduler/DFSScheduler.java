@@ -19,15 +19,6 @@ public class DFSScheduler extends Scheduler {
     private boolean localDuplicateDetectionOnly = false;
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private long startTime;
-    private int[] duplicateStats;
-    private int[] generatedStats;
-
-    // DEV ONLY REMOVE LATER
-    public void printDuplicateStats() {
-        for (int i = 0; i < duplicateStats.length; i++) {
-            System.out.println((i + 1) + " nodes: " + duplicateStats[i] + " generated: " + generatedStats[i]);
-        }
-    }
 
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors, true);
@@ -36,10 +27,7 @@ public class DFSScheduler extends Scheduler {
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
         startTime = System.currentTimeMillis();
-        duplicateStats = new int[graph.getAllNodes().size()];
-        generatedStats = new int[graph.getAllNodes().size()];
         calculateScheduleRecursive(currentSchedule);
-        printDuplicateStats();
     }
 
     private void cleanExistingSchedules() {
@@ -126,10 +114,8 @@ public class DFSScheduler extends Scheduler {
                     calculateScheduleRecursive(candidate);
                 } else if (!localDuplicateDetectionOnly && !existingSchedules.contains(minimal)) {
                     if (existingSchedules.size() < 25000000) existingSchedules.add(minimal);
-                    generatedStats[graph.getAllNodes().size() - candidate.getUnAddedNodes().size() - 1]++;
                     calculateScheduleRecursive(candidate);
                 } else {
-                    duplicateStats[graph.getAllNodes().size() - candidate.getUnAddedNodes().size() - 1]++;
                     branchesKilled++; // drop this branch
                     branchesKilledDuplication++;
                 }
