@@ -56,72 +56,94 @@ public class DFSScheduler extends Scheduler {
 
         PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
 
-        for (Node node : currentSchedule.getAvailableNodes()) {
-            // Get the amount of processors in the current schedule
-            ScheduledProcessor[] processors = currentSchedule.getProcessors();
-            int[] processorEarliestAvailable = new int[processors.length];
+        // Independent Nodes
+        boolean isAllIndependent = currentSchedule.getAvailableNodes().stream().allMatch(Node::isIndependent);
+        if (isAllIndependent) {
+            System.out.println("everything is independent!");
+            Schedule newSchedule = new Schedule(currentSchedule);
+            for (Node node : currentSchedule.getAvailableNodes()) {
+                // find processor with earliest available time
+                int endtime = Integer.MAX_VALUE;
+                int earliestProcessor = 0;
+                for (int i = 0; i < currentSchedule.getProcessors().length; i++) {
+                    int tempEndTime = currentSchedule.getProcessors()[i].endTime();
+                    if (tempEndTime < endtime) {
+                        earliestProcessor = i;
+                        endtime = tempEndTime;
+                    }
+                }
+                newSchedule.addToSchedule(node, earliestProcessor, endtime);
+            }
+            calculateScheduleRecursive(newSchedule);
+        } else {
+            // Normal Scheduling
+            for (Node node : currentSchedule.getAvailableNodes()) {
+                // Get the amount of processors in the current schedule
+                ScheduledProcessor[] processors = currentSchedule.getProcessors();
+                int[] processorEarliestAvailable = new int[processors.length];
 
-            // First, calculate the next available time on all nodes, taking into account parents
-            for (Node parentNode : node.getParents().keySet()) {
-                for (int i = 0; i < processors.length; i++) {
-                    ScheduleEntry sEntry = processors[i].getEntry(parentNode);
-                    if (sEntry != null) { // if this parent
-                        // Get end time of parent, and the communication cost
-                        int endTime = sEntry.getEndTime();
-                        int communication = sEntry.getNode().getChildren().get(node);
+                // First, calculate the next available time on all nodes, taking into account parents
+                for (Node parentNode : node.getParents().keySet()) {
+                    for (int i = 0; i < processors.length; i++) {
+                        ScheduleEntry sEntry = processors[i].getEntry(parentNode);
+                        if (sEntry != null) { // if this parent
+                            // Get end time of parent, and the communication cost
+                            int endTime = sEntry.getEndTime();
+                            int communication = sEntry.getNode().getChildren().get(node);
 
-                        for (int j = 0; j < processors.length; j++) { // for each entry in the processorEarliestAvailable array
-                            if (j == i) { // If same proc (no comm cost)
-                                if (processorEarliestAvailable[j] < endTime) {
-                                    processorEarliestAvailable[j] = endTime;
-                                }
-                            } else { // not same proc (comm cost!)
-                                if (processorEarliestAvailable[j] < endTime + communication) {
-                                    processorEarliestAvailable[j] = endTime + communication;
+                            for (int j = 0; j < processors.length; j++) { // for each entry in the processorEarliestAvailable array
+                                if (j == i) { // If same proc (no comm cost)
+                                    if (processorEarliestAvailable[j] < endTime) {
+                                        processorEarliestAvailable[j] = endTime;
+                                    }
+                                } else { // not same proc (comm cost!)
+                                    if (processorEarliestAvailable[j] < endTime + communication) {
+                                        processorEarliestAvailable[j] = endTime + communication;
+                                    }
                                 }
                             }
+                            break; // A node cannot be scheduled in multiple processors
                         }
-                        break; // A node cannot be scheduled in multiple processors
+                    }
+                }
+
+                for (int j = 0; j < processors.length; j++) {
+                    int startTime = processors[j].getEarliestStartAfter(processorEarliestAvailable[j], node.getCost());
+                    Schedule tempSchedule = new Schedule(currentSchedule);
+                    tempSchedule.addToSchedule(node, j, startTime);
+                    // Only continue if sub-schedule time is under upper bound
+                    // i.e. skip this branch if its overall time is already longer than the currently known best overall time
+                    if (bestSchedule == null || tempSchedule.getCost() < bestSchedule.getCost()) {
+                        candidateSchedules.add(tempSchedule);
+                    } else {
+                        // drop this branch, because this partial schedule is guaranteed to be worse than what we currently have, based on overallTime
+                        branchesKilled++;
                     }
                 }
             }
 
-            for (int j = 0; j < processors.length; j++) {
-                int startTime = processors[j].getEarliestStartAfter(processorEarliestAvailable[j], node.getCost());
-                Schedule tempSchedule = new Schedule(currentSchedule);
-                tempSchedule.addToSchedule(node, j, startTime);
-                // Only continue if sub-schedule time is under upper bound
-                // i.e. skip this branch if its overall time is already longer than the currently known best overall time
-                if (bestSchedule == null || tempSchedule.getCost() < bestSchedule.getCost()) {
-                    candidateSchedules.add(tempSchedule);
-                } else {
-                    // drop this branch, because this partial schedule is guaranteed to be worse than what we currently have, based on overallTime
-                    branchesKilled++;
-                }
-            }
-        }
+            // used for local duplicate detection
+            Set<MinimalSchedule> consideredThisRound = new HashSet<>();
 
-        // used for local duplicate detection
-        Set<MinimalSchedule> consideredThisRound = new HashSet<>();
-
-        while (!candidateSchedules.isEmpty()) {
-            Schedule candidate = candidateSchedules.poll();
-            if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
-                // Only continue if this schedule hasn't been considered before
-                MinimalSchedule minimal = new MinimalSchedule(candidate);
-                if (localDuplicateDetectionOnly && !consideredThisRound.contains(minimal)) {
-                    consideredThisRound.add(minimal);
-                    calculateScheduleRecursive(candidate);
-                } else if (!localDuplicateDetectionOnly && !existingSchedules.contains(minimal)) {
-                    if (existingSchedules.size() < 25000000) existingSchedules.add(minimal);
-                    calculateScheduleRecursive(candidate);
+            while (!candidateSchedules.isEmpty()) {
+                Schedule candidate = candidateSchedules.poll();
+                if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
+                    // Only continue if this schedule hasn't been considered before
+                    MinimalSchedule minimal = new MinimalSchedule(candidate);
+                    if (localDuplicateDetectionOnly && !consideredThisRound.contains(minimal)) {
+                        consideredThisRound.add(minimal);
+                        calculateScheduleRecursive(candidate);
+                    } else if (!localDuplicateDetectionOnly && !existingSchedules.contains(minimal)) {
+                        if (existingSchedules.size() < 25000000) existingSchedules.add(minimal);
+                        calculateScheduleRecursive(candidate);
+                    } else {
+                        branchesKilled++; // drop this branch
+                        branchesKilledDuplication++;
+                    }
                 } else {
-                    branchesKilled++; // drop this branch
-                    branchesKilledDuplication++;
+                    branchesKilled += candidateSchedules.size() + 1;
+                    break; // It's a priority queue, so we can just drop the rest
                 }
-            } else {
-                branchesKilled += candidateSchedules.size() + 1;
-                break; // It's a priority queue, so we can just drop the rest
             }
         }
     }

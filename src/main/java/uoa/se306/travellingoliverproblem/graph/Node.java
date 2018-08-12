@@ -11,6 +11,7 @@ public class Node implements Comparable<Node> {
     private int currentBottomLevel = 0;
     private Integer level = 1;
     private char identifier;
+    private boolean isIndependent = false;
 
     // Integers for parents and children in hash map are the edge weight costs
     private Map<Node, Integer> children = new HashMap<>();
@@ -70,6 +71,7 @@ public class Node implements Comparable<Node> {
     public void calculateBottomLevel() {
         // Make sure this is run-once
         if (currentBottomLevel == 0) calculateCurrentBottomLevel(this, currentBottomLevel, new ArrayList<>());
+        if (children.isEmpty() && parents.isEmpty()) isIndependent = true;
     }
 
     /*
@@ -107,6 +109,10 @@ public class Node implements Comparable<Node> {
             return (((Node) obj).name.equals(name) && ((Node) obj).children.equals(children));
         }
         return false;
+    }
+
+    public boolean isIndependent() {
+        return isIndependent;
     }
 
     @Override
