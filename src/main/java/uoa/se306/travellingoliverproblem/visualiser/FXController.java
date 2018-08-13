@@ -43,11 +43,15 @@ public class FXController {
     private Text statusText;
 
     @FXML
+    private Text scheduleTitleText;
+
+    @FXML
     private ScrollPane graphScrollPane;
 
     private Map<Node, GraphNode> graphNodeMap;
     private Timeline timeline;
     private long lastBranches = 0;
+    private Schedule lastSchedule;
 
     private void drawGraph(Graph graph) {
         SequentialGraphDrawer drawer = new SequentialGraphDrawer(graphPane, graph, graphScrollPane);
@@ -70,6 +74,7 @@ public class FXController {
                 timeline.playFromStart();
                 SchedulerRunner.getInstance().printResult();
                 drawSchedule(SchedulerRunner.getInstance().getSchedule());
+                scheduleTitleText.setText("Best Schedule");
                 DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), outputName);
                 fileWriter.outputSchedule();
             }
@@ -120,7 +125,7 @@ public class FXController {
                 .build();
 
         Tile dedupCulls = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
-                .title("Culled using deduplication")
+                .title("Current best schedule length")
                 .decimals(0)
                 .chartData(new ChartData(0), new ChartData(0))
                 .animated(false)
@@ -129,6 +134,11 @@ public class FXController {
 
         tilesBox.getChildren().addAll(memoryTile, boundedBranches, generatedBranches, branchRate, branchConsidered, dedupCulls);
         timeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
+            // Check for new schedule
+            if (lastSchedule == null || !lastSchedule.equals(SchedulerRunner.getInstance().getScheduler().getCurrentBestSchedule())) {
+                lastSchedule = SchedulerRunner.getInstance().getScheduler().getCurrentBestSchedule();
+                drawSchedule(lastSchedule);
+            }
             // Update statistics
             double memoryUse = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1000000d;
             long totalBranches = SchedulerRunner.getInstance().getScheduler().getBranchesConsidered() + SchedulerRunner.getInstance().getScheduler().getBranchesKilled();
@@ -149,6 +159,7 @@ public class FXController {
     }
 
     private void drawSchedule(Schedule schedule) {
+        schedulePane.getChildren().clear();
         ScheduleDrawer drawer = new ScheduleDrawer(schedulePane, schedule, graphNodeMap);
         drawer.drawSchedule();
     }

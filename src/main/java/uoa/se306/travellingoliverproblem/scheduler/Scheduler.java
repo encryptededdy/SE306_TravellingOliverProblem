@@ -24,6 +24,10 @@ public abstract class Scheduler {
         this.amountOfProcessors = amountOfProcessors;
     }
 
+    public Schedule getCurrentBestSchedule() {
+        return bestSchedule;
+    }
+
     // Initial call to the recursive function, returns a Schedule object
     // Template method pattern
     public Schedule getBestSchedule() {
