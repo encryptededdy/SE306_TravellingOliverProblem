@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ScheduleDrawer {
-    public static int SCHEDULE_WIDTH = 700;
+    public static int SCHEDULE_WIDTH = 700; // width of the whole thing
     public static int ROW_HEIGHT = 30;
     public static int HEADER_WIDTH = 100;
 
@@ -69,11 +69,15 @@ public class ScheduleDrawer {
                     // Draw gap
                     int gap = e.getStartTime() - lastScheduleEnd;
                     double width = ((gap / (double) totalTime) * dividableWidth);
+                    // round width to nearest 0.1
+                    width = Math.round(width);
                     ScheduleNode node = new ScheduleNode(width);
                     row.getChildren().add(node);
                 }
                 // Draw entry
                 double width = ((e.getLength() / (double) totalTime) * dividableWidth);
+                // round width to nearest 0.1
+                width = Math.round(width);
                 ScheduleNode node = new ScheduleNode(width, e, graphNodes.get(e.getNode()));
                 row.getChildren().add(node);
                 lastScheduleEnd = e.getEndTime();
@@ -90,8 +94,10 @@ public class ScheduleDrawer {
             scaleSpacing = 5;
         } else if (totalTime <= 150) {
             scaleSpacing = 10;
-        } else {
+        } else if (totalTime <= 250) {
             scaleSpacing = 25;
+        } else {
+            scaleSpacing = 50;
         }
 
         // draw scale
@@ -105,11 +111,11 @@ public class ScheduleDrawer {
         row.getChildren().add(header);
         for (int i = 0; i <= totalTime; i++) {
             ScheduleScaleNode node;
-            if (i % scaleSpacing == 0) {
+            if (i % scaleSpacing == 0) { // draw a number
                 node = new ScheduleScaleNode(i, width);
                 row.getChildren().add(node);
             } else {
-                if ((i - 1) % scaleSpacing == 0) {
+                if ((i - 1) % scaleSpacing == 0) { // draw empty space
                     node = new ScheduleScaleNode(width * (scaleSpacing - 1));
                     row.getChildren().add(node);
                 }

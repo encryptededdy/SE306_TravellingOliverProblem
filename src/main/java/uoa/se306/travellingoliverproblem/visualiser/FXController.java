@@ -146,7 +146,6 @@ public class FXController {
                 .title("Current best schedule length")
                 .decimals(0)
                 .chartData(new ChartData(COMPUTATIONAL_LOAD), new ChartData(COMPUTATIONAL_LOAD))
-                .animated(true)
                 .smoothing(true)
                 .build();
 
