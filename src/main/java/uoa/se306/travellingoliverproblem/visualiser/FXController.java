@@ -92,7 +92,7 @@ public class FXController {
         timerTimeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
             Duration time = Duration.millis(System.currentTimeMillis() - startTime);
             int minutes = (int) time.toMinutes();
-            int seconds = (minutes > 0) ? minutes * 60 - (int) time.toSeconds() : (int) time.toSeconds();
+            int seconds = (int) time.toSeconds() - minutes * 60;
             statusText.setText(String.format("Running: %02dm %02ds elapsed", minutes, seconds));
         }));
         timerTimeline.setCycleCount(Animation.INDEFINITE);

@@ -33,7 +33,6 @@ public class ScheduledProcessor {
     }
 
     // Used for rendering schedules
-    // TODO: Remove this and use listeners instead
     public ArrayList<ScheduleEntry> getFullSchedule() {
         return entryArray;
     }
