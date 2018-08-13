@@ -51,9 +51,11 @@ public class FXController {
     private ScrollPane graphScrollPane;
 
     private Map<Node, GraphNode> graphNodeMap;
-    private Timeline timeline;
+    private Timeline pollingTimeline;
+    private Timeline timerTimeline;
     private long lastBranches = 0;
     private Schedule lastSchedule;
+    long startTime;
 
     private void drawGraph(Graph graph) {
         SequentialGraphDrawer drawer = new SequentialGraphDrawer(graphPane, graph, graphScrollPane);
@@ -64,16 +66,16 @@ public class FXController {
     public void startProcessing(Graph inputGraph, int processors, String outputName) {
         Task<Void> task = SchedulerRunner.getInstance().startSchedulerJavaFXTask(inputGraph, processors);
         drawGraph(SchedulerRunner.getInstance().getInputGraph());
-        long startTime = System.nanoTime();
-
+        startTime = System.currentTimeMillis();
         task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent event) {
-                long endTime = System.nanoTime();
-                statusText.setText("Done, took " + (endTime - startTime) / 1000000 + " ms");
+                timerTimeline.stop();
+                long endTime = System.currentTimeMillis();
+                statusText.setText("Done, took " + (endTime - startTime) + " ms");
                 statusPane.setStyle("-fx-background-color: green;");
-                timeline.setCycleCount(1);
-                timeline.playFromStart();
+                pollingTimeline.setCycleCount(1);
+                pollingTimeline.playFromStart();
                 SchedulerRunner.getInstance().printResult();
                 drawSchedule(SchedulerRunner.getInstance().getSchedule());
                 scheduleTitleText.setText("Best Schedule");
@@ -82,7 +84,19 @@ public class FXController {
             }
         });
         new Thread(task).start();
+        startTimer();
         startPolling();
+    }
+
+    private void startTimer() {
+        timerTimeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
+            Duration time = Duration.millis(System.currentTimeMillis() - startTime);
+            int minutes = (int) time.toMinutes();
+            int seconds = (minutes > 0) ? minutes * 60 - (int) time.toSeconds() : (int) time.toSeconds();
+            statusText.setText(String.format("Running: %02dm %02ds elapsed", minutes, seconds));
+        }));
+        timerTimeline.setCycleCount(Animation.INDEFINITE);
+        timerTimeline.play();
     }
 
     private void startPolling() {
@@ -136,8 +150,8 @@ public class FXController {
                 .smoothing(true)
                 .build();
 
-        tilesBox.getChildren().addAll(memoryTile, boundedBranches, generatedBranches, branchRate, branchConsidered, bestTime);
-        timeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
+        tilesBox.getChildren().addAll(memoryTile, boundedBranches, bestTime, generatedBranches, branchRate, branchConsidered);
+        pollingTimeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
             // Check for new schedule
             if (lastSchedule == null || !lastSchedule.equals(SchedulerRunner.getInstance().getScheduler().getCurrentBestSchedule())) {
                 lastSchedule = SchedulerRunner.getInstance().getScheduler().getCurrentBestSchedule();
@@ -158,8 +172,8 @@ public class FXController {
             boundedBranches.setChartData(cd1, cd2, cd3);
             lastBranches = totalBranches;
         }));
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
+        pollingTimeline.setCycleCount(Animation.INDEFINITE);
+        pollingTimeline.play();
     }
 
     private void drawSchedule(Schedule schedule) {

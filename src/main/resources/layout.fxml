@@ -24,7 +24,7 @@
                          style="-fx-background-color: orange;">
                  <children>
                      <Text fx:id="statusText" fill="WHITE" layoutX="18.0" layoutY="33.0" strokeType="OUTSIDE"
-                           strokeWidth="0.0" text="Processing... 0m 0s elapsed">
+                           strokeWidth="0.0" text="Starting up...">
                          <font>
                              <Font name="System Bold" size="20.0"/>
                          </font>
