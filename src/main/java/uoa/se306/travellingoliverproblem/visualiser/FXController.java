@@ -26,6 +26,8 @@ import uoa.se306.travellingoliverproblem.visualiser.schedule.ScheduleDrawer;
 
 import java.util.Map;
 
+import static uoa.se306.travellingoliverproblem.scheduler.Scheduler.COMPUTATIONAL_LOAD;
+
 public class FXController {
     @FXML
     private Pane graphPane;
@@ -111,6 +113,7 @@ public class FXController {
         Tile branchRate = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
                 .title("Branches/sec")
                 .decimals(0)
+                .minWidth(300)
                 .chartData(new ChartData(0), new ChartData(0))
                 .animated(false)
                 .smoothing(true)
@@ -121,23 +124,25 @@ public class FXController {
                 .decimals(0)
                 .chartData(new ChartData(0), new ChartData(0))
                 .animated(false)
+                .minWidth(300)
                 .smoothing(true)
                 .build();
 
-        Tile dedupCulls = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
+        Tile bestTime = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
                 .title("Current best schedule length")
                 .decimals(0)
-                .chartData(new ChartData(0), new ChartData(0))
-                .animated(false)
+                .chartData(new ChartData(COMPUTATIONAL_LOAD), new ChartData(COMPUTATIONAL_LOAD))
+                .animated(true)
                 .smoothing(true)
                 .build();
 
-        tilesBox.getChildren().addAll(memoryTile, boundedBranches, generatedBranches, branchRate, branchConsidered, dedupCulls);
+        tilesBox.getChildren().addAll(memoryTile, boundedBranches, generatedBranches, branchRate, branchConsidered, bestTime);
         timeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
             // Check for new schedule
             if (lastSchedule == null || !lastSchedule.equals(SchedulerRunner.getInstance().getScheduler().getCurrentBestSchedule())) {
                 lastSchedule = SchedulerRunner.getInstance().getScheduler().getCurrentBestSchedule();
                 drawSchedule(lastSchedule);
+                bestTime.addChartData(new ChartData(lastSchedule.getOverallTime()));
             }
             // Update statistics
             double memoryUse = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1000000d;
@@ -146,7 +151,6 @@ public class FXController {
             generatedBranches.addChartData(new ChartData(totalBranches));
             branchRate.addChartData(new ChartData(totalBranches - lastBranches));
             branchConsidered.addChartData(new ChartData(SchedulerRunner.getInstance().getScheduler().getBranchesConsidered()));
-            dedupCulls.addChartData(new ChartData(SchedulerRunner.getInstance().getScheduler().getBranchesKilledDuplication()));
             // Setup data for pie chart
             ChartData cd1 = new ChartData("Considered", SchedulerRunner.getInstance().getScheduler().getBranchesConsidered(), Tile.GREEN);
             ChartData cd2 = new ChartData("Pruned", SchedulerRunner.getInstance().getScheduler().getBranchesKilled() - SchedulerRunner.getInstance().getScheduler().getBranchesKilledDuplication(), Tile.BLUE);
