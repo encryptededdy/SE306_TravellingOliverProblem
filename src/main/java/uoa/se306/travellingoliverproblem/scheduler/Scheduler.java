@@ -14,13 +14,18 @@ public abstract class Scheduler {
     // Graph of all nodes
     protected Graph graph;
 
+    public static int COMPUTATIONAL_LOAD;
+
     long branchesConsidered = 0;
     long branchesKilled = 0;
     long branchesKilledDuplication = 0;
+    private boolean useDFSCostFunction;
 
     // constructor to initialize the input graph and the amount of processors to use
-    Scheduler(Graph graph, int amountOfProcessors){
+    Scheduler(Graph graph, int amountOfProcessors, boolean useDFSCostFunction) {
+        this.useDFSCostFunction = useDFSCostFunction;
         this.graph = graph;
+        COMPUTATIONAL_LOAD = graph.getComputationalLoad();
         this.amountOfProcessors = amountOfProcessors;
     }
 
@@ -31,7 +36,7 @@ public abstract class Scheduler {
     // Initial call to the recursive function, returns a Schedule object
     // Template method pattern
     public Schedule getBestSchedule() {
-        calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes()));
+        calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes(), useDFSCostFunction));
         return bestSchedule;
     }
 
@@ -53,4 +58,5 @@ public abstract class Scheduler {
 
     // Recursive function, to be implemented by children
     protected abstract void calculateSchedule(Schedule currentSchedule);
+
 }

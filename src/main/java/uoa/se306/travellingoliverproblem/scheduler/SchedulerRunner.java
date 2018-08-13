@@ -7,7 +7,6 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
 import java.util.ArrayList;
-import java.util.TreeSet;
 
 public class SchedulerRunner {
     private static SchedulerRunner ourInstance = new SchedulerRunner();
@@ -16,7 +15,6 @@ public class SchedulerRunner {
     private Schedule schedule;
     private Scheduler scheduler;
     private ThreadListener tListener = null;
-    
     public static SchedulerRunner getInstance() {
         return ourInstance;
     }
@@ -33,6 +31,8 @@ public class SchedulerRunner {
         this.noProcessors = noProcessors;
 
         scheduler = new DFSScheduler(inputGraph, noProcessors);
+        //scheduler = new AStarSearchScheduler(inputGraph, noProcessors);
+
         // create task to run on a separate thread
         Runnable scheduleTask = () -> {
             long startTime = System.nanoTime();
@@ -54,6 +54,8 @@ public class SchedulerRunner {
         this.noProcessors = noProcessors;
 
         scheduler = new DFSScheduler(inputGraph, noProcessors);
+        //scheduler = new AStarSearchScheduler(inputGraph, noProcessors);
+
         // create task to run on a separate thread
         return new Task<Void>() {
             @Override

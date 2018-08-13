@@ -37,7 +37,7 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-
+        long totalStartTime = System.currentTimeMillis();
         int numOfCores = 1; //default 1 means that the code will run in sequential
         boolean useVisuals = false;
 
@@ -131,6 +131,7 @@ public class Main extends Application {
                     SchedulerRunner.getInstance().getSchedule().checkValidity();
                     DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), tempOutputFileName);
                     fileWriter.outputSchedule();
+                    System.out.println("Total time (incl startup, I/O etc.): " + (System.currentTimeMillis()-totalStartTime) + " ms");
                     System.exit(0);
                 });
             }
