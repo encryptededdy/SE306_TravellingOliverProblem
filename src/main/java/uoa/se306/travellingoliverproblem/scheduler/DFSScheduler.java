@@ -45,7 +45,7 @@ public class DFSScheduler extends Scheduler {
         if (currentSchedule.getAvailableNodes().isEmpty()) {
             // If our bestSchedule is null or the overall time for the bestSchedule is less than our current schedule
             if (bestSchedule == null || bestSchedule.getCost() > currentSchedule.getCost()) {
-                // System.out.println("Found new best schedule: " + currentSchedule.getOverallTime());
+                System.out.println("Found new best schedule: " + currentSchedule.getOverallTime());
                 bestSchedule = currentSchedule;
                 // Only run cleaner if it's been at least 5 seconds since we started, otherwise there's no point
                 if (!localDuplicateDetectionOnly && useExistingScheduleCleaner && System.currentTimeMillis() > startTime + 5000)
