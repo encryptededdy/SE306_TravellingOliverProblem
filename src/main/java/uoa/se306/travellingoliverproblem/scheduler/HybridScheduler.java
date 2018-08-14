@@ -93,7 +93,7 @@ public class HybridScheduler extends Scheduler {
                             Schedule tempSchedule = new Schedule(partial);
                             tempSchedule.addToSchedule(node, j, startTime);
                             existingSchedules.add(new MinimalSchedule(tempSchedule)); // existingSchedules needs cost data
-                            if ((graph.getAllNodes().size() - tempSchedule.getUnAddedNodes().size()) > hybridLimit) {
+                            if ((graph.getAllNodes().size() - tempSchedule.getUnAddedNodes().size()) >= hybridLimit) {
                                 readySchedules.add(tempSchedule); // put this in readySchedules to prepare it for DFS
                             } else {
                                 candidateSchedules.add(tempSchedule); // otherwise continue A*
@@ -110,12 +110,11 @@ public class HybridScheduler extends Scheduler {
 
     private int getHybridSize(Graph graph) {
         // TODO: Actually calculate the size to switch
-        return 5;
+        return 4;
     }
 
     private void beginDFS() {
         System.out.println("Switching to DFS with " + readySchedules.size() + " schedules from AStar");
-        int subschedules = 0;
         while (!readySchedules.isEmpty()) {
             Schedule schedule = readySchedules.poll();
             if (bestSchedule == null || schedule.getCost() < bestSchedule.getCost()) {

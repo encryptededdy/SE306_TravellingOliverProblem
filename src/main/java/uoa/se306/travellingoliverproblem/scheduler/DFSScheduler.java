@@ -114,7 +114,7 @@ public class DFSScheduler extends Scheduler {
                     consideredThisRound.add(minimal);
                     calculateScheduleRecursive(candidate);
                 } else if (!localDuplicateDetectionOnly && !existingSchedules.contains(minimal)) {
-                    if (existingSchedules.size() < 25000000) existingSchedules.add(minimal);
+                    if (existingSchedules.size() < 20000000) existingSchedules.add(minimal);
                     calculateScheduleRecursive(candidate);
                 } else {
                     branchesKilled++; // drop this branch
