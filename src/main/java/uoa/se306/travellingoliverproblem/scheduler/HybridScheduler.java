@@ -115,11 +115,13 @@ public class HybridScheduler extends Scheduler {
 
     private void beginDFS() {
         System.out.println("Switching to DFS with " + readySchedules.size() + " schedules from AStar");
+        int subschedules = 0;
         while (!readySchedules.isEmpty()) {
             Schedule schedule = readySchedules.poll();
             if (bestSchedule == null || schedule.getCost() < bestSchedule.getCost()) {
                 DFSScheduler scheduler = new DFSScheduler(graph, amountOfProcessors);
                 scheduler.bestSchedule = bestSchedule;
+                System.out.println(readySchedules.size() + " remaining");
                 scheduler.calculateSchedule(schedule);
                 if (bestSchedule == null || bestSchedule.getOverallTime() > scheduler.getBestSchedule().getOverallTime()) {
                     bestSchedule = scheduler.getBestSchedule();
