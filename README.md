@@ -3,6 +3,15 @@
 Master: [![Build Status](https://travis-ci.com/encryptededdy/SE306_TravellingOliverProblem.svg?token=yWUrDYvrGQFpxBXqf7zH&branch=master)](https://travis-ci.com/encryptededdy/SE306_TravellingOliverProblem)
 
 ## Project Overview
+### Description
+The main goal of the project was to solve a problem using artificial intelligence and parallel processing, while trying to stick to a strict waterfall model. The problem is a shceduling problem which involves scheduling a full graph made up of tasks, onto multiple processors. Each task can have dependencies to parents or constraints on children, which indicates that they have a communication cost. The communication cost further extends the state space for this problem as it is an extra constraint to test for, and all these dependencies have to be fulfilled for a tasks parents for it to be scheduled. Once all tasks on the graph have been scheduled the schedule is seen as complete. An optimal solution is such that no other "correct" schedule has an earlier end time than the current one.
+There are three other goals for this project, and they are:
+* Optimal schedule output
+* Visualisation
+* Parallelisation
+### AStar Algorithm
+
+### Branch and bound
 
 ## Instructions
 ### Usage
