@@ -2,6 +2,13 @@
 
 Master: [![Build Status](https://travis-ci.com/encryptededdy/SE306_TravellingOliverProblem.svg?token=yWUrDYvrGQFpxBXqf7zH&branch=master)](https://travis-ci.com/encryptededdy/SE306_TravellingOliverProblem)
 
+## Project Overview
+
+## Instructions
+
+## Navigation
+
+
 ## Group Members
 | Name         | Username | Uni ID | GitHub    | Email (Personal) |
 | ------------ | ------- | ------ | --------- | --- |
