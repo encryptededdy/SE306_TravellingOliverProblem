@@ -34,6 +34,8 @@ There are three other goals for this project, and they are:
 The wiki is the location for majority of our documentation and research behind our projet, including the algorithm optimisations, assumptions and other similar information
 ### Issues
 The issue tracker contains a portion of the issues encountered throughout our project, despite this a number of our issues were just managed through our messaging app telegram as this provided a faster way to get peoples attention when a bug occured
+### Releases
+Where you find the release for both the milestones of the project
 
 ## Group Members
 | Name         | Username | Uni ID | GitHub    | Email (Personal) |
