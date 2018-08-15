@@ -3,6 +3,7 @@ package uoa.se306.travellingoliverproblem.scheduler;
 import gnu.trove.set.hash.THashSet;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
+import uoa.se306.travellingoliverproblem.graph.NodeCostComparator;
 import uoa.se306.travellingoliverproblem.schedule.*;
 
 import java.util.*;
@@ -22,7 +23,11 @@ public class DFSScheduler extends Scheduler {
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
         startTime = System.currentTimeMillis();
-        calculateScheduleRecursive(currentSchedule);
+        if (currentSchedule.getAvailableNodes().stream().allMatch(Node::isIndependent)) {
+            doIndependent(currentSchedule);
+        } else {
+            calculateScheduleRecursive(currentSchedule);
+        }
     }
 
     private void cleanExistingSchedules() {
@@ -62,10 +67,11 @@ public class DFSScheduler extends Scheduler {
 
         //TODO: reduce this massive overhead
         boolean useFixedOrder = false;
+
         if (previousFixedNodes != null && nodesList.containsAll(previousFixedNodes)) {
             useFixedOrder = true;
         } else if (fixingOrder(currentSchedule)) {
-            nodesList = taskSorting(nodesList, currentSchedule.getProcessors());
+            Collections.sort(nodesList, new NodeComparator(currentSchedule.getProcessors()));
             if (verifyOutEdgeOrder(nodesList)) {
                 useFixedOrder = true;
             }
@@ -108,6 +114,7 @@ public class DFSScheduler extends Scheduler {
                     break; // It's a priority queue, so we can just drop the rest
                 }
             }
+
         } else { // Else, just do the normal scheduling
 
             for (Node node : nodesList) {
@@ -160,6 +167,29 @@ public class DFSScheduler extends Scheduler {
         }
     }
 
+    //-------------------------------------------------------------
+    private void doIndependent(Schedule currentSchedule) {
+        branchesConsidered++;
+        if (currentSchedule.getUnAddedNodes().isEmpty() && (bestSchedule == null || currentSchedule.getCost() < bestSchedule.getCost())) {
+            System.out.println("Found new best schedule: " + currentSchedule.getOverallTime());
+            bestSchedule = currentSchedule;
+            return;
+        }
+        ArrayList<Node> nodesList = new ArrayList<>(currentSchedule.getAvailableNodes());
+        Node max = Collections.max(nodesList, new NodeCostComparator());
+        for (int i = 0; i < currentSchedule.getProcessors().length; i++) {
+            Schedule newSchedule = new Schedule(currentSchedule);
+            int endtime = currentSchedule.getProcessors()[i].endTime();
+            newSchedule.addToSchedule(max, i, endtime);
+            if (!existingSchedules.contains(new MinimalSchedule(newSchedule)) && (bestSchedule == null || newSchedule.getCost() < bestSchedule.getCost())) {
+                existingSchedules.add(new MinimalSchedule(newSchedule));
+                //System.out.println("Calling for node "+max.toString()+" on proc "+i+" "+nodesList.size()+" left");
+                doIndependent(newSchedule);
+            } else {
+                branchesKilled++;
+            }
+        }
+    }
 
     //------------------------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------------------
@@ -244,23 +274,6 @@ public class DFSScheduler extends Scheduler {
             }
         }
         return processorEarliestAvailable;
-    }
-
-    /*
-    Only call this method if the fixingOrder() method returns true
-    This method sorts the available nodes in INCREASING data-ready time (drt)
-    The drt of the free node is the finishing time of its parents + communication cost (We always take into account the communication cost).
-    If the node has no parent, set drt to 0
-    If nodes have same Data-Ready-Time, then sort them in DECREASING out edge cost
-    If the node have no parent, set out edge cost to 0 (which means
-
-    verify that the available nodes are in decreasing out-edge order
-     */
-    private ArrayList<Node> taskSorting(ArrayList<Node> theList, ScheduledProcessor[] processors) {
-        Collections.sort(theList, new NodeComparator(processors));
-
-        //System.out.println("the list looks like this after sorting" + theList);
-        return theList;
     }
 
     /*
