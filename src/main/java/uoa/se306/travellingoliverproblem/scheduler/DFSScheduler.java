@@ -20,6 +20,8 @@ public class DFSScheduler extends Scheduler {
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private long startTime;
 
+    private static final int MAX_MEMORY = 20000000;
+    
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors, true);
     }
@@ -114,7 +116,7 @@ public class DFSScheduler extends Scheduler {
                     consideredThisRound.add(minimal);
                     calculateScheduleRecursive(candidate);
                 } else if (!localDuplicateDetectionOnly && !existingSchedules.contains(minimal)) {
-                    if (existingSchedules.size() < 20000000) existingSchedules.add(minimal);
+                    if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
                     calculateScheduleRecursive(candidate);
                 } else {
                     branchesKilled++; // drop this branch
