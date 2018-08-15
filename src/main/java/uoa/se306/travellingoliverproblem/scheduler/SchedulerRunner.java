@@ -80,10 +80,11 @@ public class SchedulerRunner {
             System.out.println("Processor " + Integer.toString(i) + " has tasks:" + nodeMap.toString());
         }
         System.out.println("The best overall time was: " + schedule.getOverallTime());
-        System.out.printf("Out of %d branches, %d were pruned (%.1f%%)",
+        System.out.printf("Out of %d branches, %d were pruned (%.1f%%) (%d considered)",
                 scheduler.getBranchesConsidered()+scheduler.getBranchesKilled(),
                 scheduler.getBranchesKilled(),
-                scheduler.proportionKilled()*100);
+                scheduler.proportionKilled()*100,
+                scheduler.getBranchesConsidered());
     }
 
     public Graph getInputGraph() {

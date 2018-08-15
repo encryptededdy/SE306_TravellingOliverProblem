@@ -52,7 +52,7 @@ public class Schedule implements Comparable<Schedule> {
         }
     }
 
-    private void calculateCostFunction(Node node, int processorNo, int startTime, float idleTimeAndComputation) {
+    private void calculateCostFunction(Node node, int startTime, float idleTimeAndComputation) {
         maxStartTimeAndBottomLevel(node, startTime);
         if (useDFSCostFunction) {
             cost = Math.max(maxStartTimeBottomLevel, idleTimeAndComputation);
@@ -126,7 +126,7 @@ public class Schedule implements Comparable<Schedule> {
             // If the child has had all its dependencies fulfilled, add the child to the available set
             if (available) availableNodes.add(child);
         }
-        calculateCostFunction(node, processorNo, startTime, idleTimeAndComputation);
+        calculateCostFunction(node, startTime, idleTimeAndComputation);
     }
 
     // Returns all nodes that have not been added to the schedule
