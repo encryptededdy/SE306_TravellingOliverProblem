@@ -20,7 +20,7 @@ public class Main extends Application {
     private static FXController controller;
     private static Graph inputGraph;
     private static int processors = 1;
-    private static String outputFileName;
+    public static String outputFileName;
 
     // JavaFX start method (depends if visualisation enabled)
     @Override
