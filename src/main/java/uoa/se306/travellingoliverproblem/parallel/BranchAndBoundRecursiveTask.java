@@ -17,7 +17,7 @@ public class BranchAndBoundRecursiveTask extends RecursiveTask<Schedule> {
     private static Logger logger =
             Logger.getAnonymousLogger();
     // TODO check what optimal threshold is
-    private static final int SEQUENTIAL_THRESHOLD = 200;
+    private static final int SEQUENTIAL_THRESHOLD = 100;
     private static Schedule bestSchedule;//TODO sync issues
     public static Graph graph;
     private int amountOfProcessors = 2;//TODO Change later
@@ -31,12 +31,6 @@ public class BranchAndBoundRecursiveTask extends RecursiveTask<Schedule> {
 
     //Initial scheduler task
     public BranchAndBoundRecursiveTask(PriorityQueue<Schedule> schedules) {
-        this.schedules = schedules;
-    }
-
-    //Following scheduler tasks
-    public BranchAndBoundRecursiveTask(PriorityQueue<Schedule> schedules, Schedule bestSchedule) {
-        this.bestSchedule = bestSchedule;
         this.schedules = schedules;
     }
 
@@ -62,15 +56,13 @@ public class BranchAndBoundRecursiveTask extends RecursiveTask<Schedule> {
                 setDirection = !setDirection;
             }
 
-            subTasks.add(new BranchAndBoundRecursiveTask(firstPartitionedQueue, bestSchedule));
-            subTasks.add(new BranchAndBoundRecursiveTask(secondPartitionedQueue, bestSchedule));
-            //Fork then join 2 tasks, almost recursively iterate until set is split
+            subTasks.add(new BranchAndBoundRecursiveTask(firstPartitionedQueue));
+            subTasks.add(new BranchAndBoundRecursiveTask(secondPartitionedQueue));
+            //Fork then join 2 tasks, recursively iterate until set is split fully
             ForkJoinTask.invokeAll(subTasks)
                     .stream()
                     .map(ForkJoinTask::join).forEach(schedule -> {
-                        if (bestSchedule == null || schedule.getOverallTime() < bestSchedule.getOverallTime()) {
-                            setBestSchedule(schedule);
-                        }
+                        getAndSetBestSchedule(schedule);
                     });
 
         } else {
@@ -87,28 +79,27 @@ public class BranchAndBoundRecursiveTask extends RecursiveTask<Schedule> {
         while(schedules.size() > 0) {
             schedule = schedules.poll();
             if (bestSchedule == null || schedule.getOverallTime() < bestSchedule.getOverallTime()) {
-                calculateScheduleRecursive(schedules.poll());
+                calculateScheduleRecursive(schedule);
             }
         }
     }
 
     private void calculateScheduleRecursive(Schedule currentSchedule) {
         DFSScheduler scheduler = new DFSScheduler(graph, amountOfProcessors);
-        if (bestSchedule != null) {
-            scheduler.setBestSchedule(bestSchedule);
-        }
+        scheduler.bestSchedule = bestSchedule;
         scheduler.calculateSchedule(currentSchedule);
         Schedule schedule = scheduler.getBestSchedule();
-        if (bestSchedule == null || schedule.getOverallTime() < bestSchedule.getOverallTime()) {
-            setBestSchedule(schedule);
-        }
+        getAndSetBestSchedule(schedule);
     }
 
     public Schedule getBestSchedule() {
         return bestSchedule;
     }
 
-    private static synchronized void setBestSchedule(Schedule schedule) {
-        bestSchedule = schedule;
+    //Synchronised method to set bestSchedule
+    private static synchronized void getAndSetBestSchedule(Schedule schedule) {
+        if (bestSchedule == null || bestSchedule.getCost() > schedule.getCost()) {
+            bestSchedule = schedule;
+        }
     }
 }

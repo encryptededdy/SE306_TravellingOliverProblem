@@ -152,14 +152,14 @@ public class Main extends Application {
             } else {
                 if (numOfCores > 1) {
                     // Run AStar
+                    // TODO move this to schedulerrunner
                     forkJoinPool = new ForkJoinPool(numOfCores);
                     HybridScheduler initialScheduler = new HybridScheduler(inputGraph, processors);
                     initialScheduler.getBestSchedule();
                     BranchAndBoundRecursiveTask bab = new BranchAndBoundRecursiveTask(initialScheduler.getSchedules());
                     BranchAndBoundRecursiveTask.graph = inputGraph;
-                    System.out.println(initialScheduler.getSchedules().size());
                     bab.invoke();
-                    System.out.println(bab.getBestSchedule());
+                    System.out.println(bab.getBestSchedule().getOverallTime());
                     System.exit(bab.isCompletedAbnormally() ? 1 : 0);
 
                 }

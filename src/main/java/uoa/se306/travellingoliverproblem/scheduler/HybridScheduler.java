@@ -22,7 +22,7 @@ public class HybridScheduler extends Scheduler {
     private PriorityQueue<Schedule> readySchedules = new PriorityQueue<>();
 
     private static final int HYBRID_MAX_DEPTH = 4;
-    private static final int HYBRID_MAX_SIZE = 1000;//TODO set appropriate
+    private static final int HYBRID_MAX_SIZE = 10000;//TODO set appropriate
     private static final boolean USE_DEPTH_LIMIT = false;
 
     public HybridScheduler(Graph graph, int amountOfProcessors) {
