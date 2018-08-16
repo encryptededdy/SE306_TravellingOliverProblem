@@ -80,9 +80,15 @@ public class Main extends Application {
             inputGraph = reader.readFile();
 
             File file = new File(fileName);
-            //gets the file name of the provided file path, gets rid of the file type and appends .dot to it.
-            //this will be the default output file name. (output(graphNameFileName).dot) (if the digraph has no name
-            outputFileName = file.getName().substring(0, file.getName().lastIndexOf('.')) + ".dot";
+
+            //if it's an empty file name the default output file will be output.dot
+            if (file.getName().equals(".dot")){
+                outputFileName = "output.dot";
+            } else{
+                //gets the file name of the provided file path, gets rid of the file type and appends .dot to it.
+                //this will be the default output file name. (output(graphNameFileName).dot) (if the digraph has no name
+                outputFileName = file.getName().substring(0, file.getName().lastIndexOf('.')) + ".dot";
+            }
 
             //check if there are any valid optional arguments
             if (args.length > 2) {
