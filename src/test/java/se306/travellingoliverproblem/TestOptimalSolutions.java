@@ -155,12 +155,12 @@ public class TestOptimalSolutions {
         checkValidAndOptimal(scheduler.getBestSchedule(), 227);
     }
 
-    private void checkValidAndOptimal(Schedule scheduleToCheck, int optimalTime) {
+    static void checkValidAndOptimal(Schedule scheduleToCheck, int optimalTime) {
         scheduleToCheck.checkValidity();
         assertEquals(optimalTime, scheduleToCheck.getOverallTime());
     }
 
-    private Graph getGraphFromInput(String fileName) throws FileNotFoundException {
+    static Graph getGraphFromInput(String fileName) throws FileNotFoundException {
         File inputFile = new File("testInput/checkOptimal/" + fileName);
         GraphFileReader reader = new DotReader();
         reader.openFile(inputFile);

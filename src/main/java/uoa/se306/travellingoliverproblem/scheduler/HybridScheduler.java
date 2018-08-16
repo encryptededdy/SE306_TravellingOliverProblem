@@ -22,16 +22,17 @@ public class HybridScheduler extends Scheduler {
     private PriorityQueue<Schedule> readySchedules = new PriorityQueue<>();
 
     private static final int HYBRID_MAX_DEPTH = 4;
-    private static final int HYBRID_MAX_SIZE = 1000;//TODO set appropriate
+    private int hybridMaxSize;//TODO set appropriate
     private static final boolean USE_DEPTH_LIMIT = false;
 
-    public HybridScheduler(Graph graph, int amountOfProcessors, boolean isParallelised) {
+    public HybridScheduler(Graph graph, int amountOfProcessors, boolean isParallelised, int maxSize) {
         super(graph, amountOfProcessors, false, isParallelised);
+        this.hybridMaxSize = maxSize;
     }
 
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
-        System.out.println("Hybrid config: MAX_DEPTH = " + HYBRID_MAX_DEPTH + ", MAX_SIZE = " + HYBRID_MAX_SIZE + ", USE_DEPTH_LIMIT = " + USE_DEPTH_LIMIT);
+        System.out.println("Hybrid config: MAX_DEPTH = " + HYBRID_MAX_DEPTH + ", MAX_SIZE = " + hybridMaxSize + ", USE_DEPTH_LIMIT = " + USE_DEPTH_LIMIT);
         solveAStar(currentSchedule);
     }
 
@@ -49,7 +50,7 @@ public class HybridScheduler extends Scheduler {
                     beginDFS();
                 }
                 break;
-            } else if (!USE_DEPTH_LIMIT && candidateSchedules.size() > HYBRID_MAX_SIZE) {
+            } else if (!USE_DEPTH_LIMIT && candidateSchedules.size() > hybridMaxSize) {
                 existingSchedules = null; // clear ExistingSchedules from Memory
                 readySchedules = candidateSchedules;
                 if (!isParallelised) {

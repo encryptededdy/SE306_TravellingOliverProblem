@@ -93,7 +93,7 @@ public class SchedulerRunner {
             return new DFSScheduler(inputGraph, noProcessors, isParallelised);
         } else {
             System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using A*/BnB hybrid scheduling algorithm");
-            return new HybridScheduler(inputGraph, noProcessors, isParallelised);
+            return new HybridScheduler(inputGraph, noProcessors, isParallelised, 1000);
         }
     }
 

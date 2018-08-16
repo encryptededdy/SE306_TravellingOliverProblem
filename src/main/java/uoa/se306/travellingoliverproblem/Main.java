@@ -10,7 +10,6 @@ import uoa.se306.travellingoliverproblem.fileIO.DotReader;
 import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.parallel.BranchAndBoundRecursiveTask;
-import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.HybridScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.SchedulerRunner;
 import uoa.se306.travellingoliverproblem.visualiser.FXController;
@@ -23,6 +22,7 @@ import java.util.concurrent.ForkJoinPool;
 
 public class Main extends Application {
 
+    private static ForkJoinPool forkJoinPool;
     private static FXController controller;
     private static Graph inputGraph;
     private static int processors = 1;
@@ -42,8 +42,6 @@ public class Main extends Application {
         primaryStage.sizeToScene(); // JavaFX Bug RT-30647 workaround
         primaryStage.show();
     }
-
-    public static ForkJoinPool forkJoinPool;
 
     public static void main(String[] args) {
         long totalStartTime = System.currentTimeMillis();
@@ -156,7 +154,7 @@ public class Main extends Application {
                     // TODO move this to schedulerrunner
                     long t1 = System.currentTimeMillis();
                     forkJoinPool = new ForkJoinPool(numOfCores);
-                    HybridScheduler initialScheduler = new HybridScheduler(inputGraph, processors, isParallelised);
+                    HybridScheduler initialScheduler = new HybridScheduler(inputGraph, processors, isParallelised, 1000);
                     initialScheduler.getBestSchedule();
                     BranchAndBoundRecursiveTask bab = new BranchAndBoundRecursiveTask(initialScheduler.getSchedules(), processors);
                     BranchAndBoundRecursiveTask.graph = inputGraph;
