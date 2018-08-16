@@ -94,6 +94,12 @@
             <artifactId>tilesfx</artifactId>
             <version>1.6.4</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/net.sf.trove4j/trove4j -->
+        <dependency>
+            <groupId>net.sf.trove4j</groupId>
+            <artifactId>trove4j</artifactId>
+            <version>3.0.3</version>
+        </dependency>
         <dependency>
             <groupId>com.paypal.digraph</groupId>
             <artifactId>digraph-parser</artifactId>

@@ -7,7 +7,6 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
 import java.util.ArrayList;
-import java.util.TreeSet;
 
 public class SchedulerRunner {
     private static SchedulerRunner ourInstance = new SchedulerRunner();
@@ -31,7 +30,8 @@ public class SchedulerRunner {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
-        scheduler = new DFSScheduler(inputGraph, noProcessors);
+        scheduler = autoPickScheduler(inputGraph, noProcessors);
+
         // create task to run on a separate thread
         Runnable scheduleTask = () -> {
             long startTime = System.nanoTime();
@@ -52,7 +52,8 @@ public class SchedulerRunner {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
-        scheduler = new DFSScheduler(inputGraph, noProcessors);
+        scheduler = autoPickScheduler(inputGraph, noProcessors);
+
         // create task to run on a separate thread
         return new Task<Void>() {
             @Override
@@ -81,6 +82,19 @@ public class SchedulerRunner {
                 scheduler.getBranchesConsidered()+scheduler.getBranchesKilled(),
                 scheduler.getBranchesKilled(),
                 scheduler.proportionKilled()*100);
+    }
+
+    private Scheduler autoPickScheduler(Graph inputGraph, int noProcessors) {
+        if (inputGraph.getAllNodes().size() < 10) {
+            System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using A* scheduling algorithm");
+            return new AStarSearchScheduler(inputGraph, noProcessors);
+        } else if (inputGraph.getAllNodes().size() < 14) {
+            System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using DFS/BnB scheduling algorithm");
+            return new DFSScheduler(inputGraph, noProcessors);
+        } else {
+            System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using A*/BnB hybrid scheduling algorithm");
+            return new HybridScheduler(inputGraph, noProcessors);
+        }
     }
 
     public Graph getInputGraph() {

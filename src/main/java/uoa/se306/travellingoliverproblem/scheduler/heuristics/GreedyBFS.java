@@ -43,7 +43,6 @@ public class GreedyBFS {
         for (Node node : availableNodes){
             ScheduledProcessor[] processors = partialSchedule.getProcessors();
 
-            //recursively call this method after scheduling a node in a processor
             for (int i = 0; i < processors.length; i++) {
                 ScheduledProcessor processor = processors[i];
                 int processorStartTime;

@@ -2,7 +2,6 @@ package uoa.se306.travellingoliverproblem.scheduler;
 
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
-import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
 /*
 Outlines signature for schedulers to adhere to
@@ -10,29 +9,40 @@ Outlines signature for schedulers to adhere to
 public abstract class Scheduler {
 
     // Best schedule found from all iterations
-    protected Schedule bestSchedule;
-    protected int amountOfProcessors;
+    Schedule bestSchedule;
+    int amountOfProcessors;
     // Graph of all nodes
     protected Graph graph;
 
-    protected long branchesConsidered = 0;
-    protected long branchesKilled = 0;
+    public static int COMPUTATIONAL_LOAD;
+
+    long branchesConsidered = 0;
+    long branchesKilled = 0;
+    long branchesKilledDuplication = 0;
+    private boolean useDFSCostFunction;
 
     // constructor to initialize the input graph and the amount of processors to use
-    Scheduler(Graph graph, int amountOfProcessors){
+    Scheduler(Graph graph, int amountOfProcessors, boolean useDFSCostFunction) {
+        this.useDFSCostFunction = useDFSCostFunction;
         this.graph = graph;
+        COMPUTATIONAL_LOAD = graph.getComputationalLoad();
         this.amountOfProcessors = amountOfProcessors;
     }
 
     // Initial call to the recursive function, returns a Schedule object
     // Template method pattern
     public Schedule getBestSchedule() {
-        calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes()));
+        calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes(), useDFSCostFunction));
+        bestSchedule.checkValidity();
         return bestSchedule;
     }
 
     public long getBranchesConsidered() {
         return branchesConsidered;
+    }
+
+    public long getBranchesKilledDuplication() {
+        return branchesKilledDuplication;
     }
 
     public long getBranchesKilled() {
@@ -45,4 +55,5 @@ public abstract class Scheduler {
 
     // Recursive function, to be implemented by children
     protected abstract void calculateSchedule(Schedule currentSchedule);
+
 }

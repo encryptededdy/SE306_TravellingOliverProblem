@@ -15,17 +15,23 @@ import java.util.Set;
 /*
 Scheduler for the A Star Algorithm
  */
-public class AStarSearchScheduler extends Scheduler {
+public class HybridScheduler extends Scheduler {
 
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
+    private PriorityQueue<Schedule> readySchedules = new PriorityQueue<>();
 
-    public AStarSearchScheduler(Graph graph, int amountOfProcessors) {
+    private static final int HYBRID_MAX_DEPTH = 4;
+    private static final int HYBRID_MAX_SIZE = 500000;
+    private static final boolean USE_DEPTH_LIMIT = false;
+
+    public HybridScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors, false);
     }
 
     @Override
-    protected void calculateSchedule(Schedule currentSchedule){
+    protected void calculateSchedule(Schedule currentSchedule) {
+        System.out.println("Hybrid config: MAX_DEPTH = " + HYBRID_MAX_DEPTH + ", MAX_SIZE = " + HYBRID_MAX_SIZE + ", USE_DEPTH_LIMIT = " + USE_DEPTH_LIMIT);
         solveAStar(currentSchedule);
     }
 
@@ -36,11 +42,21 @@ public class AStarSearchScheduler extends Scheduler {
 
         while (true) {
 
-            Schedule partial = candidateSchedules.poll();
-            branchesConsidered++;
+            // if it's empty, then it's time to switch to DFS!
+            if (USE_DEPTH_LIMIT && candidateSchedules.isEmpty()) {
+                existingSchedules = null; // clear ExistingSchedules from Memory
+                beginDFS();
+                break;
+            } else if (!USE_DEPTH_LIMIT && candidateSchedules.size() > HYBRID_MAX_SIZE) {
+                existingSchedules = null; // clear ExistingSchedules from Memory
+                readySchedules = candidateSchedules;
+                beginDFS();
+                break;
+            }
 
-            // If the first partial schedule in the priority queue is complete
-            // It is an optimal schedule
+            Schedule partial = candidateSchedules.poll();
+
+            // Oh, we found the optimal solution!
             if (partial.getAvailableNodes().isEmpty()) {
                 bestSchedule = partial;
                 break;
@@ -80,19 +96,43 @@ public class AStarSearchScheduler extends Scheduler {
                         int startTime = processors[j].getEarliestStartAfter(processorEarliestAvailable[j], node.getCost());
                         MinimalSchedule m = partial.testAddToSchedule(node, j, startTime);
 
-                        if (!existingSchedules.contains(m)){
+                        if (!existingSchedules.contains(m)) {
+                            branchesConsidered++;
                             //create a copy of our partialSchedule
                             //add the availableNode into processor i at time startTime in the schedule
                             Schedule tempSchedule = new Schedule(partial);
                             tempSchedule.addToSchedule(node, j, startTime);
                             existingSchedules.add(new MinimalSchedule(tempSchedule)); // existingSchedules needs cost data
-                            candidateSchedules.add(tempSchedule);
+                            if (USE_DEPTH_LIMIT && (graph.getAllNodes().size() - tempSchedule.getUnAddedNodes().size()) >= HYBRID_MAX_DEPTH) {
+                                readySchedules.add(tempSchedule); // put this in readySchedules to prepare it for DFS
+                            } else {
+                                candidateSchedules.add(tempSchedule); // otherwise continue A*
+                            }
                         } else {
                             branchesKilled++;
                             branchesKilledDuplication++;
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private void beginDFS() {
+        System.out.println("Switching to DFS from A*");
+        while (!readySchedules.isEmpty()) {
+            Schedule schedule = readySchedules.poll();
+            if (bestSchedule == null || schedule.getCost() < bestSchedule.getCost()) {
+                DFSScheduler scheduler = new DFSScheduler(graph, amountOfProcessors);
+                scheduler.bestSchedule = bestSchedule;
+                System.out.println("Computing Schedule... " + (readySchedules.size() + 1) + " remaining, size " + (graph.getAllNodes().size() - schedule.getUnAddedNodes().size()));
+                scheduler.calculateSchedule(schedule);
+                if (bestSchedule == null || bestSchedule.getOverallTime() > scheduler.getBestSchedule().getOverallTime()) {
+                    bestSchedule = scheduler.getBestSchedule();
+                }
+            } else {
+                System.out.println((readySchedules.size() + 1) + " schedules dropped (not passed to DFS)");
+                break; // It's a priority queue, so we don't need to see anymore.
             }
         }
     }

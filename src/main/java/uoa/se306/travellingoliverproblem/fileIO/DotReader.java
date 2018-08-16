@@ -74,7 +74,7 @@ public class DotReader implements GraphFileReader {
     }
 
     private void calculateChildLevel(Node currentNode, Integer level) {
-        for (Node childrenNodes: currentNode.getChildren().keySet()) {
+        for (Node childrenNodes : currentNode.getChildren().keySet()) {
             if (level > childrenNodes.getLevel()) {
                 childrenNodes.setLevel(level);
                 calculateChildLevel(childrenNodes, level++);
