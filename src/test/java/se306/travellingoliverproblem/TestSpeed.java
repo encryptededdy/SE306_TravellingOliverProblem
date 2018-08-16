@@ -25,8 +25,8 @@ public class TestSpeed {
 
     @Test
     public void compareSpeed2ProcessorsInput3(){
-        Scheduler DFSScheduler3_2 = new DFSScheduler(input3Graph, 2);
-        Scheduler AStarScheduler3_2 = new AStarSearchScheduler(input3Graph, 2);
+        Scheduler DFSScheduler3_2 = new DFSScheduler(input3Graph, 2, false);
+        Scheduler AStarScheduler3_2 = new AStarSearchScheduler(input3Graph, 2, false);
 
         long startTime = System.nanoTime();
         DFSScheduler3_2.getBestSchedule();
@@ -49,8 +49,8 @@ public class TestSpeed {
 
     @Test
     public void compareSpeed2ProcessorsInput10(){
-        Scheduler DFSScheduler10_2 = new DFSScheduler(input10Graph, 2);
-        Scheduler AStarScheduler10_2 = new AStarSearchScheduler(input10Graph, 2);
+        Scheduler DFSScheduler10_2 = new DFSScheduler(input10Graph, 2, false);
+        Scheduler AStarScheduler10_2 = new AStarSearchScheduler(input10Graph, 2, false);
 
         long startTime = System.nanoTime();
         DFSScheduler10_2.getBestSchedule();
@@ -73,8 +73,8 @@ public class TestSpeed {
 
     @Test
     public void compareSpeed4ProcessorsInput3(){
-        Scheduler DFSScheduler3_4 = new AStarSearchScheduler(input3Graph, 4);
-        Scheduler AStarScheduler3_4 = new AStarSearchScheduler(input3Graph, 4);
+        Scheduler DFSScheduler3_4 = new AStarSearchScheduler(input3Graph, 4, false);
+        Scheduler AStarScheduler3_4 = new AStarSearchScheduler(input3Graph, 4, false);
 
         long startTime = System.nanoTime();
         DFSScheduler3_4.getBestSchedule();
@@ -97,8 +97,8 @@ public class TestSpeed {
 
     @Test
     public void compareSpeed4ProcessorsInput10(){
-        Scheduler AStarScheduler10_4 = new AStarSearchScheduler(input10Graph, 8);
-        Scheduler DFSScheduler10_4 = new AStarSearchScheduler(input10Graph, 8);
+        Scheduler AStarScheduler10_4 = new AStarSearchScheduler(input10Graph, 8, false);
+        Scheduler DFSScheduler10_4 = new AStarSearchScheduler(input10Graph, 8, false);
 
         long startTime = System.nanoTime();
         DFSScheduler10_4.getBestSchedule();

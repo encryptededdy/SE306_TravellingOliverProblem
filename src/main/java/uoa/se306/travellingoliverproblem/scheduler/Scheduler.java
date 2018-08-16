@@ -9,21 +9,23 @@ Outlines signature for schedulers to adhere to
 public abstract class Scheduler {
 
     // Best schedule found from all iterations
-    public Schedule bestSchedule;
+    Schedule bestSchedule;
     int amountOfProcessors;
     // Graph of all nodes
     protected Graph graph;
 
     public static int COMPUTATIONAL_LOAD;
 
+    boolean isParallelised;
     long branchesConsidered = 0;
     long branchesKilled = 0;
     long branchesKilledDuplication = 0;
     private boolean useDFSCostFunction;
 
     // constructor to initialize the input graph and the amount of processors to use
-    Scheduler(Graph graph, int amountOfProcessors, boolean useDFSCostFunction) {
+    Scheduler(Graph graph, int amountOfProcessors, boolean useDFSCostFunction, boolean isParallelised) {
         this.useDFSCostFunction = useDFSCostFunction;
+        this.isParallelised = isParallelised;
         this.graph = graph;
         COMPUTATIONAL_LOAD = graph.getComputationalLoad();
         this.amountOfProcessors = amountOfProcessors;

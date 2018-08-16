@@ -22,11 +22,11 @@ public class HybridScheduler extends Scheduler {
     private PriorityQueue<Schedule> readySchedules = new PriorityQueue<>();
 
     private static final int HYBRID_MAX_DEPTH = 4;
-    private static final int HYBRID_MAX_SIZE = 10000;//TODO set appropriate
+    private static final int HYBRID_MAX_SIZE = 1000;//TODO set appropriate
     private static final boolean USE_DEPTH_LIMIT = false;
 
-    public HybridScheduler(Graph graph, int amountOfProcessors) {
-        super(graph, amountOfProcessors, false);
+    public HybridScheduler(Graph graph, int amountOfProcessors, boolean isParallelised) {
+        super(graph, amountOfProcessors, false, isParallelised);
     }
 
     @Override
@@ -44,13 +44,17 @@ public class HybridScheduler extends Scheduler {
 
             // if it's empty, then it's time to switch to DFS!
             if (USE_DEPTH_LIMIT && candidateSchedules.isEmpty()) {
-                existingSchedules = null; // clear ExistingSchedules from Memory
-                //beginDFS();
+                existingSchedules = null;// clear ExistingSchedules from Memory
+                if (!isParallelised) {
+                    beginDFS();
+                }
                 break;
             } else if (!USE_DEPTH_LIMIT && candidateSchedules.size() > HYBRID_MAX_SIZE) {
                 existingSchedules = null; // clear ExistingSchedules from Memory
                 readySchedules = candidateSchedules;
-                //beginDFS();
+                if (!isParallelised) {
+                    beginDFS();
+                }
                 break;
             }
 
@@ -124,7 +128,7 @@ public class HybridScheduler extends Scheduler {
         while (!readySchedules.isEmpty()) {
             Schedule schedule = readySchedules.poll();
             if (bestSchedule == null || schedule.getCost() < bestSchedule.getCost()) {
-                DFSScheduler scheduler = new DFSScheduler(graph, amountOfProcessors);
+                DFSScheduler scheduler = new DFSScheduler(graph, amountOfProcessors, isParallelised);
                 scheduler.bestSchedule = bestSchedule;
                 System.out.println("Computing Schedule... " + (readySchedules.size() + 1) + " remaining, size " + (graph.getAllNodes().size() - schedule.getUnAddedNodes().size()));
                 scheduler.calculateSchedule(schedule);

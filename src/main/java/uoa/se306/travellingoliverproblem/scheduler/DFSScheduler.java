@@ -11,7 +11,6 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 public class DFSScheduler extends Scheduler {
@@ -19,15 +18,14 @@ public class DFSScheduler extends Scheduler {
     // useEquivalentScheduleCulling always enabled.
     private boolean useExistingScheduleCleaner = true;
     private boolean localDuplicateDetectionOnly = false;
-    private boolean parallel = true; // Change this
     private static Set<MinimalSchedule> existingParallelSchedules = new THashSet<>();
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private long startTime;
 
     private static final int MAX_MEMORY = 20000000;
     
-    public DFSScheduler(Graph graph, int amountOfProcessors) {
-        super(graph, amountOfProcessors, true);
+    public DFSScheduler(Graph graph, int amountOfProcessors, boolean IsParallelised) {
+        super(graph, amountOfProcessors, true, IsParallelised);
     }
 
     @Override
@@ -40,7 +38,7 @@ public class DFSScheduler extends Scheduler {
         long startTime = System.nanoTime();
         int cleaned;
         int previousSize;
-        if (parallel) {
+        if (isParallelised) {
             previousSize = getQueueSize();
             removeIfQueue(minimalSchedule -> minimalSchedule.getCost() >= bestSchedule.getCost());
             cleaned = previousSize - getQueueSize();
@@ -127,10 +125,10 @@ public class DFSScheduler extends Scheduler {
                 if (localDuplicateDetectionOnly && !consideredThisRound.contains(minimal)) {
                     consideredThisRound.add(minimal);
                     calculateScheduleRecursive(candidate);
-                } else if (!localDuplicateDetectionOnly && !parallel && !existingSchedules.contains(minimal)) {
+                } else if (!localDuplicateDetectionOnly && !isParallelised && !existingSchedules.contains(minimal)) {
                     if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
                     calculateScheduleRecursive(candidate);
-                } else if (!localDuplicateDetectionOnly && parallel) { // TODO concurrent  //Need to check and lock together
+                } else if (!localDuplicateDetectionOnly && isParallelised) { // TODO concurrent  //Need to check and lock together
                     if (getQueueSize() < MAX_MEMORY) checkThenAddToQueue(minimal);
                     calculateScheduleRecursive(candidate);
                 } else {

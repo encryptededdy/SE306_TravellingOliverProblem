@@ -26,6 +26,7 @@ public class Main extends Application {
     private static FXController controller;
     private static Graph inputGraph;
     private static int processors = 1;
+    private static boolean isParallelised = false;
     private static String outputFileName;
 
     // JavaFX start method (depends if visualisation enabled)
@@ -34,7 +35,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/layout.fxml"));
         Parent root = loader.load();
         controller = loader.getController();
-        controller.startProcessing(inputGraph, processors, outputFileName);
+        controller.startProcessing(inputGraph, processors, isParallelised, outputFileName);
         primaryStage.setTitle("Visualisation");
         primaryStage.setResizable(false);
         primaryStage.setScene(new Scene(root, 1200, 850));
@@ -121,7 +122,7 @@ public class Main extends Application {
                         case "-p":
                         case "--parallel":
                             numOfCores = Integer.parseInt(args[i + 1]);//will throw NumberFormatException if cant convert
-
+                            isParallelised = numOfCores > 1;
                             i = i + 1;
                             break;
                         case "-v":
@@ -150,21 +151,23 @@ public class Main extends Application {
             if (useVisuals) {
                 launch();
             } else {
-                if (numOfCores > 1) {
+                if (isParallelised) {
                     // Run AStar
                     // TODO move this to schedulerrunner
+                    long t1 = System.currentTimeMillis();
                     forkJoinPool = new ForkJoinPool(numOfCores);
-                    HybridScheduler initialScheduler = new HybridScheduler(inputGraph, processors);
+                    HybridScheduler initialScheduler = new HybridScheduler(inputGraph, processors, isParallelised);
                     initialScheduler.getBestSchedule();
-                    BranchAndBoundRecursiveTask bab = new BranchAndBoundRecursiveTask(initialScheduler.getSchedules());
+                    BranchAndBoundRecursiveTask bab = new BranchAndBoundRecursiveTask(initialScheduler.getSchedules(), processors);
                     BranchAndBoundRecursiveTask.graph = inputGraph;
                     bab.invoke();
+                    System.out.println("Took: " + ((double)System.currentTimeMillis() - (double)t1)/1000);
                     System.out.println(bab.getBestSchedule().getOverallTime());
                     System.exit(bab.isCompletedAbnormally() ? 1 : 0);
 
                 }
                 else {
-                    SchedulerRunner.getInstance().startScheduler(inputGraph, processors);
+                    SchedulerRunner.getInstance().startScheduler(inputGraph, processors, isParallelised);
                     final String tempOutputFileName = outputFileName;
                     // run the following after the scheduler has finished.
                     SchedulerRunner.getInstance().setThreadListener(() -> {
