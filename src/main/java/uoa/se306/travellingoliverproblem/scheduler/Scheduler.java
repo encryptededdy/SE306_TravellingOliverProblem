@@ -10,7 +10,7 @@ public abstract class Scheduler {
 
     // Best schedule found from all iterations
     Schedule bestSchedule;
-    private int amountOfProcessors;
+    int amountOfProcessors;
     // Graph of all nodes
     protected Graph graph;
 

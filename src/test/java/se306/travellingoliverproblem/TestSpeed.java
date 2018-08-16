@@ -12,8 +12,6 @@ import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import static org.junit.Assert.assertTrue;
-
 public class TestSpeed {
 
     Graph input3Graph, input10Graph;
