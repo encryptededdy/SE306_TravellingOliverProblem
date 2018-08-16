@@ -22,7 +22,7 @@ public class HybridScheduler extends Scheduler {
     private PriorityQueue<Schedule> readySchedules = new PriorityQueue<>();
 
     private static final int HYBRID_MAX_DEPTH = 4;
-    private static final int HYBRID_MAX_SIZE = 500000;
+    private static final int HYBRID_MAX_SIZE = 1000;//TODO set appropriate
     private static final boolean USE_DEPTH_LIMIT = false;
 
     public HybridScheduler(Graph graph, int amountOfProcessors) {
@@ -45,12 +45,12 @@ public class HybridScheduler extends Scheduler {
             // if it's empty, then it's time to switch to DFS!
             if (USE_DEPTH_LIMIT && candidateSchedules.isEmpty()) {
                 existingSchedules = null; // clear ExistingSchedules from Memory
-                beginDFS();
+                //beginDFS();
                 break;
             } else if (!USE_DEPTH_LIMIT && candidateSchedules.size() > HYBRID_MAX_SIZE) {
                 existingSchedules = null; // clear ExistingSchedules from Memory
                 readySchedules = candidateSchedules;
-                beginDFS();
+                //beginDFS();
                 break;
             }
 
@@ -120,6 +120,7 @@ public class HybridScheduler extends Scheduler {
 
     private void beginDFS() {
         System.out.println("Switching to DFS from A*");
+        System.out.println(readySchedules.size());
         while (!readySchedules.isEmpty()) {
             Schedule schedule = readySchedules.poll();
             if (bestSchedule == null || schedule.getCost() < bestSchedule.getCost()) {
@@ -135,5 +136,9 @@ public class HybridScheduler extends Scheduler {
                 break; // It's a priority queue, so we don't need to see anymore.
             }
         }
+    }
+
+    public PriorityQueue<Schedule> getSchedules() {
+        return readySchedules;
     }
 }

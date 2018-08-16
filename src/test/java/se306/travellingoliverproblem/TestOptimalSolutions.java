@@ -155,7 +155,6 @@ public class TestOptimalSolutions {
         checkValidAndOptimal(scheduler.getBestSchedule(), 227);
     }
 
-
     private void checkValidAndOptimal(Schedule scheduleToCheck, int optimalTime) {
         scheduleToCheck.checkValidity();
         assertEquals(optimalTime, scheduleToCheck.getOverallTime());

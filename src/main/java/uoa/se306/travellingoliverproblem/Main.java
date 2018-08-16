@@ -9,9 +9,9 @@ import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
 import uoa.se306.travellingoliverproblem.fileIO.DotReader;
 import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
 import uoa.se306.travellingoliverproblem.graph.Graph;
-import uoa.se306.travellingoliverproblem.parallel.BranchAndBoundRecursiveAction;
+import uoa.se306.travellingoliverproblem.parallel.BranchAndBoundRecursiveTask;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
-import uoa.se306.travellingoliverproblem.scheduler.BranchAndBoundScheduler;
+import uoa.se306.travellingoliverproblem.scheduler.HybridScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.SchedulerRunner;
 import uoa.se306.travellingoliverproblem.visualiser.FXController;
 
@@ -19,8 +19,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
 public class Main extends Application {
@@ -155,11 +153,15 @@ public class Main extends Application {
                 if (numOfCores > 1) {
                     // Run AStar
                     forkJoinPool = new ForkJoinPool(numOfCores);
-                    Set<Schedule> allStartingSchedules = new HashSet<>();
-                    allStartingSchedules.add(new Schedule(processors, inputGraph.getStartingNodes(), inputGraph.getAllNodes()));
-                    BranchAndBoundRecursiveAction bab = new BranchAndBoundRecursiveAction(allStartingSchedules);
+                    HybridScheduler initialScheduler = new HybridScheduler(inputGraph, processors);
+                    initialScheduler.getBestSchedule();
+                    BranchAndBoundRecursiveTask bab = new BranchAndBoundRecursiveTask(initialScheduler.getSchedules());
+                    BranchAndBoundRecursiveTask.graph = inputGraph;
+                    System.out.println(initialScheduler.getSchedules().size());
                     bab.invoke();
-                    System.exit(0);
+                    System.out.println(bab.getBestSchedule());
+                    System.exit(bab.isCompletedAbnormally() ? 1 : 0);
+
                 }
                 else {
                     SchedulerRunner.getInstance().startScheduler(inputGraph, processors);
@@ -172,8 +174,8 @@ public class Main extends Application {
                         fileWriter.outputSchedule();
                         System.out.println("Total time (incl startup, I/O etc.): " + (System.currentTimeMillis() - totalStartTime) + " ms");
                         System.exit(0);
-                    }
-                });
+                    });
+                }
             }
         }
     }

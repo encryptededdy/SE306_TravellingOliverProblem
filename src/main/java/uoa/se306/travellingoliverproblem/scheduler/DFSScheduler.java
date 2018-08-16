@@ -11,12 +11,16 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 public class DFSScheduler extends Scheduler {
 
     // useEquivalentScheduleCulling always enabled.
     private boolean useExistingScheduleCleaner = true;
     private boolean localDuplicateDetectionOnly = false;
+    private boolean parallel = true; // Change this
+    private static Set<MinimalSchedule> existingParallelSchedules = new THashSet<>();
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private long startTime;
 
@@ -27,16 +31,24 @@ public class DFSScheduler extends Scheduler {
     }
 
     @Override
-    protected void calculateSchedule(Schedule currentSchedule) {
+    public void calculateSchedule(Schedule currentSchedule) {
         startTime = System.currentTimeMillis();
         calculateScheduleRecursive(currentSchedule);
     }
 
     private void cleanExistingSchedules() {
         long startTime = System.nanoTime();
-        int previousSize = existingSchedules.size();
-        existingSchedules.removeIf(minimalSchedule -> minimalSchedule.getCost() >= bestSchedule.getCost());
-        int cleaned = previousSize - existingSchedules.size();
+        int cleaned;
+        int previousSize;
+        if (parallel) {
+            previousSize = getQueueSize();
+            removeIfQueue(minimalSchedule -> minimalSchedule.getCost() >= bestSchedule.getCost());
+            cleaned = previousSize - getQueueSize();
+        } else {
+            previousSize = existingSchedules.size();
+            existingSchedules.removeIf(minimalSchedule -> minimalSchedule.getCost() >= bestSchedule.getCost());
+            cleaned = previousSize - existingSchedules.size();
+        }
         long endTime = System.nanoTime();
         System.out.println("Cleaning Took " + (endTime - startTime) / 1000000 + " ms, cleaned " + cleaned + " entries (" + (cleaned * 100 / previousSize) + "%)");
     }
@@ -115,8 +127,11 @@ public class DFSScheduler extends Scheduler {
                 if (localDuplicateDetectionOnly && !consideredThisRound.contains(minimal)) {
                     consideredThisRound.add(minimal);
                     calculateScheduleRecursive(candidate);
-                } else if (!localDuplicateDetectionOnly && !existingSchedules.contains(minimal)) {
+                } else if (!localDuplicateDetectionOnly && !parallel && !existingSchedules.contains(minimal)) {
                     if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
+                    calculateScheduleRecursive(candidate);
+                } else if (!localDuplicateDetectionOnly && parallel) { // TODO concurrent  //Need to check and lock together
+                    if (getQueueSize() < MAX_MEMORY) checkThenAddToQueue(minimal);
                     calculateScheduleRecursive(candidate);
                 } else {
                     branchesKilled++; // drop this branch
@@ -128,5 +143,20 @@ public class DFSScheduler extends Scheduler {
             }
         }
     }
+
+    private static synchronized void checkThenAddToQueue(MinimalSchedule mSchedule){
+        if (!existingParallelSchedules.contains(mSchedule)) {
+            existingParallelSchedules.add(mSchedule);
+        }
+    }
+
+    private static synchronized int getQueueSize() {
+        return existingParallelSchedules.size();
+    }
+
+    private static synchronized void removeIfQueue(Predicate<MinimalSchedule> filter) {
+        existingParallelSchedules.removeIf(filter);
+    }
+
 }
 
