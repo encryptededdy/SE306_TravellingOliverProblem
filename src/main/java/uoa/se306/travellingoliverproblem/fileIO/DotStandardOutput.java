@@ -19,8 +19,10 @@ public class DotStandardOutput implements ScheduleOutputter {
     public DotStandardOutput(Graph graph, Schedule schedule) {
         String outputGraphName = graph.getGraphName();
         if(outputGraphName == null) {
-            outputGraphName = Main.outputFileName.replace(".dot", "");
-            outputGraphName = outputGraphName.substring(0, 1).toUpperCase() + Main.outputFileName.substring(1);
+            // get the fine name without the .dot extension
+            outputGraphName = Main.outputFileName.substring(0, (Main.outputFileName.length() - 4));
+            // capitalise start of string
+            outputGraphName = outputGraphName.substring(0, 1).toUpperCase() + outputGraphName.substring(1);
         } else {
             outputGraphName = outputGraphName.substring(0, 1).toUpperCase() + graph.getGraphName().substring(1);
             outputGraphName = removeQuotes(outputGraphName);
