@@ -24,6 +24,7 @@ public class DFSScheduler extends Scheduler {
     protected void calculateSchedule(Schedule currentSchedule) {
         startTime = System.currentTimeMillis();
         if (currentSchedule.getAvailableNodes().stream().allMatch(Node::isIndependent)) {
+            //TODO: This only get called when all the nodes are independent at the start, maybe change it to check every partial schedule ?
             doIndependent(currentSchedule);
         } else {
             calculateScheduleRecursive(currentSchedule);
@@ -60,10 +61,8 @@ public class DFSScheduler extends Scheduler {
 
         PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
 
-        //TODO: try use a priority queue
+        //TODO: try use a priority queue ?
         ArrayList<Node> nodesList = new ArrayList<>(currentSchedule.getAvailableNodes());
-        // Check if the available nodes set can be fixed in fork-join ordering
-        // if it can, order it, and then verify the list
 
         //TODO: reduce this massive overhead
         boolean useFixedOrder = false;
@@ -81,7 +80,7 @@ public class DFSScheduler extends Scheduler {
             Node topNode = nodesList.get(0);
             ScheduledProcessor[] processors = currentSchedule.getProcessors();
             // TODO: Don't recalculate for other processors
-            int[] processorEarliestAvailable = findProcesserEarliestAvaliable(processors, topNode);
+            int[] processorEarliestAvailable = findProcessorEarliestAvailable(processors, topNode);
 
             for (int j = 0; j < processors.length; j++) {
                 int startTime = processors[j].getEarliestStartAfter(processorEarliestAvailable[j], topNode.getCost());
@@ -121,7 +120,7 @@ public class DFSScheduler extends Scheduler {
                 // Get the processors in the current schedule
                 ScheduledProcessor[] processors = currentSchedule.getProcessors();
 
-                int[] processorEarliestAvailable = findProcesserEarliestAvaliable(processors, node);
+                int[] processorEarliestAvailable = findProcessorEarliestAvailable(processors, node);
 
                 //at this point, we have a list of starting times, for each processor, for this node
                 //maybe we can order the nodes in terms of their bottomLevel ? (increasing or decreasing ???)
@@ -245,7 +244,7 @@ public class DFSScheduler extends Scheduler {
         return true;
     }
 
-    private int[] findProcesserEarliestAvaliable(ScheduledProcessor[] processors, Node node) {
+    private int[] findProcessorEarliestAvailable(ScheduledProcessor[] processors, Node node) {
         // This list stores the starting times(int) for this node in each processor(index)
         int[] processorEarliestAvailable = new int[processors.length];
 
