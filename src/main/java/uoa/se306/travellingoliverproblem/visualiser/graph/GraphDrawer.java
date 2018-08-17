@@ -170,9 +170,6 @@ public class GraphDrawer {
 
                 backgroundPane.getChildren().add(line);
                 backgroundPane.getChildren().add(arrowHeadShape);
-
-                if (child.getKey().toString().equals("3")) {
-                }
             }
         }
     }

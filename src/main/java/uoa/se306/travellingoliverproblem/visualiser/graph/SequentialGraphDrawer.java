@@ -11,6 +11,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.CubicCurve;
+import javafx.scene.shape.Polygon;
 import javafx.util.Duration;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
@@ -95,42 +96,91 @@ public class SequentialGraphDrawer {
                 cubicCurve.setStroke(Color.DIMGRAY);
                 cubicCurve.setFill(Color.TRANSPARENT);
 
+                double lineEndX = destnBounds.getMinX() + destnBounds.getWidth()/2;
+                double lineEndY = destnBounds.getMinY() + destnBounds.getHeight()/2;
+
+                double lineStartX = sourceBounds.getMinX() + sourceBounds.getWidth()/2;
+                double lineStartY = sourceBounds.getMinY() + sourceBounds.getHeight()/2;
+
                 // ugly code binding X start, end, Y start, end
                 cubicCurve.startXProperty().bind(Bindings.createDoubleBinding(() -> {
-                    return sourceBounds.getMinX() + sourceBounds.getWidth() / 2;
+                    return lineStartX;
                 }, source.layoutBoundsProperty()));
 
                 cubicCurve.startYProperty().bind(Bindings.createDoubleBinding(() -> {
-                    return sourceBounds.getMinY() + sourceBounds.getHeight() / 2;
+                    return lineStartY;
                 }, source.layoutBoundsProperty()));
 
                 cubicCurve.endXProperty().bind(Bindings.createDoubleBinding(() -> {
-                    return destnBounds.getMinX() + destnBounds.getWidth() / 2;
+                    return lineEndX;
                 }, dest.layoutBoundsProperty()));
 
                 cubicCurve.endYProperty().bind(Bindings.createDoubleBinding(() -> {
-                    return destnBounds.getMinY() + destnBounds.getHeight() / 2;
+                    return lineEndY;
                 }, dest.layoutBoundsProperty()));
 
                 cubicCurve.setControlY1(cubicCurve.getStartY());
                 cubicCurve.setControlY2(cubicCurve.getEndY());
 
-                if (right) {
-                    cubicCurve.setControlX1(cubicCurve.getStartX() + Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2);
-                    cubicCurve.setControlX2(cubicCurve.getEndX() + Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2);
+                double ctrlX1;
+                double ctrlX2;
+
+                boolean adjacent = lineEndY - lineStartY < 100 ? true : false;
+
+                if (adjacent) {
+                    ctrlX1 = cubicCurve.getStartX();
+                    ctrlX2 = cubicCurve.getEndX();
+                } else if (right) {
+                    ctrlX1 = cubicCurve.getStartX() + Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2;
+                    ctrlX2 = cubicCurve.getEndX() + Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2;
                 } else {
-                    cubicCurve.setControlX1(cubicCurve.getStartX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2);
-                    cubicCurve.setControlX2(cubicCurve.getEndX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2);
+                    ctrlX1 = cubicCurve.getStartX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2;
+                    ctrlX2 = cubicCurve.getEndX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2;
                 }
+                cubicCurve.setControlX1(ctrlX1);
+                cubicCurve.setControlX2(ctrlX2);
+                backgroundPane.getChildren().add(cubicCurve);
+
+                // calculate midpoint x-coordinate on bezier curve
+                double bezierMidpointX = (0.125 * lineStartX) + ((3 * 0.125) * ctrlX1) + ((3 * 0.125) * ctrlX2) + (0.125 * lineEndX);
+                drawArrowHead(bezierMidpointX, (lineStartY + lineEndY + 15) / 2);
+
+
+
 
 
                 // TODO: Draw weight... somehow!
 
-                backgroundPane.getChildren().add(cubicCurve);
                 right = !right;
             }
         }
         sp.setHvalue(0.5);
     }
 
+    private void drawArrowHead(double arrowHeadTipX, double arrowHeadTipY) {
+        double theta = Math.PI / 2;
+
+        double arrowMidPointX =  arrowHeadTipX + (-15 * Math.cos(theta));
+        double arrowMidPointY =  arrowHeadTipY + (-15 * Math.sin(theta));
+
+        double beta = (Math.PI/2) - theta;
+        double leftDeltaX = 7 * Math.cos(beta);
+        double leftDeltaY = 7 * Math.sin(beta);
+
+        double arrowHeadLeftPointX = arrowMidPointX + leftDeltaX;
+        double arrowHeadLeftPointY = arrowMidPointY - leftDeltaY;
+
+        double arrowHeadRightPointX = arrowMidPointX - leftDeltaX;
+        double arrowHeadRightPointY = arrowMidPointY + leftDeltaY;
+
+        Polygon arrowHeadShape = new Polygon();
+        arrowHeadShape.getPoints().addAll(new Double[]{
+                arrowHeadTipX, arrowHeadTipY,
+                arrowHeadLeftPointX, arrowHeadLeftPointY,
+                arrowHeadRightPointX, arrowHeadRightPointY
+        });
+        arrowHeadShape.setFill(Color.BLACK);
+
+        backgroundPane.getChildren().add(arrowHeadShape);
+    }
 }

@@ -7,6 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import uoa.se306.travellingoliverproblem.visualiser.schedule.ScheduleNode;
 
 
 public class GraphNode extends Pane {
@@ -14,6 +15,8 @@ public class GraphNode extends Pane {
     private String name;
 
     private Circle circle = new Circle();
+
+    private ScheduleNode scheduleNode;
 
     public GraphNode(String name, Integer cost) {
         super();
@@ -35,10 +38,50 @@ public class GraphNode extends Pane {
         stack.getChildren().addAll(circle, costLabel, nameLabel);
         stack.setPadding(new Insets(5));
 
+        circle.setOnMouseEntered(event -> {
+            if (scheduleNode != null) {
+                scheduleNode.highlight();
+            }
+            highlight();
+        });
+        nameLabel.setOnMouseEntered(event -> {
+            if (scheduleNode != null) {
+                scheduleNode.highlight();
+            }
+            highlight();
+        });
+        costLabel.setOnMouseEntered(event -> {
+            if (scheduleNode != null) {
+                scheduleNode.highlight();
+            }
+            highlight();
+        });
+
+        circle.setOnMouseExited(event -> {
+            if (scheduleNode != null) {
+                scheduleNode.unHighlight();
+            }
+            unHighlight();
+        });
+        nameLabel.setOnMouseExited(event -> {
+            if (scheduleNode != null) {
+                scheduleNode.unHighlight();
+            }
+            unHighlight();
+        });
+        costLabel.setOnMouseExited(event -> {
+            if (scheduleNode != null) {
+                scheduleNode.unHighlight();
+            }
+            unHighlight();
+        });
+
         // set view
         getChildren().add(stack);
 
     }
+
+    public void setScheduleNode(ScheduleNode scheduleNode) {this.scheduleNode = scheduleNode;}
 
     public void highlight() {
         circle.setFill(Color.ORANGERED);

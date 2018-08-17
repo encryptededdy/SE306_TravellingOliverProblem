@@ -17,6 +17,7 @@ import java.lang.reflect.Field;
 
 public class ScheduleNode extends Pane {
     private String name;
+    private Rectangle rect;
 
     // normal schedule
     public ScheduleNode(double width, ScheduleEntry schedule, GraphNode graphNode) {
@@ -24,7 +25,7 @@ public class ScheduleNode extends Pane {
 
         this.name = schedule.getNode().toString();
 
-        Rectangle rect = new Rectangle();
+        rect = new Rectangle();
         rect.setHeight(ScheduleDrawer.ROW_HEIGHT);
         rect.setWidth(width);
         rect.setFill(Color.SKYBLUE);
@@ -42,14 +43,16 @@ public class ScheduleNode extends Pane {
         stack.getChildren().addAll(rect, nameLabel);
         // stack.setPadding(new Insets(20));
 
+        graphNode.setScheduleNode(this);
+
         this.setOnMouseEntered(event -> {
             graphNode.highlight();
-            rect.setFill(Color.ORANGERED);
+            highlight();
         });
 
         this.setOnMouseExited(event -> {
             graphNode.unHighlight();
-            rect.setFill(Color.SKYBLUE);
+            unHighlight();
         });
 
         Tooltip t = new Tooltip(String.format("Start time: %s, End time: %s, Cost: %s", schedule.getStartTime(), schedule.getEndTime(), schedule.getLength()));
@@ -118,6 +121,12 @@ public class ScheduleNode extends Pane {
             e.printStackTrace();
         }
     }
+
+
+
+    public void highlight() { rect.setFill(Color.ORANGERED); }
+
+    public void unHighlight() { rect.setFill(Color.SKYBLUE); }
 
 
     public String getName() {
