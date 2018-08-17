@@ -138,9 +138,10 @@ public class DFSScheduler extends Scheduler {
                 } else if (!localDuplicateDetectionOnly && !isParallelised && !existingSchedules.contains(minimal)) {
                     if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
                     recursiveIfNotParallel(candidate);
-                } else if (!localDuplicateDetectionOnly && isParallelised) { // TODO concurrent  //Need to check and lock together
-                    if (getQueueSize() < MAX_MEMORY) checkThenAddToQueue(minimal);
-                    recursiveIfNotParallel(candidate);
+                } else if (!localDuplicateDetectionOnly && isParallelised) {
+                    if (getQueueSize() < MAX_MEMORY && checkThenAddToQueue(minimal)) {
+                        recursiveIfNotParallel(candidate);
+                    }
                 } else {
                     branchesKilled++; // drop this branch
                     branchesKilledDuplication++;
@@ -165,11 +166,13 @@ public class DFSScheduler extends Scheduler {
         return unfinishedSchedules;
     }
 
-    private static synchronized void checkThenAddToQueue(MinimalSchedule mSchedule) {
+    private static synchronized boolean checkThenAddToQueue(MinimalSchedule mSchedule) {
         // Contains first as add is more expensive
         if (!existingParallelSchedules.contains(mSchedule)) {
             existingParallelSchedules.add(mSchedule);
+            return true;
         }
+        return false;
     }
 
     private static synchronized int getQueueSize() {
