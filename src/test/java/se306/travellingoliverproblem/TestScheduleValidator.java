@@ -5,7 +5,6 @@ import org.junit.Test;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.InvalidScheduleException;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
-import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 
 import java.util.ArrayList;
 
@@ -34,9 +33,7 @@ public class TestScheduleValidator {
         try {
             testSchedule.checkValidity();
             Assert.fail("Schedules with overlapping schedule entries should throw InvalidScheduleException");
-
         } catch (InvalidScheduleException e) {
-            e.printStackTrace();
             System.out.println("InvalidScheduleException thrown correctly");
         }
     }
