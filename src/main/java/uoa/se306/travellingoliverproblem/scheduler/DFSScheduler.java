@@ -29,12 +29,7 @@ public class DFSScheduler extends Scheduler {
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
         startTime = System.currentTimeMillis();
-        if (currentSchedule.getUnAddedNodes().stream().allMatch(Node::isIndependent)) {
-            //TODO: This only get called when all the nodes are independent at the start, maybe change it to check every partial schedule ?
-            doIndependent(currentSchedule);
-        } else {
-            calculateScheduleRecursive(currentSchedule);
-        }
+        calculateScheduleRecursive(currentSchedule);
     }
 
     private void cleanExistingSchedules() {
@@ -66,23 +61,29 @@ public class DFSScheduler extends Scheduler {
         }
 
         PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
-
-        NodeComparator comparator = new NodeComparator(currentSchedule.getProcessors());
-        PriorityQueue<Node> nodesList  = new PriorityQueue<>(comparator);
-        nodesList.addAll(currentSchedule.getAvailableNodes());
-
         boolean useFixedOrder = false;
+        Node topNode = null;
+        PriorityQueue<Node> nodesList = null;
 
-        if (previousFixedNodes != null && previousFixedNodes.containsAll(nodesList)) {
+        if (currentSchedule.getAvailableNodes().stream().allMatch(Node::isIndependent)) {
+            topNode = Collections.max(currentSchedule.getAvailableNodes(), new NodeCostComparator());
             useFixedOrder = true;
-        } else if (fixingOrder(currentSchedule)) {
-            if (comparator.isOutEdgeCostConsistent()) {
+        } else {
+            NodeComparator comparator = new NodeComparator(currentSchedule.getProcessors());
+            nodesList = new PriorityQueue<>(comparator);
+            nodesList.addAll(currentSchedule.getAvailableNodes());
+
+            if (previousFixedNodes != null && previousFixedNodes.containsAll(nodesList)) {
                 useFixedOrder = true;
+            } else if (fixingOrder(currentSchedule)) {
+                if (comparator.isOutEdgeCostConsistent()) {
+                    useFixedOrder = true;
+                    topNode = nodesList.poll();
+                }
             }
         }
 
-        if (useFixedOrder) {
-            Node topNode = nodesList.poll();
+        if (useFixedOrder && topNode != null) {
             ScheduledProcessor[] processors = currentSchedule.getProcessors();
             // TODO: Don't recalculate for other processors
             int[] processorEarliestAvailable = findProcessorEarliestAvailable(processors, topNode);
@@ -108,7 +109,11 @@ public class DFSScheduler extends Scheduler {
                     MinimalSchedule minimal = new MinimalSchedule(candidate);
                     if (!localDuplicateDetectionOnly && !existingSchedules.contains(minimal)) {
                         if (existingSchedules.size() < 25000000) existingSchedules.add(minimal);
-                        calculateScheduleRecursive(candidate, nodesList);
+                        if (nodesList != null) {
+                            calculateScheduleRecursive(candidate, nodesList);
+                        } else {
+                            calculateScheduleRecursive(candidate);
+                        }
                     } else {
                         branchesKilled++; // drop this branch
                         branchesKilledDuplication++;
@@ -121,7 +126,7 @@ public class DFSScheduler extends Scheduler {
 
         } else { // Else, just do the normal scheduling
 
-            for (Node node : nodesList) {
+            for (Node node : currentSchedule.getAvailableNodes()) {
                 // Get the processors in the current schedule
                 ScheduledProcessor[] processors = currentSchedule.getProcessors();
 
@@ -171,32 +176,6 @@ public class DFSScheduler extends Scheduler {
         }
     }
 
-    //-------------------------------------------------------------
-    private void doIndependent(Schedule currentSchedule) {
-        branchesConsidered++;
-        if (currentSchedule.getUnAddedNodes().isEmpty() && (bestSchedule == null || currentSchedule.getCost() < bestSchedule.getCost())) {
-            System.out.println("Found new best schedule: " + currentSchedule.getOverallTime());
-            bestSchedule = currentSchedule;
-            return;
-        }
-        ArrayList<Node> nodesList = new ArrayList<>(currentSchedule.getAvailableNodes());
-        Node max = Collections.max(nodesList, new NodeCostComparator());
-        for (int i = 0; i < currentSchedule.getProcessors().length; i++) {
-            Schedule newSchedule = new Schedule(currentSchedule);
-            int endtime = currentSchedule.getProcessors()[i].endTime();
-            newSchedule.addToSchedule(max, i, endtime);
-            if (!existingSchedules.contains(new MinimalSchedule(newSchedule)) && (bestSchedule == null || newSchedule.getCost() < bestSchedule.getCost())) {
-                existingSchedules.add(new MinimalSchedule(newSchedule));
-                //System.out.println("Calling for node "+max.toString()+" on proc "+i+" "+nodesList.size()+" left");
-                doIndependent(newSchedule);
-            } else {
-                branchesKilled++;
-            }
-        }
-    }
-
-    //------------------------------------------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------------------------------------------
     /*
     These methods are used to test if the list of available nodes meet certain conditions
     These conditions must all be true in order for us to "Fix the task order"
