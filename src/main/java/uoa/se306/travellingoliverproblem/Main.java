@@ -123,7 +123,10 @@ public class Main extends Application {
                         case "-p":
                         case "--parallel":
                             numOfCores = Integer.parseInt(args[i + 1]);//will throw NumberFormatException if cant convert
-                            isParallelised = numOfCores > 1;
+                            if (numOfCores > 1) {
+                                forkJoinPool = new ForkJoinPool(numOfCores, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null ,true);
+                                isParallelised = true;
+                            }
                             i = i + 1;
                             break;
                         case "-v":
@@ -152,36 +155,17 @@ public class Main extends Application {
             if (useVisuals) {
                 launch();
             } else {
-                if (isParallelised) {
-                    // Run AStar
-                    // TODO move this to schedulerrunner
-                    long t1 = System.currentTimeMillis();
-                    forkJoinPool = new ForkJoinPool(numOfCores, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true );
-//                    HybridScheduler initialScheduler = new HybridScheduler(inputGraph, processors, isParallelised, 1);
-//                    initialScheduler.getBestSchedule(); \\TODO run hybrid if certain size
-                    Set<Schedule> schedules = new HashSet<>();
-                    schedules.add(new Schedule(processors, inputGraph.getStartingNodes(), inputGraph.getAllNodes(), true));
-                    BranchAndBoundRecursiveAction bab = new BranchAndBoundRecursiveAction(schedules, processors);
-                    BranchAndBoundRecursiveAction.graph = inputGraph;
-                    bab.invoke();
-                    System.out.println("Took: " + ((double)System.currentTimeMillis() - (double)t1)/1000);
-                    System.out.println(bab.getBestSchedule().getOverallTime());
-                    System.exit(bab.isCompletedAbnormally() ? 1 : 0);
-
-                }
-                else {
-                    SchedulerRunner.getInstance().startScheduler(inputGraph, processors, isParallelised);
-                    final String tempOutputFileName = outputFileName;
-                    // run the following after the scheduler has finished.
-                    SchedulerRunner.getInstance().setThreadListener(() -> {
-                        SchedulerRunner.getInstance().printResult();
-                        SchedulerRunner.getInstance().getSchedule().checkValidity();
-                        DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), tempOutputFileName);
-                        fileWriter.outputSchedule();
-                        System.out.println("Total time (incl startup, I/O etc.): " + (System.currentTimeMillis() - totalStartTime) + " ms");
-                        System.exit(0);
-                    });
-                }
+                SchedulerRunner.getInstance().startScheduler(inputGraph, processors, isParallelised);
+                final String tempOutputFileName = outputFileName;
+                // run the following after the scheduler has finished.
+                SchedulerRunner.getInstance().setThreadListener(() -> {
+                    SchedulerRunner.getInstance().printResult();
+                    SchedulerRunner.getInstance().getSchedule().checkValidity();
+                    DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), tempOutputFileName);
+                    fileWriter.outputSchedule();
+                    System.out.println("Total time (incl startup, I/O etc.): " + (System.currentTimeMillis() - totalStartTime) + " ms");
+                    System.exit(0);
+                });
             }
         }
     }

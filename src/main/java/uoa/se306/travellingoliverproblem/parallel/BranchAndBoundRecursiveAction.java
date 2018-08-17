@@ -3,26 +3,26 @@ package uoa.se306.travellingoliverproblem.parallel;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
+import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
 
 import java.util.*;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 
 public class BranchAndBoundRecursiveAction extends RecursiveAction {
 
     private Collection<Schedule> schedules;
-//    private static Logger logger =
-//            Logger.getAnonymousLogger();
     // TODO check what optimal threshold is
-    private static final int SEQUENTIAL_THRESHOLD = 100;
-    private static Schedule bestSchedule;//TODO sync issues
+    public static final int SEQUENTIAL_THRESHOLD = 4;
+    private static Schedule bestSchedule;
     public static Graph graph;
     private int amountOfProcessors;//TODO Change later
-    private boolean useCurrentBestCulling = true; //TODO actually use these
-    private boolean useLocalPriorityQueue = true;
 
-    private long branchesConsidered = 0;
-    private long branchesKilled = 0;
+    private static AtomicLong branchesKilledDuplication = new AtomicLong(0);
+    private static AtomicLong branchesConsidered = new AtomicLong(0);
+    private static AtomicLong branchesKilled = new AtomicLong(0);
 
     //TODO research creating a queue
 
@@ -65,19 +65,18 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
         }
     }
 
+    // Process a collection of schedules
     private void processSchedule(Collection<Schedule> schedules) {
-//        logger.info("These schedules were processed by "
-//                + Thread.currentThread().getName());
         // Iterate through every schedule and work recursively on this
         for (Schedule schedule : schedules) {
             if (bestSchedule == null || schedule.getOverallTime() < bestSchedule.getOverallTime()) {
-                calculateScheduleRecursive(schedule);
+                runDFSScheduler(schedule);
             }
         }
         schedules.clear();
     }
 
-    private void calculateScheduleRecursive(Schedule currentSchedule) {
+    private void runDFSScheduler(Schedule currentSchedule) {
         List<BranchAndBoundRecursiveAction> subTasks = new ArrayList<>();
         DFSScheduler scheduler = new DFSScheduler(graph, amountOfProcessors, true);
         scheduler.setBestSchedule(bestSchedule);
@@ -88,17 +87,35 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
             ForkJoinTask.invokeAll(subTasks);
             return;
         }
+        branchesKilled.getAndAdd(scheduler.getBranchesKilled());
+        branchesConsidered.getAndAdd(scheduler.getBranchesConsidered());
+        branchesKilledDuplication.getAndAdd(scheduler.getBranchesKilledDuplication());
         getAndSetBestSchedule(schedule);
     }
 
     public Schedule getBestSchedule() {
         return bestSchedule;
     }
-
     //Synchronised method to set bestSchedule
     private static synchronized void getAndSetBestSchedule(Schedule schedule) {
         if (bestSchedule == null || bestSchedule.getCost() > schedule.getCost()) {
             bestSchedule = schedule;
         }
+    }
+
+    public static long getBranchesConsidered() {
+        return branchesConsidered.get();
+    }
+
+    public static long getBranchesKilledDuplication() {
+        return branchesKilledDuplication.get();
+    }
+
+    public static long getBranchesKilled() {
+        return branchesKilled.get();
+    }
+
+    public static double proportionKilled() {
+        return (double)branchesKilled.get()/(branchesConsidered.get()+branchesKilled.get());
     }
 }

@@ -3,6 +3,7 @@ package uoa.se306.travellingoliverproblem.scheduler;
 import gnu.trove.set.hash.THashSet;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
+import uoa.se306.travellingoliverproblem.parallel.BranchAndBoundRecursiveAction;
 import uoa.se306.travellingoliverproblem.schedule.MinimalSchedule;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
@@ -12,16 +13,19 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 public class DFSScheduler extends Scheduler {
 
     // useEquivalentScheduleCulling always enabled.
     private boolean useExistingScheduleCleaner = true;
     private boolean localDuplicateDetectionOnly = false;
-    private static Set<MinimalSchedule> existingParallelSchedules = new THashSet<>();
-    private Set<Schedule> unfinishedSchedules = new HashSet<>();
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private long startTime;
+
+    // For Parallel
+    private static Set<MinimalSchedule> existingParallelSchedules = new THashSet<>();
+    private Set<Schedule> unfinishedSchedules = new HashSet<>();
 
     private static final int MAX_MEMORY = 20000000;
     
@@ -162,6 +166,7 @@ public class DFSScheduler extends Scheduler {
     }
 
     private static synchronized void checkThenAddToQueue(MinimalSchedule mSchedule) {
+        // Contains first as add is more expensive
         if (!existingParallelSchedules.contains(mSchedule)) {
             existingParallelSchedules.add(mSchedule);
         }

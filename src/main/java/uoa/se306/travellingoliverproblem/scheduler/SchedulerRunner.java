@@ -2,6 +2,7 @@ package uoa.se306.travellingoliverproblem.scheduler;
 
 import javafx.concurrent.Task;
 import uoa.se306.travellingoliverproblem.graph.Graph;
+import uoa.se306.travellingoliverproblem.parallel.BranchAndBoundRecursiveAction;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
@@ -48,7 +49,7 @@ public class SchedulerRunner {
         scheduleThread.start();
     }
 
-    public Task<Void> startSchedulerJavaFXTask(Graph inputGraph, int noProcessors, boolean isParallelised) {//Probably needs fixing
+    public Task<Void> startSchedulerJavaFXTask(Graph inputGraph, int noProcessors, boolean isParallelised) {//TODO Probably needs fixing
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
@@ -85,15 +86,21 @@ public class SchedulerRunner {
     }
 
     private Scheduler autoPickScheduler(Graph inputGraph, int noProcessors, boolean isParallelised) {
-        if (inputGraph.getAllNodes().size() < 10) {
-            System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using A* scheduling algorithm");
-            return new AStarSearchScheduler(inputGraph, noProcessors, isParallelised);
-        } else if (inputGraph.getAllNodes().size() < 14) {
-            System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using DFS/BnB scheduling algorithm");
-            return new DFSScheduler(inputGraph, noProcessors, isParallelised);
+        if (isParallelised) {
+            System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using DFS/BnB Parallel scheduling algorithm");
+            BranchAndBoundRecursiveAction.graph = inputGraph;
+            return new ParallelScheduler(inputGraph, noProcessors, false, isParallelised);
         } else {
-            System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using A*/BnB hybrid scheduling algorithm");
-            return new HybridScheduler(inputGraph, noProcessors, isParallelised, 1000);
+            if (inputGraph.getAllNodes().size() < 10) {
+                System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using A* scheduling algorithm");
+                return new AStarSearchScheduler(inputGraph, noProcessors, isParallelised);
+            } else if (inputGraph.getAllNodes().size() < 14) {
+                System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using DFS/BnB scheduling algorithm");
+                return new DFSScheduler(inputGraph, noProcessors, isParallelised);
+            } else {
+                System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using A*/BnB hybrid scheduling algorithm");
+                return new HybridScheduler(inputGraph, noProcessors, isParallelised, 1000);
+            }
         }
     }
 
