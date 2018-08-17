@@ -39,7 +39,7 @@ public class TestGraphLevels {
 
     @Test
     public void testGraphLevelsLargeGraph() throws FileNotFoundException {
-        File inputFile = new File("testInput/Nodes_10_Random.dot");
+        File inputFile = new File("testInput/checkOptimal/Nodes_10_Random.dot");
         GraphFileReader reader = new DotReader();
         reader.openFile(inputFile);
         Graph output = reader.readFile();
