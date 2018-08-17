@@ -3,7 +3,6 @@ package uoa.se306.travellingoliverproblem.parallel;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
-import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
 
 import java.util.*;
 import java.util.concurrent.ForkJoinTask;
@@ -15,10 +14,10 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
 
     private Collection<Schedule> schedules;
     // TODO check what optimal threshold is
-    public static final int SEQUENTIAL_THRESHOLD = 4;
+    public static final int SEQUENTIAL_THRESHOLD = 4; // Magic number????
     private static Schedule bestSchedule;
     public static Graph graph;
-    private int amountOfProcessors;//TODO Change later
+    private int amountOfProcessors;
 
     private static AtomicLong branchesKilledDuplication = new AtomicLong(0);
     private static AtomicLong branchesConsidered = new AtomicLong(0);
@@ -36,7 +35,6 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
     protected void compute() {
         // Split set into smaller sets to be worked on by threads
         if (schedules.size() > SEQUENTIAL_THRESHOLD) {
-            List<BranchAndBoundRecursiveAction> subTasks = new ArrayList<>();
 
             // Split Set
             //TODO change this as inefficient, and may need better load balancing
@@ -55,10 +53,10 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
             }
             schedules.clear();
 
-            subTasks.add(new BranchAndBoundRecursiveAction(firstPartitionedQueue, amountOfProcessors));
-            subTasks.add(new BranchAndBoundRecursiveAction(secondPartitionedQueue, amountOfProcessors));
             //Fork then join 2 tasks, recursively iterate until set is split fully
-            ForkJoinTask.invokeAll(subTasks);
+            ForkJoinTask.invokeAll(
+                    new BranchAndBoundRecursiveAction(firstPartitionedQueue, amountOfProcessors),
+                    new BranchAndBoundRecursiveAction(secondPartitionedQueue, amountOfProcessors));
 
         } else {
             processSchedule(schedules);
@@ -77,14 +75,12 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
     }
 
     private void runDFSScheduler(Schedule currentSchedule) {
-        List<BranchAndBoundRecursiveAction> subTasks = new ArrayList<>();
         DFSScheduler scheduler = new DFSScheduler(graph, amountOfProcessors, true);
         scheduler.setBestSchedule(bestSchedule);
         Schedule schedule = scheduler.calculateScheduleParallel(currentSchedule);
         Set<Schedule> unfinishedSchedules = scheduler.getUnfinishedSchedules();
         if (unfinishedSchedules.size() > 0) {
-            subTasks.add(new BranchAndBoundRecursiveAction(unfinishedSchedules, amountOfProcessors));
-            ForkJoinTask.invokeAll(subTasks);
+            ForkJoinTask.invokeAll(new BranchAndBoundRecursiveAction(unfinishedSchedules, amountOfProcessors));
             return;
         }
         branchesKilled.getAndAdd(scheduler.getBranchesKilled());
@@ -117,5 +113,16 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
 
     public static double proportionKilled() {
         return (double)branchesKilled.get()/(branchesConsidered.get()+branchesKilled.get());
+    }
+
+    // Testing purposes
+    @Deprecated
+    public static void reset() {
+        branchesKilled = new AtomicLong(0);
+        branchesKilledDuplication = new AtomicLong(0);
+        branchesConsidered = new AtomicLong(0);
+        bestSchedule = null;
+        graph = null;
+        DFSScheduler.
     }
 }

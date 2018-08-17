@@ -166,6 +166,7 @@ public class DFSScheduler extends Scheduler {
         return unfinishedSchedules;
     }
 
+    // Check if minimum schedule is in the queue, if it isnt add it, else dont
     private static synchronized boolean checkThenAddToQueue(MinimalSchedule mSchedule) {
         // Contains first as add is more expensive
         if (!existingParallelSchedules.contains(mSchedule)) {
@@ -175,12 +176,19 @@ public class DFSScheduler extends Scheduler {
         return false;
     }
 
+    //Get the queue size concurrently to ensure values are correct at the time
     private static synchronized int getQueueSize() {
         return existingParallelSchedules.size();
     }
 
+    //Remove from queue based on a predicate input (Usually checking for larger schedules)
     private static synchronized void removeIfQueue(Predicate<MinimalSchedule> filter) {
         existingParallelSchedules.removeIf(filter);
+    }
+
+    @Deprecated
+    private static void reset() {
+        existingParallelSchedules = new THashSet<>();
     }
 
 }
