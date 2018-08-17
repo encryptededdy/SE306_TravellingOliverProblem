@@ -29,7 +29,7 @@ public class DFSScheduler extends Scheduler {
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
         startTime = System.currentTimeMillis();
-        if (currentSchedule.getAvailableNodes().stream().allMatch(Node::isIndependent)) {
+        if (currentSchedule.getUnAddedNodes().stream().allMatch(Node::isIndependent)) {
             //TODO: This only get called when all the nodes are independent at the start, maybe change it to check every partial schedule ?
             doIndependent(currentSchedule);
         } else {

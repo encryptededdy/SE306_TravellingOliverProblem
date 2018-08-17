@@ -2,6 +2,7 @@ package uoa.se306.travellingoliverproblem.scheduler;
 
 import javafx.concurrent.Task;
 import uoa.se306.travellingoliverproblem.graph.Graph;
+import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
@@ -85,10 +86,10 @@ public class SchedulerRunner {
     }
 
     private Scheduler autoPickScheduler(Graph inputGraph, int noProcessors) {
-        if (inputGraph.getAllNodes().size() < 10) {
+        if (inputGraph.getAllNodes().size() < 10 && !inputGraph.getAllNodes().stream().allMatch(Node::isIndependent)) {
             System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using A* scheduling algorithm");
             return new AStarSearchScheduler(inputGraph, noProcessors);
-        } else if (inputGraph.getAllNodes().size() < 14) {
+        } else if (inputGraph.getAllNodes().size() < 14 || inputGraph.getAllNodes().stream().allMatch(Node::isIndependent)) {
             System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using DFS/BnB scheduling algorithm");
             return new DFSScheduler(inputGraph, noProcessors);
         } else {
