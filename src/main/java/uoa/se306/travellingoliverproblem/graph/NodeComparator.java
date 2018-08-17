@@ -1,12 +1,15 @@
-package uoa.se306.travellingoliverproblem.schedule;
+package uoa.se306.travellingoliverproblem.graph;
 
-import uoa.se306.travellingoliverproblem.graph.Node;
+import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
+import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
 import java.util.Comparator;
 
 public class NodeComparator implements Comparator<Node> {
 
     private ScheduledProcessor[] processors;
+
+    private boolean outEdgeCostConsistent = true;
 
     public NodeComparator (ScheduledProcessor[] processors){
         this.processors = processors;
@@ -42,12 +45,29 @@ public class NodeComparator implements Comparator<Node> {
         int drtObjectOne = getDRT(o1);
         int drtObjectTwo = getDRT(o2);
 
-        if (Integer.compare(drtObjectOne, drtObjectTwo) == 0) {
-            int outEdgeCostObjectOne = (o1.getChildren().isEmpty()) ? 0 : o1.getChildren().values().iterator().next();
-            int outEdgeCostObjectTwo = (o2.getChildren().isEmpty()) ? 0 : o2.getChildren().values().iterator().next();
-            return Integer.compare(outEdgeCostObjectTwo, outEdgeCostObjectOne); // flipped intentionally
-        } else {
-            return Integer.compare(drtObjectOne, drtObjectTwo);
+        int outEdgeCostObjectOne = (o1.getChildren().isEmpty()) ? 0 : o1.getChildren().values().iterator().next();
+        int outEdgeCostObjectTwo = (o2.getChildren().isEmpty()) ? 0 : o2.getChildren().values().iterator().next();
+
+        switch (Integer.compare(drtObjectOne, drtObjectTwo)) {
+            case 0:
+                return Integer.compare(outEdgeCostObjectTwo, outEdgeCostObjectOne);
+            case 1:
+                if (outEdgeCostObjectOne <= outEdgeCostObjectTwo) {
+                    return 1;
+                } else {
+                    outEdgeCostConsistent = false;
+                    return 1;
+                }
+            case -1:
+                if (outEdgeCostObjectOne >= outEdgeCostObjectTwo) {
+                    return -1;
+                } else {
+                    outEdgeCostConsistent = false;
+                    return -1;
+                }
+            default:
+                // this should never happen
+                throw new RuntimeException("Integer compare returned not -1 - 1. This should never happen.");
         }
     }
 
@@ -66,6 +86,10 @@ public class NodeComparator implements Comparator<Node> {
             }
             return endTime + node.getParents().get(parent);
         }
+    }
+
+    public boolean isOutEdgeCostConsistent() {
+        return outEdgeCostConsistent;
     }
 
 }

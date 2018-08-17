@@ -3,6 +3,7 @@ package uoa.se306.travellingoliverproblem.scheduler;
 import gnu.trove.set.hash.THashSet;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
+import uoa.se306.travellingoliverproblem.graph.NodeComparator;
 import uoa.se306.travellingoliverproblem.graph.NodeCostComparator;
 import uoa.se306.travellingoliverproblem.schedule.*;
 
@@ -44,7 +45,7 @@ public class DFSScheduler extends Scheduler {
         calculateScheduleRecursive(currentSchedule, null);
     }
 
-    private void calculateScheduleRecursive(Schedule currentSchedule, ArrayList<Node> previousFixedNodes) {
+    private void calculateScheduleRecursive(Schedule currentSchedule, PriorityQueue<Node> previousFixedNodes) {
         branchesConsidered++;
         // If the currentSchedule has no available nodes
         if (currentSchedule.getAvailableNodes().isEmpty()) {
@@ -61,23 +62,22 @@ public class DFSScheduler extends Scheduler {
 
         PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
 
-        //TODO: try use a priority queue ?
-        ArrayList<Node> nodesList = new ArrayList<>(currentSchedule.getAvailableNodes());
+        NodeComparator comparator = new NodeComparator(currentSchedule.getProcessors());
+        PriorityQueue<Node> nodesList  = new PriorityQueue<>(comparator);
+        nodesList.addAll(currentSchedule.getAvailableNodes());
 
-        //TODO: reduce this massive overhead
         boolean useFixedOrder = false;
 
-        if (previousFixedNodes != null && nodesList.containsAll(previousFixedNodes)) {
+        if (previousFixedNodes != null && previousFixedNodes.containsAll(nodesList)) {
             useFixedOrder = true;
         } else if (fixingOrder(currentSchedule)) {
-            Collections.sort(nodesList, new NodeComparator(currentSchedule.getProcessors()));
-            if (verifyOutEdgeOrder(nodesList)) {
+            if (comparator.isOutEdgeCostConsistent()) {
                 useFixedOrder = true;
             }
         }
 
         if (useFixedOrder) {
-            Node topNode = nodesList.get(0);
+            Node topNode = nodesList.poll();
             ScheduledProcessor[] processors = currentSchedule.getProcessors();
             // TODO: Don't recalculate for other processors
             int[] processorEarliestAvailable = findProcessorEarliestAvailable(processors, topNode);
@@ -103,7 +103,7 @@ public class DFSScheduler extends Scheduler {
                     MinimalSchedule minimal = new MinimalSchedule(candidate);
                     if (!localDuplicateDetectionOnly && !existingSchedules.contains(minimal)) {
                         if (existingSchedules.size() < 25000000) existingSchedules.add(minimal);
-                        calculateScheduleRecursive(candidate);
+                        calculateScheduleRecursive(candidate, nodesList);
                     } else {
                         branchesKilled++; // drop this branch
                         branchesKilledDuplication++;
@@ -273,35 +273,6 @@ public class DFSScheduler extends Scheduler {
             }
         }
         return processorEarliestAvailable;
-    }
-
-    /*
-    This method takes a sorted ArrayList<Node> and checks if this list is sorted in
-    non-increasing out-edge costs of the Node.
-     */
-    private boolean verifyOutEdgeOrder(ArrayList<Node> theList) {
-        //get the first node in the list
-        //for every other node in the list
-        //  if first node out-edge cost is larger than or equal to the second element
-        //      first = second
-        //  else
-        //      return false;
-        //return true;
-        if (theList.size() > 1) {
-            Node firstNode = theList.get(0);
-            for (int i = 1; i < theList.size() - 1; i++) {
-                Node secondNode = theList.get(i);
-                int outEdgeCostFirstNode = (firstNode.getChildren().isEmpty()) ? 0 : firstNode.getChildren().values().iterator().next();
-                int outEdgeCostSecondNode = (secondNode.getChildren().isEmpty()) ? 0 : secondNode.getChildren().values().iterator().next();
-                if (outEdgeCostFirstNode >= outEdgeCostSecondNode) {
-                    firstNode = secondNode;
-                } else {
-                    return false;
-                }
-            }
-        }
-        return true;
-
     }
 }
 
