@@ -10,6 +10,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
 import javafx.util.Duration;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
@@ -103,27 +104,75 @@ public class GraphDrawer {
                 line.setStrokeWidth(4);
                 line.setStroke(Color.DIMGRAY);
 
+                double lineEndX = destnBounds.getMinX() + destnBounds.getWidth()/2;
+                double lineEndY = destnBounds.getMinY() + destnBounds.getHeight()/2;
+
+                double lineStartX = sourceBounds.getMinX() + sourceBounds.getWidth()/2;
+                double lineStartY = sourceBounds.getMinY() + sourceBounds.getHeight()/2;
+
                 // ugly code binding X start, end, Y start, end
                 line.startXProperty().bind(Bindings.createDoubleBinding(() -> {
-                    return sourceBounds.getMinX() + sourceBounds.getWidth()/2;
+                    return lineStartX;
                 }, source.layoutBoundsProperty()));
 
                 line.startYProperty().bind(Bindings.createDoubleBinding(() -> {
-                    return sourceBounds.getMinY() + sourceBounds.getHeight()/2;
+                    return lineStartY;
                 }, source.layoutBoundsProperty()));
 
                 line.endXProperty().bind(Bindings.createDoubleBinding(() -> {
-                    return destnBounds.getMinX() + destnBounds.getWidth()/2;
+                    return lineEndX;
                 }, dest.layoutBoundsProperty()));
 
                 line.endYProperty().bind(Bindings.createDoubleBinding(() -> {
-                    return destnBounds.getMinY() + destnBounds.getHeight()/2;
+                    return lineEndY;
                 }, dest.layoutBoundsProperty()));
 
+                double deltaX = lineEndX - lineStartX;
+                double deltaY = lineEndY - lineStartY;
+
+                double theta = Math.atan(deltaX/deltaY);
+                if (theta < 0) {
+                    theta = (2 * Math.PI) + (Math.PI / 2) - theta;
+                } else {
+                    theta = (Math.PI / 2) - theta;
+                }
+
+                System.out.println(child.getKey().toString() + "(" + deltaX + "," + deltaY + ")" + " " + theta);
+
+                double newDeltaX = -30 * Math.cos(theta);
+                double newDeltaY = -30 * Math.sin(theta);
+
+                double arrowHeadTipX = lineEndX + newDeltaX;
+                double arrowHeadTipY = lineEndY + newDeltaY;
+
+                double arrowMidPointX =  lineEndX + (-45 * Math.cos(theta));
+                double arrowMidPointY =  lineEndY + (-45 * Math.sin(theta));
+
+                double beta = (Math.PI/2) - theta;
+                double leftDeltaX = 10 * Math.cos(beta);
+                double leftDeltaY = 10 * Math.sin(beta);
+
+                double arrowHeadLeftPointX = arrowMidPointX + leftDeltaX;
+                double arrowHeadLeftPointY = arrowMidPointY - leftDeltaY;
+
+                double arrowHeadRightPointX = arrowMidPointX - leftDeltaX;
+                double arrowHeadRightPointY = arrowMidPointY + leftDeltaY;
+
+                Polygon arrowHeadShape = new Polygon();
+                arrowHeadShape.getPoints().addAll(new Double[]{
+                        arrowHeadTipX, arrowHeadTipY,
+                        arrowHeadLeftPointX, arrowHeadLeftPointY,
+                        arrowHeadRightPointX, arrowHeadRightPointY
+                });
+                arrowHeadShape.setFill(Color.DIMGRAY);
 
                 // TODO: Draw weight... somehow!
 
                 backgroundPane.getChildren().add(line);
+                backgroundPane.getChildren().add(arrowHeadShape);
+
+                if (child.getKey().toString().equals("3")) {
+                }
             }
         }
     }
