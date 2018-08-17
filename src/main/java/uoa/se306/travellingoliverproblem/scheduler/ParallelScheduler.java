@@ -1,7 +1,7 @@
 package uoa.se306.travellingoliverproblem.scheduler;
 
 import uoa.se306.travellingoliverproblem.graph.Graph;
-import uoa.se306.travellingoliverproblem.parallel.BranchAndBoundRecursiveAction;
+import uoa.se306.travellingoliverproblem.scheduler.parallel.BranchAndBoundRecursiveAction;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 
 import java.util.HashSet;
@@ -9,8 +9,9 @@ import java.util.Set;
 
 public class ParallelScheduler extends Scheduler {
 
-    ParallelScheduler(Graph graph, int amountOfProcessors, boolean useDFSCostFunction, boolean isParallelised) {
+    public ParallelScheduler(Graph graph, int amountOfProcessors, boolean useDFSCostFunction, boolean isParallelised) {
         super(graph, amountOfProcessors, useDFSCostFunction, isParallelised);
+        BranchAndBoundRecursiveAction.graph = graph;
     }
 
     @Override

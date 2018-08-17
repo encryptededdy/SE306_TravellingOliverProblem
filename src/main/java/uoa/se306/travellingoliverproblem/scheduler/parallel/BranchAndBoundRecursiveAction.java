@@ -1,4 +1,4 @@
-package uoa.se306.travellingoliverproblem.parallel;
+package uoa.se306.travellingoliverproblem.scheduler.parallel;
 
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Logger;
 
 public class BranchAndBoundRecursiveAction extends RecursiveAction {
 

@@ -2,7 +2,7 @@ package uoa.se306.travellingoliverproblem.scheduler;
 
 import javafx.concurrent.Task;
 import uoa.se306.travellingoliverproblem.graph.Graph;
-import uoa.se306.travellingoliverproblem.parallel.BranchAndBoundRecursiveAction;
+import uoa.se306.travellingoliverproblem.scheduler.parallel.BranchAndBoundRecursiveAction;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
@@ -88,7 +88,6 @@ public class SchedulerRunner {
     private Scheduler autoPickScheduler(Graph inputGraph, int noProcessors, boolean isParallelised) {
         if (isParallelised) {
             System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using DFS/BnB Parallel scheduling algorithm");
-            BranchAndBoundRecursiveAction.graph = inputGraph;
             return new ParallelScheduler(inputGraph, noProcessors, false, isParallelised);
         } else {
             if (inputGraph.getAllNodes().size() < 10) {

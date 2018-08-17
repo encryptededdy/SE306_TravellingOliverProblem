@@ -9,9 +9,6 @@ import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
 import uoa.se306.travellingoliverproblem.fileIO.DotReader;
 import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
 import uoa.se306.travellingoliverproblem.graph.Graph;
-import uoa.se306.travellingoliverproblem.parallel.BranchAndBoundRecursiveAction;
-import uoa.se306.travellingoliverproblem.schedule.Schedule;
-import uoa.se306.travellingoliverproblem.scheduler.HybridScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.SchedulerRunner;
 import uoa.se306.travellingoliverproblem.visualiser.FXController;
 
@@ -19,8 +16,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
 public class Main extends Application {
