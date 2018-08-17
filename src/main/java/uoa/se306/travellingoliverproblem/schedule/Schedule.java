@@ -52,7 +52,7 @@ public class Schedule implements Comparable<Schedule> {
         }
     }
 
-    private void calculateCostFunction(Node node, int startTime, float idleTimeAndComputation) {
+    private void calculateCostFunction(Node node, int processorNo, int startTime, float idleTimeAndComputation) {
         maxStartTimeAndBottomLevel(node, startTime);
         if (useDFSCostFunction) {
             cost = Math.max(maxStartTimeBottomLevel, idleTimeAndComputation);
@@ -126,7 +126,7 @@ public class Schedule implements Comparable<Schedule> {
             // If the child has had all its dependencies fulfilled, add the child to the available set
             if (available) availableNodes.add(child);
         }
-        calculateCostFunction(node, startTime, idleTimeAndComputation);
+        calculateCostFunction(node, processorNo, startTime, idleTimeAndComputation);
     }
 
     // Returns all nodes that have not been added to the schedule
@@ -251,7 +251,9 @@ public class Schedule implements Comparable<Schedule> {
             Collections.sort(scheduleEntries);
 
             int prevNodeFinishTime = 0;
-            scheduleEntries.forEach(scheduleEntry -> {
+            for (int j = 0; j < scheduleEntries.size(); j++) {
+                ScheduleEntry scheduleEntry = scheduleEntries.get(j);
+
                 // Check for no overlaps on the same processor
                 if (scheduleEntry.getStartTime() < prevNodeFinishTime) {
                     throw new InvalidScheduleException("Invalid Schedule Exception: Schedule Entry Overlap");
@@ -259,24 +261,25 @@ public class Schedule implements Comparable<Schedule> {
 
                 // For each of the parents of the schedule entry
                 scheduleEntry.getNode().getParents().forEach((parentNode, cost) -> {
-                    for (int j = 0; j < processors.length; j++) {
-                        if (processors[j].contains(parentNode)) { // TODO: Change this to not use contains, and instead cache the output (faster)
+                    for (int k = 0; k < processors.length; k++) {
+                        if (processors[k].contains(parentNode)) { // TODO: Change this to not use contains, and instead cache the output (faster)
 
                             // If the parent is scheduled on the same processor
-                            if (j == processorIndex) {
-                                if (processors[j].getEntry(parentNode).getEndTime() > scheduleEntry.getStartTime()) {
+                            if (k == processorIndex) {
+                                if (processors[k].getEntry(parentNode).getEndTime() > scheduleEntry.getStartTime()) {
                                     // Check the parent task is completed before the child task starts
                                     throw new InvalidScheduleException("Child task started before Parent task completed on the same processor");
                                 }
 
-                            } else if (processors[j].getEntry(parentNode).getEndTime() + cost > scheduleEntry.getStartTime()) {
+                            } else if (processors[k].getEntry(parentNode).getEndTime() + cost > scheduleEntry.getStartTime()) {
                                 // Check the parent task is completed + communication time before the child task starts
                                 throw new InvalidScheduleException("Child task started before Parent task completed + communication cost on another processor");
                             }
                         }
                     }
                 });
-            });
+                prevNodeFinishTime = scheduleEntry.getEndTime();
+            };
 
 
         }

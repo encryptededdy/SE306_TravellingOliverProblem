@@ -3,9 +3,12 @@ package uoa.se306.travellingoliverproblem.scheduler;
 import gnu.trove.set.hash.THashSet;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
+import uoa.se306.travellingoliverproblem.schedule.MinimalSchedule;
+import uoa.se306.travellingoliverproblem.schedule.Schedule;
+import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
+import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import uoa.se306.travellingoliverproblem.graph.NodeComparator;
 import uoa.se306.travellingoliverproblem.graph.NodeCostComparator;
-import uoa.se306.travellingoliverproblem.schedule.*;
 
 import java.util.*;
 
@@ -16,6 +19,8 @@ public class DFSScheduler extends Scheduler {
     private boolean localDuplicateDetectionOnly = false;
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private long startTime;
+
+    private static final int MAX_MEMORY = 20000000;
 
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors, true);
