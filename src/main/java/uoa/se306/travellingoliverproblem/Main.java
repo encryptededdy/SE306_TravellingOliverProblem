@@ -9,7 +9,8 @@ import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
 import uoa.se306.travellingoliverproblem.fileIO.DotReader;
 import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
 import uoa.se306.travellingoliverproblem.graph.Graph;
-import uoa.se306.travellingoliverproblem.parallel.BranchAndBoundRecursiveTask;
+import uoa.se306.travellingoliverproblem.parallel.BranchAndBoundRecursiveAction;
+import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.HybridScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.SchedulerRunner;
 import uoa.se306.travellingoliverproblem.visualiser.FXController;
@@ -18,6 +19,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 
 public class Main extends Application {
@@ -153,11 +156,13 @@ public class Main extends Application {
                     // Run AStar
                     // TODO move this to schedulerrunner
                     long t1 = System.currentTimeMillis();
-                    forkJoinPool = new ForkJoinPool(numOfCores);
-                    HybridScheduler initialScheduler = new HybridScheduler(inputGraph, processors, isParallelised, 1000);
-                    initialScheduler.getBestSchedule();
-                    BranchAndBoundRecursiveTask bab = new BranchAndBoundRecursiveTask(initialScheduler.getSchedules(), processors);
-                    BranchAndBoundRecursiveTask.graph = inputGraph;
+                    forkJoinPool = new ForkJoinPool(numOfCores, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true );
+//                    HybridScheduler initialScheduler = new HybridScheduler(inputGraph, processors, isParallelised, 1);
+//                    initialScheduler.getBestSchedule(); \\TODO run hybrid if certain size
+                    Set<Schedule> schedules = new HashSet<>();
+                    schedules.add(new Schedule(processors, inputGraph.getStartingNodes(), inputGraph.getAllNodes(), true));
+                    BranchAndBoundRecursiveAction bab = new BranchAndBoundRecursiveAction(schedules, processors);
+                    BranchAndBoundRecursiveAction.graph = inputGraph;
                     bab.invoke();
                     System.out.println("Took: " + ((double)System.currentTimeMillis() - (double)t1)/1000);
                     System.out.println(bab.getBestSchedule().getOverallTime());

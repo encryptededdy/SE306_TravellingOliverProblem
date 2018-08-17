@@ -1,19 +1,16 @@
 package uoa.se306.travellingoliverproblem.parallel;
 
 import uoa.se306.travellingoliverproblem.graph.Graph;
-import uoa.se306.travellingoliverproblem.schedule.MinimalSchedule;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.RecursiveTask;
-import java.util.logging.Logger;
+import java.util.concurrent.RecursiveAction;
 
-public class BranchAndBoundRecursiveTask extends RecursiveTask<Schedule> {
+public class BranchAndBoundRecursiveAction extends RecursiveAction {
 
-    private PriorityQueue<Schedule> schedules;
+    private Collection<Schedule> schedules;
 //    private static Logger logger =
 //            Logger.getAnonymousLogger();
     // TODO check what optimal threshold is
@@ -30,16 +27,16 @@ public class BranchAndBoundRecursiveTask extends RecursiveTask<Schedule> {
     //TODO research creating a queue
 
     //Initial scheduler task
-    public BranchAndBoundRecursiveTask(PriorityQueue<Schedule> schedules, int amountOfProcessors) {
+    public BranchAndBoundRecursiveAction(Collection<Schedule> schedules, int amountOfProcessors) {
         this.schedules = schedules;
         this.amountOfProcessors = amountOfProcessors;
     }
 
     @Override
-    protected Schedule compute() {
+    protected void compute() {
         // Split set into smaller sets to be worked on by threads
         if (schedules.size() > SEQUENTIAL_THRESHOLD) {
-            List<BranchAndBoundRecursiveTask> subTasks = new ArrayList<>();
+            List<BranchAndBoundRecursiveAction> subTasks = new ArrayList<>();
 
             // Split Set
             //TODO change this as inefficient, and may need better load balancing
@@ -48,47 +45,49 @@ public class BranchAndBoundRecursiveTask extends RecursiveTask<Schedule> {
             PriorityQueue<Schedule> secondPartitionedQueue = new PriorityQueue<>();
 
             // Shitty load balancing, fix TODO
-            while (schedules.size() > 0) {
+            for (Schedule schedule : schedules) {
                 if (setDirection) {
-                    firstPartitionedQueue.add(schedules.poll());
+                    firstPartitionedQueue.add(schedule);
                 } else {
-                    secondPartitionedQueue.add(schedules.poll());
+                    secondPartitionedQueue.add(schedule);
                 }
                 setDirection = !setDirection;
             }
+            schedules.clear();
 
-            subTasks.add(new BranchAndBoundRecursiveTask(firstPartitionedQueue, amountOfProcessors));
-            subTasks.add(new BranchAndBoundRecursiveTask(secondPartitionedQueue, amountOfProcessors));
+            subTasks.add(new BranchAndBoundRecursiveAction(firstPartitionedQueue, amountOfProcessors));
+            subTasks.add(new BranchAndBoundRecursiveAction(secondPartitionedQueue, amountOfProcessors));
             //Fork then join 2 tasks, recursively iterate until set is split fully
-            ForkJoinTask.invokeAll(subTasks)
-                    .stream()
-                    .map(ForkJoinTask::join)
-                    .forEach(BranchAndBoundRecursiveTask::getAndSetBestSchedule);
+            ForkJoinTask.invokeAll(subTasks);
 
         } else {
             processSchedule(schedules);
         }
-        return bestSchedule;
     }
 
-    private void processSchedule(PriorityQueue<Schedule> schedules) {
+    private void processSchedule(Collection<Schedule> schedules) {
 //        logger.info("These schedules were processed by "
 //                + Thread.currentThread().getName());
         // Iterate through every schedule and work recursively on this
-        Schedule schedule;
-        while(schedules.size() > 0) {
-            schedule = schedules.poll();
+        for (Schedule schedule : schedules) {
             if (bestSchedule == null || schedule.getOverallTime() < bestSchedule.getOverallTime()) {
                 calculateScheduleRecursive(schedule);
             }
         }
+        schedules.clear();
     }
 
     private void calculateScheduleRecursive(Schedule currentSchedule) {
+        List<BranchAndBoundRecursiveAction> subTasks = new ArrayList<>();
         DFSScheduler scheduler = new DFSScheduler(graph, amountOfProcessors, true);
         scheduler.setBestSchedule(bestSchedule);
-        scheduler.calculateSchedule(currentSchedule);
-        Schedule schedule = scheduler.getBestSchedule();
+        Schedule schedule = scheduler.calculateScheduleParallel(currentSchedule);
+        Set<Schedule> unfinishedSchedules = scheduler.getUnfinishedSchedules();
+        if (unfinishedSchedules.size() > 0) {
+            subTasks.add(new BranchAndBoundRecursiveAction(unfinishedSchedules, amountOfProcessors));
+            ForkJoinTask.invokeAll(subTasks);
+            return;
+        }
         getAndSetBestSchedule(schedule);
     }
 

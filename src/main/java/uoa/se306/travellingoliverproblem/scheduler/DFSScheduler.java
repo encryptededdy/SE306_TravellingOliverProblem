@@ -19,6 +19,7 @@ public class DFSScheduler extends Scheduler {
     private boolean useExistingScheduleCleaner = true;
     private boolean localDuplicateDetectionOnly = false;
     private static Set<MinimalSchedule> existingParallelSchedules = new THashSet<>();
+    private Set<Schedule> unfinishedSchedules = new HashSet<>();
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private long startTime;
 
@@ -32,6 +33,12 @@ public class DFSScheduler extends Scheduler {
     public void calculateSchedule(Schedule currentSchedule) {
         startTime = System.currentTimeMillis();
         calculateScheduleRecursive(currentSchedule);
+    }
+
+    public Schedule calculateScheduleParallel(Schedule currentSchedule) {
+        startTime = System.currentTimeMillis();
+        calculateScheduleRecursive(currentSchedule);
+        return bestSchedule;
     }
 
     private void cleanExistingSchedules() {
@@ -67,7 +74,6 @@ public class DFSScheduler extends Scheduler {
         }
 
         PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
-
         // Normal Scheduling
         for (Node node : currentSchedule.getAvailableNodes()) {
             // Get the amount of processors in the current schedule
@@ -124,13 +130,13 @@ public class DFSScheduler extends Scheduler {
                 MinimalSchedule minimal = new MinimalSchedule(candidate);
                 if (localDuplicateDetectionOnly && !consideredThisRound.contains(minimal)) {
                     consideredThisRound.add(minimal);
-                    calculateScheduleRecursive(candidate);
+                    recursiveIfNotParallel(candidate);
                 } else if (!localDuplicateDetectionOnly && !isParallelised && !existingSchedules.contains(minimal)) {
                     if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
-                    calculateScheduleRecursive(candidate);
+                    recursiveIfNotParallel(candidate);
                 } else if (!localDuplicateDetectionOnly && isParallelised) { // TODO concurrent  //Need to check and lock together
                     if (getQueueSize() < MAX_MEMORY) checkThenAddToQueue(minimal);
-                    calculateScheduleRecursive(candidate);
+                    recursiveIfNotParallel(candidate);
                 } else {
                     branchesKilled++; // drop this branch
                     branchesKilledDuplication++;
@@ -142,7 +148,20 @@ public class DFSScheduler extends Scheduler {
         }
     }
 
-    private static synchronized void checkThenAddToQueue(MinimalSchedule mSchedule){
+    private void recursiveIfNotParallel(Schedule schedule) {
+        if (isParallelised) {
+            unfinishedSchedules.add(schedule);
+        } else {
+            calculateScheduleRecursive(schedule);
+        }
+    }
+
+
+    public Set<Schedule> getUnfinishedSchedules() {
+        return unfinishedSchedules;
+    }
+
+    private static synchronized void checkThenAddToQueue(MinimalSchedule mSchedule) {
         if (!existingParallelSchedules.contains(mSchedule)) {
             existingParallelSchedules.add(mSchedule);
         }
