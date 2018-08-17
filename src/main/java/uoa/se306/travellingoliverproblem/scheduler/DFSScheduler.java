@@ -21,7 +21,7 @@ public class DFSScheduler extends Scheduler {
     private long startTime;
 
     private static final int MAX_MEMORY = 20000000;
-    
+
     public DFSScheduler(Graph graph, int amountOfProcessors) {
         super(graph, amountOfProcessors, true);
     }
@@ -129,4 +129,3 @@ public class DFSScheduler extends Scheduler {
         }
     }
 }
-
