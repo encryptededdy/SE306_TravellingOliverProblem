@@ -187,7 +187,7 @@ public class DFSScheduler extends Scheduler {
     }
 
     @Deprecated
-    private static void reset() {
+    public static void reset() {
         existingParallelSchedules = new THashSet<>();
     }
 

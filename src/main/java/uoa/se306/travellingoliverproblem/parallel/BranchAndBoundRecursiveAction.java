@@ -123,6 +123,6 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
         branchesConsidered = new AtomicLong(0);
         bestSchedule = null;
         graph = null;
-        DFSScheduler.
+        DFSScheduler.reset();
     }
 }
