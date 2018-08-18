@@ -91,7 +91,7 @@ public class SchedulerRunner {
             System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using DFS/BnB Parallel scheduling algorithm");
             return new ParallelScheduler(inputGraph, noProcessors, false, isParallelised);
         } else {
-            if (inputGraph.getAllNodes().size() < 10&& !inputGraph.getAllNodes().stream().allMatch(Node::isIndependent)) {
+            if (inputGraph.getAllNodes().size() < 10 && !inputGraph.getAllNodes().stream().allMatch(Node::isIndependent)) {
                 System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using A* scheduling algorithm");
                 return new AStarSearchScheduler(inputGraph, noProcessors, isParallelised);
             } else if (inputGraph.getAllNodes().size() < 14 || inputGraph.getAllNodes().stream().allMatch(Node::isIndependent)) {
