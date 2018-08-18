@@ -95,7 +95,7 @@ public class SchedulerRunner {
                     System.out.println("Using DFS Scheduler");
                     return new DFSScheduler(inputGraph, noProcessors);
                 case HYBRID:
-                    System.out.println("Using Hybrid Scheduler");
+                    System.out.println("Using Hybrid Scheduler (BETA). Note that Visualisation is not supported in this mode.");
                     return new HybridScheduler(inputGraph, noProcessors);
                 default:
                     return new DFSScheduler(inputGraph, noProcessors);
