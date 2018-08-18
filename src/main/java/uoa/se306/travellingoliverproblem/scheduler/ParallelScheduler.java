@@ -8,8 +8,8 @@ import java.util.PriorityQueue;
 
 public class ParallelScheduler extends Scheduler {
 
-    public ParallelScheduler(Graph graph, int amountOfProcessors, boolean useDFSCostFunction, boolean isParallelised) {
-        super(graph, amountOfProcessors, useDFSCostFunction, isParallelised);
+    public ParallelScheduler(Graph graph, int amountOfProcessors, boolean isParallelised) {
+        super(graph, amountOfProcessors, true, isParallelised);
         BranchAndBoundRecursiveAction.graph = graph;
     }
 

@@ -2,8 +2,6 @@ package se306.travellingoliverproblem;
 
 import org.junit.Before;
 import org.junit.Test;
-import uoa.se306.travellingoliverproblem.fileIO.DotReader;
-import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.scheduler.AStarSearchScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
@@ -11,7 +9,6 @@ import uoa.se306.travellingoliverproblem.scheduler.ParallelScheduler;
 import uoa.se306.travellingoliverproblem.scheduler.Scheduler;
 import uoa.se306.travellingoliverproblem.scheduler.parallel.BranchAndBoundRecursiveAction;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.logging.Logger;
@@ -67,7 +64,7 @@ public class TestSpeed {
 
         long startTime3 = System.nanoTime();
         BranchAndBoundRecursiveAction.graph = graph;
-        Scheduler ParallelScheduler = new ParallelScheduler(graph, amtOfProcessors, false, true);
+        Scheduler ParallelScheduler = new ParallelScheduler(graph, amtOfProcessors, true);
         TestOptimalSolutions.checkValidAndOptimal(ParallelScheduler.getBestSchedule(), optimalTime);
         long endTime3 = System.nanoTime();
         long ParallelSchedulerTime = endTime3 - startTime3;

@@ -118,7 +118,7 @@ public class DirectoryAutoTest {
                     GraphFileReader reader = new DotReader();
                     reader.openFile(file);
                     Graph graph = reader.readFile();
-                    ParallelScheduler scheduler = new ParallelScheduler(graph , finalProcessors, false, true);
+                    ParallelScheduler scheduler = new ParallelScheduler(graph, finalProcessors, true);
                     BranchAndBoundRecursiveAction.graph = graph;
                     startTime2 = System.nanoTime();
                     Schedule output = assertTimeoutPreemptively(Duration.ofSeconds(TIMEOUT_SECONDS), scheduler::getBestSchedule);

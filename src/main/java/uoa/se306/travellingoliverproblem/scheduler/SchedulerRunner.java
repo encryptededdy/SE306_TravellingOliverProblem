@@ -3,7 +3,6 @@ package uoa.se306.travellingoliverproblem.scheduler;
 import javafx.concurrent.Task;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
-import uoa.se306.travellingoliverproblem.scheduler.parallel.BranchAndBoundRecursiveAction;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
@@ -90,7 +89,7 @@ public class SchedulerRunner {
         if (isParallelised) {
             // ForkJoinPool has already set up the number of threads to run
             System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using DFS/BnB Parallel scheduling algorithm");
-            return new ParallelScheduler(inputGraph, noProcessors, false, isParallelised);
+            return new ParallelScheduler(inputGraph, noProcessors, isParallelised);
         } else {
             if (type != null) {
                 switch (type) {
