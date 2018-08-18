@@ -3,14 +3,17 @@ package uoa.se306.travellingoliverproblem.scheduler;
 import gnu.trove.set.hash.THashSet;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
+import uoa.se306.travellingoliverproblem.graph.NodeComparator;
+import uoa.se306.travellingoliverproblem.graph.NodeCostComparator;
 import uoa.se306.travellingoliverproblem.schedule.MinimalSchedule;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
-import uoa.se306.travellingoliverproblem.graph.NodeComparator;
-import uoa.se306.travellingoliverproblem.graph.NodeCostComparator;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public class DFSScheduler extends Scheduler {
@@ -25,7 +28,7 @@ public class DFSScheduler extends Scheduler {
     private static Set<MinimalSchedule> existingParallelSchedules = new THashSet<>();
     private Set<Schedule> unfinishedSchedules = new HashSet<>();
 
-    private static final int MAX_MEMORY = 25000000;
+    private static final int MAX_MEMORY = 20000000; // Max number of existing schedules to store in HashSet
     
     public DFSScheduler(Graph graph, int amountOfProcessors, boolean IsParallelised) {
         super(graph, amountOfProcessors, true, IsParallelised);
@@ -57,7 +60,7 @@ public class DFSScheduler extends Scheduler {
             cleaned = previousSize - existingSchedules.size();
         }
         long endTime = System.nanoTime();
-        System.out.println("Cleaning Took " + (endTime - startTime) / 1000000 + " ms, cleaned " + cleaned + " entries (" + (cleaned * 100 / previousSize) + "%)");
+        // System.out.println("Cleaning Took " + (endTime - startTime) / 1000000 + " ms, cleaned " + cleaned + " entries (" + (cleaned * 100 / previousSize) + "%)");
     }
 
     private void calculateScheduleRecursive(Schedule currentSchedule) {
@@ -70,7 +73,7 @@ public class DFSScheduler extends Scheduler {
         if (currentSchedule.getAvailableNodes().isEmpty()) {
             // If our bestSchedule is null or the overall time for the bestSchedule is less than our current schedule
             if (bestSchedule == null || bestSchedule.getCost() > currentSchedule.getCost()) {
-                System.out.println("Found new best schedule: " + currentSchedule.getOverallTime());
+                // System.out.println("Found new best schedule: " + currentSchedule.getOverallTime());
                 bestSchedule = currentSchedule;
                 // Only run cleaner if it's been at least 5 seconds since we started, otherwise there's no point
                 if (!localDuplicateDetectionOnly && useExistingScheduleCleaner && System.currentTimeMillis() > startTime + 5000)
