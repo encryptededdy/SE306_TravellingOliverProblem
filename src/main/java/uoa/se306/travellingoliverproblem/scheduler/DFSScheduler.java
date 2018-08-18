@@ -130,13 +130,13 @@ public class DFSScheduler extends Scheduler {
                     // Only continue if this schedule hasn't been considered before
                     MinimalSchedule minimal = new MinimalSchedule(candidate);
                     if (!localDuplicateDetectionOnly && !isParallelised && !existingSchedules.contains(minimal)) {
-                        if (existingSchedules.size() < 25000000) existingSchedules.add(minimal);
+                        if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
                         if (nodesList != null) {
                             calculateScheduleRecursive(candidate, nodesList);
                         } else {
                             calculateScheduleRecursive(candidate);
                         }
-                    } else if (!localDuplicateDetectionOnly && isParallelised && getQueueSize() < 25000000 && checkThenAddToQueue(minimal)) {
+                    } else if (!localDuplicateDetectionOnly && isParallelised && getQueueSize() < MAX_MEMORY && checkThenAddToQueue(minimal)) {
                             recursiveIfNotParallel(candidate);
                     } else {
                         branchesKilled++; // drop this branch
@@ -188,7 +188,7 @@ public class DFSScheduler extends Scheduler {
                     } else if (!localDuplicateDetectionOnly && !isParallelised && !existingSchedules.contains(minimal)) {
                         if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
                             recursiveIfNotParallel(candidate);
-                    } else if (!localDuplicateDetectionOnly && isParallelised && getQueueSize() < MAX_MEMORY && checkThenAddToQueue(minimal)) {
+                    } else if (!localDuplicateDetectionOnly && isParallelised && checkThenAddToQueue(minimal)) {
                         recursiveIfNotParallel(candidate);
                     } else {
                         branchesKilled++; // drop this branch
@@ -218,7 +218,9 @@ public class DFSScheduler extends Scheduler {
     private static synchronized boolean checkThenAddToQueue(MinimalSchedule mSchedule) {
         // Contains first as add is more expensive
         if (!existingParallelSchedules.contains(mSchedule)) {
-            existingParallelSchedules.add(mSchedule);
+            if (existingParallelSchedules.size() < MAX_MEMORY) {
+                existingParallelSchedules.add(mSchedule);
+            }
             return true;
         }
         return false;

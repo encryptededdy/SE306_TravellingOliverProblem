@@ -4,7 +4,9 @@ import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicLong;
@@ -13,7 +15,7 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
 
     private Collection<Schedule> schedules;
     // TODO check what optimal threshold is
-    public static final int SEQUENTIAL_THRESHOLD = 4; // Magic number????
+    public static final int SEQUENTIAL_THRESHOLD = 1; // Magic number????
     private static Schedule bestSchedule;
     public static Graph graph;
     private int amountOfProcessors;
