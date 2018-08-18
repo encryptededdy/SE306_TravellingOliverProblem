@@ -17,12 +17,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.concurrent.ForkJoinPool;
 
 public class Main extends Application {
 
+    private static ForkJoinPool forkJoinPool;
     private static SchedulerType schedulerType;
     private static Graph inputGraph;
     private static int processors = 1;
+    private static boolean isParallelised = false;
     public static String outputFileName;
 
     // JavaFX start method (depends if visualisation enabled)
@@ -31,7 +34,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/layout.fxml"));
         Parent root = loader.load();
         FXController controller = loader.getController();
-        controller.startProcessing(inputGraph, processors, outputFileName, schedulerType);
+        controller.startProcessing(inputGraph, processors, isParallelised, outputFileName, schedulerType);
         primaryStage.setTitle("Visualisation");
         primaryStage.setResizable(false);
         primaryStage.setScene(new Scene(root, 1200, 850));
@@ -125,6 +128,11 @@ public class Main extends Application {
                         case "--parallel":
                             try {
                                 numOfThreads = Integer.parseInt(args[i + 1]);//will throw NumberFormatException if cant convert
+                                if (numOfThreads > 1) {
+                                    // Set up fork join pool to have numOfCores threads
+                                    forkJoinPool = new ForkJoinPool(numOfThreads, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null ,true);
+                                    isParallelised = true;
+                                }
                             } catch (NumberFormatException e) {
                                 System.err.println("Invalid number of threads.\nType -h or --help for help.");
                                 System.exit(1);
@@ -168,7 +176,7 @@ public class Main extends Application {
             if (useVisuals) {
                 launch();
             } else {
-                SchedulerRunner.getInstance().startScheduler(inputGraph, processors, schedulerType);
+                SchedulerRunner.getInstance().startScheduler(inputGraph, processors, isParallelised, schedulerType);
                 final String tempOutputFileName = outputFileName;
                 // run the following after the scheduler has finished.
                 SchedulerRunner.getInstance().setThreadListener(() -> {

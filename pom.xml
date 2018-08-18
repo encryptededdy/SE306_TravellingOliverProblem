@@ -57,6 +57,8 @@
                     <trimStackTrace>true</trimStackTrace>
                     <excludes>
                         <exclude>**/DirectoryAutoTest.java</exclude>
+                        <exclude>**/TestParallelSolutionMass.java</exclude>
+                        <exclude>**/TestSpeed.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

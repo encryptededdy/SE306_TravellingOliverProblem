@@ -52,8 +52,8 @@ public class FXController {
         graphNodeMap = drawer.getGraphNodes();
     }
 
-    public void startProcessing(Graph inputGraph, int processors, String outputName, SchedulerType type) {
-        Task<Void> task = SchedulerRunner.getInstance().startSchedulerJavaFXTask(inputGraph, processors, type);
+    public void startProcessing(Graph inputGraph, int processors, boolean isParallelised, String outputName, SchedulerType type) {
+        Task<Void> task = SchedulerRunner.getInstance().startSchedulerJavaFXTask(inputGraph, processors, isParallelised, type);
         drawGraph(SchedulerRunner.getInstance().getInputGraph());
         long startTime = System.nanoTime();
 

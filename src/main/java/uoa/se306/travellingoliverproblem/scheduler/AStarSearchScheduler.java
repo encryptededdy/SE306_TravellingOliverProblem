@@ -20,8 +20,8 @@ public class AStarSearchScheduler extends Scheduler {
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
 
-    public AStarSearchScheduler(Graph graph, int amountOfProcessors) {
-        super(graph, amountOfProcessors, false);
+    public AStarSearchScheduler(Graph graph, int amountOfProcessors, boolean isParallelised) {
+        super(graph, amountOfProcessors, false, isParallelised);
     }
 
     @Override
