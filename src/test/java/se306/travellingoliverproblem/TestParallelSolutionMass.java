@@ -16,7 +16,7 @@ public class TestParallelSolutionMass {
         forkJoinPool = new ForkJoinPool(4);
         Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_20_Random.dot");
         for (int i = 0; i < 1000; i++) {
-            testParallelScheduler(inputGraph, 564);
+            testParallelScheduler(inputGraph, 564, 2);
         }
     }
 
@@ -25,7 +25,7 @@ public class TestParallelSolutionMass {
         forkJoinPool = new ForkJoinPool(3);
         Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_20_Random.dot");
         for (int i = 0; i < 1000; i++) {
-            testParallelScheduler(inputGraph, 564);
+            testParallelScheduler(inputGraph, 564, 2);
         }
     }
 
@@ -34,7 +34,7 @@ public class TestParallelSolutionMass {
         forkJoinPool = new ForkJoinPool(2);
         Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_20_Random.dot");
         for (int i = 0; i < 1000; i++) {
-            testParallelScheduler(inputGraph, 564);
+            testParallelScheduler(inputGraph, 564, 2);
         }
     }
 
@@ -44,7 +44,7 @@ public class TestParallelSolutionMass {
         forkJoinPool = new ForkJoinPool(4);
         Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_8_Random.dot");
         for (int i = 0; i < 10000; i++) {
-            testParallelScheduler(inputGraph, 581);
+            testParallelScheduler(inputGraph, 581, 2);
         }
     }
 
@@ -53,7 +53,7 @@ public class TestParallelSolutionMass {
         forkJoinPool = new ForkJoinPool(4);
         Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_9_SeriesParallel.dot");
         for (int i = 0; i < 10000; i++) {
-            testParallelScheduler(inputGraph, 55);
+            testParallelScheduler(inputGraph, 55, 2);
         }
     }
 
@@ -62,7 +62,7 @@ public class TestParallelSolutionMass {
         forkJoinPool = new ForkJoinPool(2);
         Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_9_SeriesParallel.dot");
         for (int i = 0; i < 10000; i++) {
-            testParallelScheduler(inputGraph, 55);
+            testParallelScheduler(inputGraph, 55, 2);
         }
     }
 

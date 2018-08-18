@@ -39,7 +39,6 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
             PriorityQueue<Schedule> firstPartitionedQueue = new PriorityQueue<>();
             PriorityQueue<Schedule> secondPartitionedQueue = new PriorityQueue<>();
 
-            // Shitty load balancing, fix TODO
             for (Schedule schedule : schedules) {
                 if (setDirection) {
                     firstPartitionedQueue.add(schedule);
@@ -78,11 +77,11 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
         Set<Schedule> unfinishedSchedules = scheduler.getUnfinishedSchedules();
         if (unfinishedSchedules.size() > 0) {
             ForkJoinTask.invokeAll(new BranchAndBoundRecursiveAction(unfinishedSchedules, amountOfProcessors));
+            branchesKilled.getAndAdd(scheduler.getBranchesKilled());
+            branchesConsidered.getAndAdd(scheduler.getBranchesConsidered());
+            branchesKilledDuplication.getAndAdd(scheduler.getBranchesKilledDuplication());
             return;
         }
-        branchesKilled.getAndAdd(scheduler.getBranchesKilled());
-        branchesConsidered.getAndAdd(scheduler.getBranchesConsidered());
-        branchesKilledDuplication.getAndAdd(scheduler.getBranchesKilledDuplication());
         getAndSetBestSchedule(schedule);
     }
 

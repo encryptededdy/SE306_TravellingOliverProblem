@@ -133,6 +133,8 @@ public class DFSScheduler extends Scheduler {
                         } else {
                             calculateScheduleRecursive(candidate);
                         }
+                    } else if (!localDuplicateDetectionOnly && isParallelised && getQueueSize() < 25000000 && checkThenAddToQueue(minimal)) {
+                            recursiveIfNotParallel(candidate);
                     } else {
                         branchesKilled++; // drop this branch
                         branchesKilledDuplication++;
@@ -177,16 +179,14 @@ public class DFSScheduler extends Scheduler {
                 if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
                     // Only continue if this schedule hasn't been considered before
                     MinimalSchedule minimal = new MinimalSchedule(candidate);
-                    if (localDuplicateDetectionOnly && !isParallelised && !consideredThisRound.contains(minimal)) {
+                    if (localDuplicateDetectionOnly && !consideredThisRound.contains(minimal)) {
                         consideredThisRound.add(minimal);
                         recursiveIfNotParallel(candidate);
                     } else if (!localDuplicateDetectionOnly && !isParallelised && !existingSchedules.contains(minimal)) {
                         if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
-                        recursiveIfNotParallel(candidate);
-                    } else if (!localDuplicateDetectionOnly && isParallelised) {
-                        if (getQueueSize() < MAX_MEMORY && checkThenAddToQueue(minimal)) {
                             recursiveIfNotParallel(candidate);
-                        }
+                    } else if (!localDuplicateDetectionOnly && isParallelised && getQueueSize() < MAX_MEMORY && checkThenAddToQueue(minimal)) {
+                        recursiveIfNotParallel(candidate);
                     } else {
                         branchesKilled++; // drop this branch
                         branchesKilledDuplication++;
@@ -206,7 +206,6 @@ public class DFSScheduler extends Scheduler {
             calculateScheduleRecursive(schedule);
         }
     }
-
 
     public Set<Schedule> getUnfinishedSchedules() {
         return unfinishedSchedules;
