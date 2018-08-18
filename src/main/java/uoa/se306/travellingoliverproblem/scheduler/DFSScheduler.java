@@ -115,7 +115,14 @@ public class DFSScheduler extends Scheduler {
                 // Only continue if sub-schedule time is under upper bound
                 // i.e. skip this branch if its overall time is already longer than the currently known best overall time
                 if (bestSchedule == null || tempSchedule.getCost() < bestSchedule.getCost()) {
-                    candidateSchedules.add(tempSchedule);
+                    if (isParallelised && checkThenAddToQueue(new MinimalSchedule(tempSchedule))) {
+                        recursiveIfNotParallel(tempSchedule);
+                    } else if (isParallelised) {
+                        branchesKilled++;
+                        branchesKilledDuplication++;
+                    } else {
+                        candidateSchedules.add(tempSchedule);
+                    }
                 } else {
                     // drop this branch, because this partial schedule is guaranteed to be worse than what we currently have, based on overallTime
                     branchesKilled++;
@@ -165,7 +172,14 @@ public class DFSScheduler extends Scheduler {
                     // Only continue if sub-schedule time is under upper bound
                     // i.e. skip this branch if its overall time is already longer than the currently known best overall time
                     if (bestSchedule == null || tempSchedule.getCost() < bestSchedule.getCost()) {
-                        candidateSchedules.add(tempSchedule);
+                        if (isParallelised && checkThenAddToQueue(new MinimalSchedule(tempSchedule))) {
+                            recursiveIfNotParallel(tempSchedule);
+                        } else if (isParallelised) {
+                            branchesKilled++;
+                            branchesKilledDuplication++;
+                        } else {
+                            candidateSchedules.add(tempSchedule);
+                        }
                     } else {
                         // drop this branch, because this partial schedule is guaranteed to be worse than what we currently have, based on overallTime
                         branchesKilled++;
@@ -173,16 +187,15 @@ public class DFSScheduler extends Scheduler {
                 }
             }
 
+            // If parallelised, this branch won't be entered.
             while (!candidateSchedules.isEmpty()) {
                 Schedule candidate = candidateSchedules.poll();
                 if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
                     // Only continue if this schedule hasn't been considered before
                     MinimalSchedule minimal = new MinimalSchedule(candidate);
-                    if (!isParallelised && !existingSchedules.contains(minimal)) {
+                    if (!existingSchedules.contains(minimal)) {
                         if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
                             recursiveIfNotParallel(candidate);
-                    } else if (isParallelised && checkThenAddToQueue(minimal)) {
-                        recursiveIfNotParallel(candidate);
                     } else {
                         branchesKilled++; // drop this branch
                         branchesKilledDuplication++;
