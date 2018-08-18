@@ -20,9 +20,9 @@ public class HybridScheduler extends Scheduler {
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
     private PriorityQueue<Schedule> readySchedules = new PriorityQueue<>();
+    private int hybridMaxSize;
 
     private static final int HYBRID_MAX_DEPTH = 4;
-    private int hybridMaxSize;//TODO set appropriate
     private static final boolean USE_DEPTH_LIMIT = false;
 
     public HybridScheduler(Graph graph, int amountOfProcessors, boolean isParallelised, int maxSize) {
