@@ -15,12 +15,11 @@ import uoa.se306.travellingoliverproblem.visualiser.FXController;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Main extends Application {
 
-    private static FXController controller;
     private static SchedulerType schedulerType;
     private static Graph inputGraph;
     private static int processors = 1;
@@ -31,7 +30,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/layout.fxml"));
         Parent root = loader.load();
-        controller = loader.getController();
+        FXController controller = loader.getController();
         controller.startProcessing(inputGraph, processors, outputFileName, schedulerType);
         primaryStage.setTitle("Visualisation");
         primaryStage.setResizable(false);
@@ -70,7 +69,7 @@ public class Main extends Application {
                 case "--license":
                     // Print licenses
                     try {
-                        BufferedReader reader = new BufferedReader(new FileReader(Main.class.getResource("/LICENSES.txt").getFile()));
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("/TOP_LICENSES.txt")));
                         String line = reader.readLine();
                         while (line != null) {
                             System.out.println(line);
@@ -79,6 +78,7 @@ public class Main extends Application {
                         reader.close();
                     } catch (IOException e) {
                         System.err.println("Couldn't find license file!");
+                        e.printStackTrace();
                     }
                     System.exit(0);
                 default:
