@@ -82,7 +82,7 @@ public class DirectoryAutoTest {
                 Executable execDFS = () -> {
                     GraphFileReader reader = new DotReader();
                     reader.openFile(file);
-                    Scheduler scheduler = new DFSScheduler(reader.readFile(), finalProcessors);
+                    Scheduler scheduler = new DFSScheduler(reader.readFile(), finalProcessors, false);
                     Schedule output = assertTimeoutPreemptively(Duration.ofSeconds(TIMEOUT_SECONDS), scheduler::getBestSchedule);
                     output.checkValidity();
                     assertEquals(finalOptimalSolution, output.getOverallTime());
