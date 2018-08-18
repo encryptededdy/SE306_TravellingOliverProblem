@@ -123,6 +123,7 @@ public class HybridScheduler extends Scheduler {
         }
     }
 
+    // Move all current schedules to run on DFSScheduler until finished
     private void beginDFS() {
         System.out.println("Switching to DFS from A*");
         System.out.println(readySchedules.size());
@@ -143,6 +144,7 @@ public class HybridScheduler extends Scheduler {
         }
     }
 
+    // For parallelisation
     public PriorityQueue<Schedule> getSchedules() {
         return readySchedules;
     }

@@ -17,11 +17,13 @@ public class ParallelScheduler extends Scheduler {
     //Runs the recursive action, to start the parallelisation, gives it 1 empty schedule
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
+        // If we decide to run hybrid first
 //      HybridScheduler initialScheduler = new HybridScheduler(BranchAndBoundRecursiveAction.graph, amountOfProcessors, isParallelised, 1);
-//      initialScheduler.getBestSchedule(); //TODO run hybrid if certain size
+//      initialScheduler.getBestSchedule();
 //      Collection<Schedule> schedules = initialScheduler.getSchedules();
         Set<Schedule> schedules = new HashSet<>();
         schedules.add(currentSchedule);
+        // Run recursive task with x no of threads (Defined in main)
         BranchAndBoundRecursiveAction bab = new BranchAndBoundRecursiveAction(schedules, amountOfProcessors);
         bab.invoke();
         // Check if an error occurred and that the recursive action completely correctly

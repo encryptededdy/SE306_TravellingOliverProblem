@@ -10,6 +10,12 @@ import static se306.travellingoliverproblem.TestParallelSolutions.testParallelSc
 
 public class TestParallelSolutionMass {
 
+    /*
+    These tests are to ensure that no concurrency issues are taking place
+    This is insurance that there is not a case where an operation gets
+    interrupted etc. These tests are not used for TravisCi, as they take
+    a long time
+     */
     private static ForkJoinPool forkJoinPool;
     @Test
     public void testParallel20Graph1000Times4Threads() throws FileNotFoundException {
@@ -63,6 +69,26 @@ public class TestParallelSolutionMass {
         Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_9_SeriesParallel.dot");
         for (int i = 0; i < 10000; i++) {
             testParallelScheduler(inputGraph, 55, 2);
+        }
+    }
+
+    // Tests for the bad graph
+    @Test
+    public void test11NodesOutTree2ProcessorsParallel1000Times4Threads() throws FileNotFoundException {
+        forkJoinPool = new ForkJoinPool(4);
+        Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_11_OutTree.dot");
+        for (int i = 0; i < 1000; i++) {
+            testParallelScheduler(inputGraph, 350, 2);
+        }
+    }
+
+    // Tests for the bad graph
+    @Test
+    public void test11NodesOutTreeParallel4ProcessorsParallel1000Times4Threads() throws FileNotFoundException {
+        forkJoinPool = new ForkJoinPool(4);
+        Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_11_OutTree.dot");
+        for (int i = 0; i < 1000; i++) {
+            testParallelScheduler(inputGraph, 350, 2);
         }
     }
 

@@ -124,6 +124,7 @@ public class Main extends Application {
                         case "--parallel":
                             numOfCores = Integer.parseInt(args[i + 1]);//will throw NumberFormatException if cant convert
                             if (numOfCores > 1) {
+                                // Set up fork join pool to have numOfCores threads
                                 forkJoinPool = new ForkJoinPool(numOfCores, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null ,true);
                                 isParallelised = true;
                             }

@@ -88,6 +88,7 @@ public class SchedulerRunner {
 
     private Scheduler autoPickScheduler(Graph inputGraph, int noProcessors, boolean isParallelised) {
         if (isParallelised) {
+            // ForkJoinPool has already set up the number of threads to run
             System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using DFS/BnB Parallel scheduling algorithm");
             return new ParallelScheduler(inputGraph, noProcessors, false, isParallelised);
         } else {
