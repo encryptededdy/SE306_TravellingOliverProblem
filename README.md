@@ -19,16 +19,22 @@ For more information about the algorithm(s) and optimizations, please see the Wi
 * Look at the github wiki for further information
 
 ### Running the jar
-* java −jar scheduler.jar INPUT.dot P [OPTION]
+* `java −jar scheduler.jar INPUT.dot P [OPTION(S)]`
 
-### Necessary CLI arguments
-* INPUT. dot&nbsp;&nbsp;&nbsp;&nbsp;  a  task  graph  with  integer  weights  in  dot  format
-* P &nbsp;&nbsp;&nbsp;&nbsp; number  of  processors  to  schedule  the INPUT graph on
+### Required CLI arguments
+| Argument         | Description |
+| ---------------- | ----------- |
+| INPUT.dot | A path to the file with a task graph containing integer weights in dot format. |
+| P | Number of processors to schedule the INPUT graph on. |
 
 ### Optional CLI arguments
-* −p N  &nbsp;&nbsp;&nbsp;&nbsp;  use N cores  for  execution  in  parallel  ( default  is  sequential )
-* −v  &nbsp;&nbsp;&nbsp;&nbsp;  visualise  the  search
-* −o OUPUT &nbsp;&nbsp;&nbsp;&nbsp;     output  file  is  named OUTPUT ( default  is INPUT−output.dot )
+| Argument         | Argument (shorthand) | Description |
+| ---------------- | -------------------- | ----------- |
+| -v | --visualisation | Enables GUI visualisation |
+| -p [INT] | --parallel [INT] | The amount of threads to use for execution in parallel (Default: 1) |
+| -o [STRING] | --output [STRING] | Specifies the name for the output file (Default: INPUT-output.dot) |
+| -s [STRING] | --scheduler [STRING] | Specifies the scheduler type to use (AStar, DFS, Hybrid) (default: Auto select) |
+| -l | --license | View open source licenses (Note: This must be the only argument to work) |
 
 ### Building/Compiling
 Maven can handle all building/compiling/packaging.
@@ -36,6 +42,8 @@ Maven can handle all building/compiling/packaging.
 Use `mvn build` to build TOP Scheduler. Use `mvn package` to package into an executable JAR. `mvn install` to do everything and install the package. `mvn test` runs unit tests.
 
 To use this in an IDE (like IntelliJ IDEA), simply import it as a Maven project.
+
+Note that not all tests will be run automatically by Maven. To avoid excessive build times, DirectoryAutoTest and TestSpeed must be run manually.
 
 ## Navigation
 ### Wiki
