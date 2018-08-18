@@ -34,7 +34,7 @@ public class ScheduleNode extends Pane {
         Text nameLabel = new Text(name);
         //Text costLabel = new Text(cost.toString());
         nameLabel.setFill(Color.WHITE);
-        nameLabel.setFont(new Font(15));
+        nameLabel.setFont(new Font("Roboto", 15));
         //costLabel.setFont(new Font(30));
         //costLabel.setOpacity(0.4);
         //costLabel.setFill(Color.WHITE);
@@ -76,7 +76,7 @@ public class ScheduleNode extends Pane {
 
         Text nameLabel = new Text(name);
         nameLabel.setFill(Color.BLACK);
-        nameLabel.setFont(new Font(15));
+        nameLabel.setFont(new Font("Roboto", 15));
 
         StackPane stack = new StackPane();
         stack.getChildren().addAll(rect, nameLabel);

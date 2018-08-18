@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
 import uoa.se306.travellingoliverproblem.fileIO.DotReader;
@@ -25,6 +26,10 @@ public class Main extends Application {
     // JavaFX start method (depends if visualisation enabled)
     @Override
     public void start(Stage primaryStage) throws Exception{
+        Font.loadFont(getClass().getResource("/Roboto-Regular.ttf").toExternalForm(), 10);
+        Font.loadFont(getClass().getResource("/Roboto-Bold.ttf").toExternalForm(), 10);
+        Font.loadFont(getClass().getResource("/Roboto-Medium.ttf").toExternalForm(), 10);
+        Font.loadFont(getClass().getResource("/Roboto-Light.ttf").toExternalForm(), 10);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/layout.fxml"));
         Parent root = loader.load();
         controller = loader.getController();

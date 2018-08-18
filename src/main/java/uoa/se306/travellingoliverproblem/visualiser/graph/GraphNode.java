@@ -29,8 +29,8 @@ public class GraphNode extends Pane {
         Text nameLabel = new Text(name);
         Text costLabel = new Text(cost.toString());
         nameLabel.setFill(Color.WHITE);
-        nameLabel.setFont(new Font(20));
-        costLabel.setFont(new Font(34));
+        nameLabel.setFont(new Font("Roboto",20));
+        costLabel.setFont(new Font("Roboto",28));
         costLabel.setOpacity(0.4);
         costLabel.setFill(Color.WHITE);
 
