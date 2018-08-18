@@ -9,9 +9,8 @@ There are three other goals for this project, and they are:
 * Optimal schedule output
 * Visualisation
 * Parallelisation
-### AStar Algorithm
 
-### Branch and bound
+For more information about the algorithm(s) and optimizations, please see the Wiki.
 
 ## Instructions
 ### Usage
