@@ -1,11 +1,10 @@
 package uoa.se306.travellingoliverproblem.scheduler;
 
 import uoa.se306.travellingoliverproblem.graph.Graph;
-import uoa.se306.travellingoliverproblem.scheduler.parallel.BranchAndBoundRecursiveAction;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
+import uoa.se306.travellingoliverproblem.scheduler.parallel.BranchAndBoundRecursiveAction;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.PriorityQueue;
 
 public class ParallelScheduler extends Scheduler {
 
@@ -21,7 +20,7 @@ public class ParallelScheduler extends Scheduler {
 //      HybridScheduler initialScheduler = new HybridScheduler(BranchAndBoundRecursiveAction.graph, amountOfProcessors, isParallelised, 1);
 //      initialScheduler.getBestSchedule();
 //      Collection<Schedule> schedules = initialScheduler.getSchedules();
-        Set<Schedule> schedules = new HashSet<>();
+        PriorityQueue<Schedule> schedules = new PriorityQueue<>();
         schedules.add(currentSchedule);
         // Run recursive task with x no of threads (Defined in main)
         BranchAndBoundRecursiveAction bab = new BranchAndBoundRecursiveAction(schedules, amountOfProcessors);

@@ -26,7 +26,7 @@ public class DFSScheduler extends Scheduler {
 
     // For Parallel
     private static Set<MinimalSchedule> existingParallelSchedules = new THashSet<>();
-    private Set<Schedule> unfinishedSchedules = new HashSet<>();
+    private PriorityQueue<Schedule> unfinishedSchedules = new PriorityQueue<>();
 
     private static final int MAX_MEMORY = 20000000; // Max number of existing schedules to store in HashSet
     
@@ -210,7 +210,7 @@ public class DFSScheduler extends Scheduler {
         }
     }
 
-    public Set<Schedule> getUnfinishedSchedules() {
+    public PriorityQueue<Schedule> getUnfinishedSchedules() {
         return unfinishedSchedules;
     }
 

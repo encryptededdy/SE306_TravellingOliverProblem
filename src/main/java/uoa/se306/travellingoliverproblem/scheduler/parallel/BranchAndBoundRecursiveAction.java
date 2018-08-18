@@ -5,16 +5,14 @@ import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.DFSScheduler;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.PriorityQueue;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class BranchAndBoundRecursiveAction extends RecursiveAction {
 
-    private Collection<Schedule> schedules;
-    // TODO check what optimal threshold is
+    private PriorityQueue<Schedule> schedules;
     public static final int SEQUENTIAL_THRESHOLD = 1; // Magic number????
     private static Schedule bestSchedule;
     public static Graph graph;
@@ -25,7 +23,7 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
     private static AtomicLong branchesKilled = new AtomicLong(0);
 
     //Initial scheduler task
-    public BranchAndBoundRecursiveAction(Collection<Schedule> schedules, int amountOfProcessors) {
+    public BranchAndBoundRecursiveAction(PriorityQueue<Schedule> schedules, int amountOfProcessors) {
         this.schedules = schedules;
         this.amountOfProcessors = amountOfProcessors;
     }
@@ -37,19 +35,18 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
 
             // Split Set
             boolean setDirection = false;
-            Set<Schedule> firstPartitionedQueue = new HashSet<>();
-            Set<Schedule> secondPartitionedQueue = new HashSet<>();
+            PriorityQueue<Schedule> firstPartitionedQueue = new PriorityQueue<>();
+            PriorityQueue<Schedule> secondPartitionedQueue = new PriorityQueue<>();
 
             // Split set into 2 equal chunks to pass to subtasks
-            for (Schedule schedule : schedules) {
+            while (!schedules.isEmpty()) {
                 if (setDirection) {
-                    firstPartitionedQueue.add(schedule);
+                    firstPartitionedQueue.add(schedules.poll());
                 } else {
-                    secondPartitionedQueue.add(schedule);
+                    secondPartitionedQueue.add(schedules.poll());
                 }
                 setDirection = !setDirection;
             }
-            schedules.clear();
 
             //Fork then join 2 tasks, recursively iterate until set is split fully, and then DFS on inner
             ForkJoinTask.invokeAll(
@@ -78,7 +75,7 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
         DFSScheduler scheduler = new DFSScheduler(graph, amountOfProcessors, true);
         scheduler.setBestSchedule(bestSchedule);
         Schedule schedule = scheduler.calculateScheduleParallel(currentSchedule);
-        Set<Schedule> unfinishedSchedules = scheduler.getUnfinishedSchedules();
+        PriorityQueue<Schedule> unfinishedSchedules = scheduler.getUnfinishedSchedules();
         branchesKilled.getAndAdd(scheduler.getBranchesKilled());
         branchesConsidered.getAndAdd(scheduler.getBranchesConsidered());
         branchesKilledDuplication.getAndAdd(scheduler.getBranchesKilledDuplication());
