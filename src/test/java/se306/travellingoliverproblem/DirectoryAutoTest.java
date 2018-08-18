@@ -100,9 +100,9 @@ public class DirectoryAutoTest {
                     GraphFileReader reader = new DotReader();
                     reader.openFile(file);
                     Scheduler scheduler = new DFSScheduler(reader.readFile(), finalProcessors, false);
-                    startTime1 = System.nanoTime();
+                    startTime1 = System.currentTimeMillis();
                     Schedule output = assertTimeoutPreemptively(Duration.ofSeconds(TIMEOUT_SECONDS), scheduler::getBestSchedule);
-                    endTime1 = System.nanoTime();
+                    endTime1 = System.currentTimeMillis();
                     DFSSchedulerTime = endTime1 - startTime1;
                     output.checkValidity();
                     assertEquals(finalOptimalSolution, output.getOverallTime());
@@ -120,9 +120,9 @@ public class DirectoryAutoTest {
                     Graph graph = reader.readFile();
                     ParallelScheduler scheduler = new ParallelScheduler(graph, finalProcessors, true);
                     BranchAndBoundRecursiveAction.graph = graph;
-                    startTime2 = System.nanoTime();
+                    startTime2 = System.currentTimeMillis();
                     Schedule output = assertTimeoutPreemptively(Duration.ofSeconds(TIMEOUT_SECONDS), scheduler::getBestSchedule);
-                    endTime2 = System.nanoTime();
+                    endTime2 = System.currentTimeMillis();
                     ParallelSchedulerTime = endTime2 - startTime2;
                     output.checkValidity();
                     assertEquals(finalOptimalSolution, output.getOverallTime());
@@ -140,7 +140,7 @@ public class DirectoryAutoTest {
                     } else if (DFSSchedulerTime > ParallelSchedulerTime) {
                         paraCounter++;
                     } else {
-                        fail();
+                        System.out.println("Same time lol");
                     }
 
                     logger.info("DFS was better : " + dfsCounter + " times");
