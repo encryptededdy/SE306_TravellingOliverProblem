@@ -34,11 +34,11 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
         if (schedules.size() > SEQUENTIAL_THRESHOLD) {
 
             // Split Set
-            //TODO change this as inefficient, and may need better load balancing
             boolean setDirection = false;
-            PriorityQueue<Schedule> firstPartitionedQueue = new PriorityQueue<>();
-            PriorityQueue<Schedule> secondPartitionedQueue = new PriorityQueue<>();
+            Set<Schedule> firstPartitionedQueue = new HashSet<>();
+            Set<Schedule> secondPartitionedQueue = new HashSet<>();
 
+            // Split set into 2 equal chunks to pass to subtasks
             for (Schedule schedule : schedules) {
                 if (setDirection) {
                     firstPartitionedQueue.add(schedule);
@@ -49,12 +49,13 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
             }
             schedules.clear();
 
-            //Fork then join 2 tasks, recursively iterate until set is split fully
+            //Fork then join 2 tasks, recursively iterate until set is split fully, and then DFS on inner
             ForkJoinTask.invokeAll(
                     new BranchAndBoundRecursiveAction(firstPartitionedQueue, amountOfProcessors),
                     new BranchAndBoundRecursiveAction(secondPartitionedQueue, amountOfProcessors));
 
         } else {
+            // Actually run the scheduler
             processSchedule(schedules);
         }
     }
@@ -70,21 +71,24 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
         schedules.clear();
     }
 
+    //Run a schedule in the DFS scheduler, and either find a completed schedule, or more uncompleted schedules
     private void runDFSScheduler(Schedule currentSchedule) {
         DFSScheduler scheduler = new DFSScheduler(graph, amountOfProcessors, true);
         scheduler.setBestSchedule(bestSchedule);
         Schedule schedule = scheduler.calculateScheduleParallel(currentSchedule);
         Set<Schedule> unfinishedSchedules = scheduler.getUnfinishedSchedules();
+        branchesKilled.getAndAdd(scheduler.getBranchesKilled());
+        branchesConsidered.getAndAdd(scheduler.getBranchesConsidered());
+        branchesKilledDuplication.getAndAdd(scheduler.getBranchesKilledDuplication());
+
         if (unfinishedSchedules.size() > 0) {
             ForkJoinTask.invokeAll(new BranchAndBoundRecursiveAction(unfinishedSchedules, amountOfProcessors));
-            branchesKilled.getAndAdd(scheduler.getBranchesKilled());
-            branchesConsidered.getAndAdd(scheduler.getBranchesConsidered());
-            branchesKilledDuplication.getAndAdd(scheduler.getBranchesKilledDuplication());
             return;
         }
         getAndSetBestSchedule(schedule);
     }
 
+    //Return the best schedule
     public Schedule getBestSchedule() {
         return bestSchedule;
     }
