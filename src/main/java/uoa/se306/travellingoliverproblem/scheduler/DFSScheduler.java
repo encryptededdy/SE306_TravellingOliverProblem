@@ -11,7 +11,6 @@ import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -20,7 +19,6 @@ public class DFSScheduler extends Scheduler {
 
     // useEquivalentScheduleCulling always enabled.
     private boolean useExistingScheduleCleaner = true;
-    private boolean localDuplicateDetectionOnly = false;
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private long startTime;
 
@@ -76,7 +74,7 @@ public class DFSScheduler extends Scheduler {
                 // System.out.println("Found new best schedule: " + currentSchedule.getOverallTime());
                 bestSchedule = currentSchedule;
                 // Only run cleaner if it's been at least 5 seconds since we started, otherwise there's no point
-                if (!localDuplicateDetectionOnly && useExistingScheduleCleaner && System.currentTimeMillis() > startTime + 5000)
+                if (useExistingScheduleCleaner && System.currentTimeMillis() > startTime + 5000)
                     cleanExistingSchedules();
             }
             return;
@@ -129,14 +127,14 @@ public class DFSScheduler extends Scheduler {
                 if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
                     // Only continue if this schedule hasn't been considered before
                     MinimalSchedule minimal = new MinimalSchedule(candidate);
-                    if (!localDuplicateDetectionOnly && !isParallelised && !existingSchedules.contains(minimal)) {
+                    if (!isParallelised && !existingSchedules.contains(minimal)) {
                         if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
                         if (nodesList != null) {
                             calculateScheduleRecursive(candidate, nodesList);
                         } else {
                             calculateScheduleRecursive(candidate);
                         }
-                    } else if (!localDuplicateDetectionOnly && isParallelised && getQueueSize() < MAX_MEMORY && checkThenAddToQueue(minimal)) {
+                    } else if (isParallelised && checkThenAddToQueue(minimal)) {
                             recursiveIfNotParallel(candidate);
                     } else {
                         branchesKilled++; // drop this branch
@@ -174,21 +172,16 @@ public class DFSScheduler extends Scheduler {
                     }
                 }
             }
-            // used for local duplicate detection
-            Set<MinimalSchedule> consideredThisRound = new HashSet<>();
 
             while (!candidateSchedules.isEmpty()) {
                 Schedule candidate = candidateSchedules.poll();
                 if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
                     // Only continue if this schedule hasn't been considered before
                     MinimalSchedule minimal = new MinimalSchedule(candidate);
-                    if (localDuplicateDetectionOnly && !consideredThisRound.contains(minimal)) {
-                        consideredThisRound.add(minimal);
-                        recursiveIfNotParallel(candidate);
-                    } else if (!localDuplicateDetectionOnly && !isParallelised && !existingSchedules.contains(minimal)) {
+                    if (!isParallelised && !existingSchedules.contains(minimal)) {
                         if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
                             recursiveIfNotParallel(candidate);
-                    } else if (!localDuplicateDetectionOnly && isParallelised && checkThenAddToQueue(minimal)) {
+                    } else if (isParallelised && checkThenAddToQueue(minimal)) {
                         recursiveIfNotParallel(candidate);
                     } else {
                         branchesKilled++; // drop this branch
