@@ -14,6 +14,7 @@ public class ParallelScheduler extends Scheduler {
         BranchAndBoundRecursiveAction.graph = graph;
     }
 
+    //Runs the recursive action, to start the parallelisation, gives it 1 empty schedule
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
 //      HybridScheduler initialScheduler = new HybridScheduler(BranchAndBoundRecursiveAction.graph, amountOfProcessors, isParallelised, 1);
@@ -23,6 +24,7 @@ public class ParallelScheduler extends Scheduler {
         schedules.add(currentSchedule);
         BranchAndBoundRecursiveAction bab = new BranchAndBoundRecursiveAction(schedules, amountOfProcessors);
         bab.invoke();
+        // Check if an error occurred and that the recursive action completely correctly
         if (bab.isCompletedAbnormally()) {
             System.exit(1); // Bad
         }

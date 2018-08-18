@@ -184,6 +184,7 @@ public class DFSScheduler extends Scheduler {
         existingParallelSchedules.removeIf(filter);
     }
 
+    // Only to be used for testing purposes
     @Deprecated
     public static void reset() {
         existingParallelSchedules = new THashSet<>();

@@ -91,30 +91,38 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
     public Schedule getBestSchedule() {
         return bestSchedule;
     }
-    //Synchronised method to set bestSchedule
+
+    /*
+    Synchronised method to check if the given schedule is better than
+    the bestSchedule, if it is set bestSchedule
+     */
     private static synchronized void getAndSetBestSchedule(Schedule schedule) {
         if (bestSchedule == null || bestSchedule.getCost() > schedule.getCost()) {
             bestSchedule = schedule;
         }
     }
 
+    // Static method to get branches considered for all instances
     public static long getBranchesConsidered() {
         return branchesConsidered.get();
     }
 
+    // Static method to get branches killed that were duplicate for all instances
     public static long getBranchesKilledDuplication() {
         return branchesKilledDuplication.get();
     }
 
+    // Static method to get branches killed for all instances
     public static long getBranchesKilled() {
         return branchesKilled.get();
     }
 
+    // Static method to get the proportion of branches killed for all instances
     public static double proportionKilled() {
         return (double)branchesKilled.get()/(branchesConsidered.get()+branchesKilled.get());
     }
 
-    // Testing purposes
+    // Testing purposes, DO NOT USE
     @Deprecated
     public static void reset() {
         branchesKilled = new AtomicLong(0);
