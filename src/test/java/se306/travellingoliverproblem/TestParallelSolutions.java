@@ -18,31 +18,60 @@ public class TestParallelSolutions {
         forkJoinPool = new ForkJoinPool(4); // TODO, Doesnt work because of statics
         Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_20_Random.dot");
         for (int i = 0; i < 1000; i++) {
-            testParallelScheduler(inputGraph);
+            testParallelScheduler(inputGraph, 564);
         }
     }
 
     @Test
     public void testParallel20Graph1000Times3Threads() throws FileNotFoundException {
-        forkJoinPool = new ForkJoinPool(3); // TODO, Doesnt work because of statics
+        forkJoinPool = new ForkJoinPool(3);
         Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_20_Random.dot");
         for (int i = 0; i < 1000; i++) {
-            testParallelScheduler(inputGraph);
+            testParallelScheduler(inputGraph, 564);
         }
     }
 
     @Test
     public void testParallel20Graph1000Times2Threads() throws FileNotFoundException {
-        forkJoinPool = new ForkJoinPool(2); // TODO, Doesnt work because of
+        forkJoinPool = new ForkJoinPool(2);
         Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_20_Random.dot");
         for (int i = 0; i < 1000; i++) {
-            testParallelScheduler(inputGraph);
+            testParallelScheduler(inputGraph, 564);
         }
     }
 
-    private void testParallelScheduler(Graph inputGraph) {
+
+    @Test
+    public void test8Random2ProcessorsParallel10000Times4Threads() throws FileNotFoundException {
+        forkJoinPool = new ForkJoinPool(4);
+        Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_8_Random.dot");
+        for (int i = 0; i < 10000; i++) {
+            testParallelScheduler(inputGraph, 581);
+        }
+    }
+
+    @Test
+    public void test9SeriesParallel2ProcessorsParallel10000Times4Threads() throws FileNotFoundException {
+        forkJoinPool = new ForkJoinPool(4);
+        Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_9_SeriesParallel.dot");
+        for (int i = 0; i < 10000; i++) {
+            testParallelScheduler(inputGraph, 55);
+        }
+    }
+
+    @Test
+    public void test9SeriesParallel2ProcessorsParallel10000Times2Threads() throws FileNotFoundException {
+        forkJoinPool = new ForkJoinPool(2);
+        Graph inputGraph = TestOptimalSolutions.getGraphFromInput("Nodes_9_SeriesParallel.dot");
+        for (int i = 0; i < 10000; i++) {
+            testParallelScheduler(inputGraph, 55);
+        }
+    }
+
+    private void testParallelScheduler(Graph inputGraph, int optimalTime) {
         Scheduler parallelScheduler = new ParallelScheduler(inputGraph, 2, false, true);
-        TestOptimalSolutions.checkValidAndOptimal(parallelScheduler.getBestSchedule(), 564);
+        TestOptimalSolutions.checkValidAndOptimal(parallelScheduler.getBestSchedule(), optimalTime);
         BranchAndBoundRecursiveAction.reset();
     }
+
 }
