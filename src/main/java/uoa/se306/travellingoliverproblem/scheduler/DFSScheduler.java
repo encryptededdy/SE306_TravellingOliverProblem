@@ -126,7 +126,7 @@ public class DFSScheduler extends Scheduler {
                 if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
                     // Only continue if this schedule hasn't been considered before
                     MinimalSchedule minimal = new MinimalSchedule(candidate);
-                    if (!localDuplicateDetectionOnly && !existingSchedules.contains(minimal)) {
+                    if (!localDuplicateDetectionOnly && !isParallelised && !existingSchedules.contains(minimal)) {
                         if (existingSchedules.size() < 25000000) existingSchedules.add(minimal);
                         if (nodesList != null) {
                             calculateScheduleRecursive(candidate, nodesList);
@@ -177,7 +177,7 @@ public class DFSScheduler extends Scheduler {
                 if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
                     // Only continue if this schedule hasn't been considered before
                     MinimalSchedule minimal = new MinimalSchedule(candidate);
-                    if (localDuplicateDetectionOnly && !consideredThisRound.contains(minimal)) {
+                    if (localDuplicateDetectionOnly && !isParallelised && !consideredThisRound.contains(minimal)) {
                         consideredThisRound.add(minimal);
                         recursiveIfNotParallel(candidate);
                     } else if (!localDuplicateDetectionOnly && !isParallelised && !existingSchedules.contains(minimal)) {

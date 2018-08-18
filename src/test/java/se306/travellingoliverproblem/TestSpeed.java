@@ -14,13 +14,17 @@ import uoa.se306.travellingoliverproblem.scheduler.parallel.BranchAndBoundRecurs
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.concurrent.ForkJoinPool;
+import java.util.logging.Logger;
 
 import static se306.travellingoliverproblem.TestOptimalSolutions.getGraphFromInput;
 
 public class TestSpeed {
 
+    private Logger logger;
+
     @Before
     public void setUpParallelisation() {
+        logger = Logger.getAnonymousLogger();
         new ForkJoinPool(4);
     }
 
@@ -71,11 +75,11 @@ public class TestSpeed {
         BranchAndBoundRecursiveAction.reset();
 
         if (DFSSchedulerTime > AStarSchedulerTime && DFSSchedulerTime > ParallelSchedulerTime) {
-            System.out.println("AStar was faster on " + amtOfProcessors + " processors for " + fileName);
+            logger.info("AStar was faster on " + amtOfProcessors + " processors for " + fileName);
         } else if (AStarSchedulerTime > ParallelSchedulerTime){
-            System.out.println("DFS was faster on " + amtOfProcessors + " processors for " + fileName);
+            logger.info("DFS was faster on " + amtOfProcessors + " processors for " + fileName);
         } else {
-            System.out.println("Parallel was faster on " + amtOfProcessors + " processors for " + fileName);
+            logger.info("Parallel was faster on " + amtOfProcessors + " processors for " + fileName);
         }
     }
 }

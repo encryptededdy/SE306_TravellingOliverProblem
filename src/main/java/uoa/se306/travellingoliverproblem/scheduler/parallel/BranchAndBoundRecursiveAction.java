@@ -22,8 +22,6 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
     private static AtomicLong branchesConsidered = new AtomicLong(0);
     private static AtomicLong branchesKilled = new AtomicLong(0);
 
-    //TODO research creating a queue
-
     //Initial scheduler task
     public BranchAndBoundRecursiveAction(Collection<Schedule> schedules, int amountOfProcessors) {
         this.schedules = schedules;

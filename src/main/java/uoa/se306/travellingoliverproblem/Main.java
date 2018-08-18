@@ -17,9 +17,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.concurrent.ForkJoinPool;
+import java.util.logging.Logger;
 
 public class Main extends Application {
-
     private static ForkJoinPool forkJoinPool;
     private static FXController controller;
     private static Graph inputGraph;

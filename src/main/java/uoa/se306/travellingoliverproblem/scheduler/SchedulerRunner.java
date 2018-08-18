@@ -50,7 +50,7 @@ public class SchedulerRunner {
         scheduleThread.start();
     }
 
-    public Task<Void> startSchedulerJavaFXTask(Graph inputGraph, int noProcessors, boolean isParallelised) {//TODO Probably needs fixing
+    public Task<Void> startSchedulerJavaFXTask(Graph inputGraph, int noProcessors, boolean isParallelised) {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
