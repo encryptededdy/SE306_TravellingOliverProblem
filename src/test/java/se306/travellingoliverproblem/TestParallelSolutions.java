@@ -57,9 +57,9 @@ public class TestParallelSolutions {
     }
 
     static void testParallelScheduler(Graph inputGraph, int optimalTime) {
+        BranchAndBoundRecursiveAction.reset();
         Scheduler parallelScheduler = new ParallelScheduler(inputGraph, 2, false, true);
         TestOptimalSolutions.checkValidAndOptimal(parallelScheduler.getBestSchedule(), optimalTime);
-        BranchAndBoundRecursiveAction.reset();
     }
 
 }

@@ -95,7 +95,7 @@ public class BranchAndBoundRecursiveAction extends RecursiveAction {
     the bestSchedule, if it is set bestSchedule
      */
     private static synchronized void getAndSetBestSchedule(Schedule schedule) {
-        if (bestSchedule == null || bestSchedule.getCost() > schedule.getCost()) {
+        if (bestSchedule == null ||  (schedule != null && bestSchedule.getCost() > schedule.getCost())) {
             bestSchedule = schedule;
         }
     }
