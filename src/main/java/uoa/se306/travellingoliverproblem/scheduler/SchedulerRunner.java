@@ -28,11 +28,11 @@ public class SchedulerRunner {
     private SchedulerRunner() {
     }
 
-    public void startScheduler(Graph inputGraph, int noProcessors, boolean isParallelised) {
+    public void startScheduler(Graph inputGraph, int noProcessors, boolean isParallelised, SchedulerType type) {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
-        scheduler = autoPickScheduler(inputGraph, noProcessors, isParallelised);
+        scheduler = autoPickScheduler(inputGraph, noProcessors, isParallelised, type);
 
         // create task to run on a separate thread
         Runnable scheduleTask = () -> {
@@ -50,11 +50,11 @@ public class SchedulerRunner {
         scheduleThread.start();
     }
 
-    public Task<Void> startSchedulerJavaFXTask(Graph inputGraph, int noProcessors, boolean isParallelised) {
+    public Task<Void> startSchedulerJavaFXTask(Graph inputGraph, int noProcessors, boolean isParallelised, SchedulerType type) {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
-        scheduler = autoPickScheduler(inputGraph, noProcessors, isParallelised);
+        scheduler = autoPickScheduler(inputGraph, noProcessors, isParallelised, type);
 
         // create task to run on a separate thread
         return new Task<Void>() {
@@ -86,21 +86,32 @@ public class SchedulerRunner {
                 scheduler.proportionKilled()*100);
     }
 
-    private Scheduler autoPickScheduler(Graph inputGraph, int noProcessors, boolean isParallelised) {
+    private Scheduler autoPickScheduler(Graph inputGraph, int noProcessors, boolean isParallelised, SchedulerType type) {
         if (isParallelised) {
             // ForkJoinPool has already set up the number of threads to run
             System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using DFS/BnB Parallel scheduling algorithm");
             return new ParallelScheduler(inputGraph, noProcessors, false, isParallelised);
         } else {
-            if (inputGraph.getAllNodes().size() < 10 && !inputGraph.getAllNodes().stream().allMatch(Node::isIndependent)) {
+            if (type != null) {
+                switch (type) {
+                    case ASTAR:
+                        System.out.println("Using A* Scheduler");
+                        return new AStarSearchScheduler(inputGraph, noProcessors, isParallelised);
+                    case DFS:
+                        System.out.println("Using DFS Scheduler");
+                        return new DFSScheduler(inputGraph, noProcessors, isParallelised);
+                    case HYBRID:
+                        System.out.println("Using Hybrid Scheduler (BETA). Note that Visualisation is not supported in this mode.");
+                        return new HybridScheduler(inputGraph, noProcessors, isParallelised, 1000);
+                    default:
+                        return new DFSScheduler(inputGraph, noProcessors, isParallelised);
+                }
+            } else if (inputGraph.getAllNodes().size() < 10 && !inputGraph.getAllNodes().stream().allMatch(Node::isIndependent)) {
                 System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using A* scheduling algorithm");
                 return new AStarSearchScheduler(inputGraph, noProcessors, isParallelised);
-            } else if (inputGraph.getAllNodes().size() < 14 || inputGraph.getAllNodes().stream().allMatch(Node::isIndependent)) {
+            } else {
                 System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using DFS/BnB scheduling algorithm");
                 return new DFSScheduler(inputGraph, noProcessors, isParallelised);
-            } else {
-                System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using A*/BnB hybrid scheduling algorithm");
-                return new HybridScheduler(inputGraph, noProcessors, isParallelised, 1000);
             }
         }
     }

@@ -10,17 +10,19 @@ import uoa.se306.travellingoliverproblem.fileIO.DotReader;
 import uoa.se306.travellingoliverproblem.fileIO.GraphFileReader;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.scheduler.SchedulerRunner;
+import uoa.se306.travellingoliverproblem.scheduler.SchedulerType;
 import uoa.se306.travellingoliverproblem.visualiser.FXController;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.concurrent.ForkJoinPool;
 
 public class Main extends Application {
+
     private static ForkJoinPool forkJoinPool;
-    private static FXController controller;
+    private static SchedulerType schedulerType;
     private static Graph inputGraph;
     private static int processors = 1;
     private static boolean isParallelised = false;
@@ -31,8 +33,8 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/layout.fxml"));
         Parent root = loader.load();
-        controller = loader.getController();
-        controller.startProcessing(inputGraph, processors, isParallelised, outputFileName);
+        FXController controller = loader.getController();
+        controller.startProcessing(inputGraph, processors, isParallelised, outputFileName, schedulerType);
         primaryStage.setTitle("Visualisation");
         primaryStage.setResizable(false);
         primaryStage.setScene(new Scene(root, 1200, 850));
@@ -42,7 +44,7 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         long totalStartTime = System.currentTimeMillis();
-        int numOfCores = 1; //default 1 means that the code will run in sequential
+        int numOfThreads = 1; //default 1 means that the code will run in sequential
         boolean useVisuals = false;
 
         System.out.println("The Travelling Oliver Problem scheduler uses various open-source libraries, the licenses for which are distributed with this application.\n" +
@@ -64,12 +66,13 @@ public class Main extends Application {
                     System.out.println("-v --visualisation          Enables GUI visuals.");
                     System.out.println("-p --parallel [INTEGER]     The amount of cores to use for execution in parallel.");
                     System.out.println("-o --output [STRING]        Specifies the name for the output file.");
+                    System.out.println("-s --scheduler [STRING]     Specifies the scheduler type to use (AStar, DFS, Hybrid)  (default: Auto pick).");
                     System.exit(0);
                 case "-l":
                 case "--license":
                     // Print licenses
                     try {
-                        BufferedReader reader = new BufferedReader(new FileReader(Main.class.getResource("/LICENSES.txt").getFile()));
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("/TOP_LICENSES.txt")));
                         String line = reader.readLine();
                         while (line != null) {
                             System.out.println(line);
@@ -78,6 +81,7 @@ public class Main extends Application {
                         reader.close();
                     } catch (IOException e) {
                         System.err.println("Couldn't find license file!");
+                        e.printStackTrace();
                     }
                     System.exit(0);
                 default:
@@ -122,13 +126,18 @@ public class Main extends Application {
                     switch (temp) {
                         case "-p":
                         case "--parallel":
-                            numOfCores = Integer.parseInt(args[i + 1]);//will throw NumberFormatException if cant convert
-                            if (numOfCores > 1) {
-                                // Set up fork join pool to have numOfCores threads
-                                forkJoinPool = new ForkJoinPool(numOfCores, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null ,true);
-                                isParallelised = true;
+                            try {
+                                numOfThreads = Integer.parseInt(args[i + 1]);//will throw NumberFormatException if cant convert
+                                if (numOfThreads > 1) {
+                                    // Set up fork join pool to have numOfCores threads
+                                    forkJoinPool = new ForkJoinPool(numOfThreads, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null ,true);
+                                    isParallelised = true;
+                                }
+                            } catch (NumberFormatException e) {
+                                System.err.println("Invalid number of threads.\nType -h or --help for help.");
+                                System.exit(1);
                             }
-                            i = i + 1;
+                            i++;
                             break;
                         case "-v":
                         case "--visualisation":
@@ -137,7 +146,18 @@ public class Main extends Application {
                         case "-o":
                         case "--output":
                             outputFileName = args[i + 1] + ".dot";
-                            i = i + 1;
+                            i++;
+                            break;
+                        case "-s":
+                        case "--scheduler":
+                            String typeString = args[i + 1].toUpperCase();
+                            i++;
+                            try {
+                                schedulerType = SchedulerType.valueOf(typeString);
+                            } catch (IllegalArgumentException e) {
+                                System.err.println("Invalid scheduler type.\nType -h or --help for help.");
+                                System.exit(1);
+                            }
                             break;
                         default:
                             System.err.println("Invalid optional argument(s).\nType -h or --help for help.");
@@ -149,14 +169,14 @@ public class Main extends Application {
             //Testing purposes
             System.out.println("Read graph with " + inputGraph.getStartingNodes().size() + " starting nodes");
             System.out.println("Number of processors to schedule: " + Integer.toString(processors));
-            System.out.println("Number of threads to use: " + Integer.toString(numOfCores));
+            System.out.println("Number of threads to use: " + Integer.toString(numOfThreads));
             System.out.println("The output file name will be: " + outputFileName);
             System.out.println();
 
             if (useVisuals) {
                 launch();
             } else {
-                SchedulerRunner.getInstance().startScheduler(inputGraph, processors, isParallelised);
+                SchedulerRunner.getInstance().startScheduler(inputGraph, processors, isParallelised, schedulerType);
                 final String tempOutputFileName = outputFileName;
                 // run the following after the scheduler has finished.
                 SchedulerRunner.getInstance().setThreadListener(() -> {
