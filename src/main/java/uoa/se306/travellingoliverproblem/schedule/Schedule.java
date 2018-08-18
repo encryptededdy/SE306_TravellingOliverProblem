@@ -285,6 +285,10 @@ public class Schedule implements Comparable<Schedule> {
         }
     }
 
+    public void setUseDFSCostFunction(boolean useDFSCostFunction) {
+        this.useDFSCostFunction = useDFSCostFunction;
+    }
+
     @Override
     public int compareTo(Schedule otherSchedule) {
         //System.out.println("this cost: " + cost + " that cost: "+ otherSchedule.getCost());

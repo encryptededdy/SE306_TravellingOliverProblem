@@ -33,7 +33,7 @@ public abstract class Scheduler {
     // Template method pattern
     public Schedule getBestSchedule() {
         calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes(), useDFSCostFunction));
-        bestSchedule.checkValidity();
+        //bestSchedule.checkValidity();
         return bestSchedule;
     }
 
