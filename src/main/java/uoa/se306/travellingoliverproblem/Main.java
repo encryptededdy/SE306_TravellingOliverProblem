@@ -127,11 +127,13 @@ public class Main extends Application {
                         case "-p":
                         case "--parallel":
                             try {
-                                numOfThreads = Integer.parseInt(args[i + 1]);//will throw NumberFormatException if cant convert
-                                if (numOfThreads > 1) {
-                                    // Set up fork join pool to have numOfCores threads
-                                    forkJoinPool = new ForkJoinPool(numOfThreads, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null ,true);
-                                    isParallelised = true;
+                                if (args.length > i + 1) {
+                                    numOfThreads = Integer.parseInt(args[i + 1]);//will throw NumberFormatException if cant convert
+                                    if (numOfThreads > 1) {
+                                        // Set up fork join pool to have numOfCores threads
+                                        forkJoinPool = new ForkJoinPool(numOfThreads, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true);
+                                        isParallelised = true;
+                                    }
                                 }
                             } catch (NumberFormatException e) {
                                 System.err.println("Invalid number of threads.\nType -h or --help for help.");
@@ -145,12 +147,17 @@ public class Main extends Application {
                             break;
                         case "-o":
                         case "--output":
-                            outputFileName = args[i + 1] + ".dot";
+                            if (args.length > i + 1) {
+                                outputFileName = args[i + 1] + ".dot";
+                            }
                             i++;
                             break;
                         case "-s":
                         case "--scheduler":
-                            String typeString = args[i + 1].toUpperCase();
+                            String typeString = "";
+                            if (args.length > i + 1) {
+                                typeString = args[i + 1].toUpperCase();
+                            }
                             i++;
                             try {
                                 schedulerType = SchedulerType.valueOf(typeString);
