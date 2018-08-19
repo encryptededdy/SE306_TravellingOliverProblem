@@ -22,7 +22,7 @@ import java.util.concurrent.ForkJoinPool;
 
 public class Main extends Application {
 
-    private static ForkJoinPool forkJoinPool;
+    public static ForkJoinPool forkJoinPool;
     private static SchedulerType schedulerType;
     private static Graph inputGraph;
     private static int processors = 1;

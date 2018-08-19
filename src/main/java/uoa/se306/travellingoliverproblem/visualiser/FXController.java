@@ -17,6 +17,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import uoa.se306.travellingoliverproblem.Main;
 import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
@@ -51,6 +52,9 @@ public class FXController {
     private Text scheduleTitleText;
 
     @FXML
+    private Text scheduleStatusText;
+
+    @FXML
     private ScrollPane graphScrollPane;
 
     private Map<Node, GraphNode> graphNodeMap;
@@ -70,6 +74,7 @@ public class FXController {
         Task<Void> task = SchedulerRunner.getInstance().startSchedulerJavaFXTask(inputGraph, processors, isParallelised, type);
         drawGraph(SchedulerRunner.getInstance().getInputGraph());
         startTime = System.currentTimeMillis();
+        scheduleStatusText.setText(String.format("Scheduling %s onto %s processors, on %s thread(s)", inputGraph.getGraphName(), processors, (Main.forkJoinPool.getPoolSize() == 0) ? 1 : Main.forkJoinPool.getPoolSize()));
         task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent event) {
