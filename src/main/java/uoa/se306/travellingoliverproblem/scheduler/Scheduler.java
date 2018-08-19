@@ -16,14 +16,16 @@ public abstract class Scheduler {
 
     public static int COMPUTATIONAL_LOAD;
 
+    boolean isParallelised;
     long branchesConsidered = 0;
     long branchesKilled = 0;
     long branchesKilledDuplication = 0;
     private boolean useDFSCostFunction;
 
     // constructor to initialize the input graph and the amount of processors to use
-    Scheduler(Graph graph, int amountOfProcessors, boolean useDFSCostFunction) {
+    Scheduler(Graph graph, int amountOfProcessors, boolean useDFSCostFunction, boolean isParallelised) {
         this.useDFSCostFunction = useDFSCostFunction;
+        this.isParallelised = isParallelised;
         this.graph = graph;
         COMPUTATIONAL_LOAD = graph.getComputationalLoad();
         this.amountOfProcessors = amountOfProcessors;
@@ -33,6 +35,9 @@ public abstract class Scheduler {
         return bestSchedule;
     }
 
+    public void setBestSchedule(Schedule bestSchedule) {
+        this.bestSchedule = bestSchedule;
+    }
     // Initial call to the recursive function, returns a Schedule object
     // Template method pattern
     public Schedule getBestSchedule() {

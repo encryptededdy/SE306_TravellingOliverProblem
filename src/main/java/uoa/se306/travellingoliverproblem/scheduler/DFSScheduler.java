@@ -3,42 +3,62 @@ package uoa.se306.travellingoliverproblem.scheduler;
 import gnu.trove.set.hash.THashSet;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
+import uoa.se306.travellingoliverproblem.graph.NodeComparator;
+import uoa.se306.travellingoliverproblem.graph.NodeCostComparator;
 import uoa.se306.travellingoliverproblem.schedule.MinimalSchedule;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
-import uoa.se306.travellingoliverproblem.graph.NodeComparator;
-import uoa.se306.travellingoliverproblem.graph.NodeCostComparator;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.function.Predicate;
 
 public class DFSScheduler extends Scheduler {
 
     // useEquivalentScheduleCulling always enabled.
     private boolean useExistingScheduleCleaner = true;
-    private boolean localDuplicateDetectionOnly = false;
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private long startTime;
 
-    private static final int MAX_MEMORY = 20000000;
+    // For Parallel
+    private static Set<MinimalSchedule> existingParallelSchedules = new THashSet<>();
+    private PriorityQueue<Schedule> unfinishedSchedules = new PriorityQueue<>();
 
-    public DFSScheduler(Graph graph, int amountOfProcessors) {
-        super(graph, amountOfProcessors, true);
+    private static final int MAX_MEMORY = 20000000; // Max number of existing schedules to store in HashSet
+    
+    public DFSScheduler(Graph graph, int amountOfProcessors, boolean IsParallelised) {
+        super(graph, amountOfProcessors, true, IsParallelised);
     }
 
     @Override
-    protected void calculateSchedule(Schedule currentSchedule) {
+    public void calculateSchedule(Schedule currentSchedule) {
         startTime = System.currentTimeMillis();
         calculateScheduleRecursive(currentSchedule);
     }
 
+    public Schedule calculateScheduleParallel(Schedule currentSchedule) {
+        startTime = System.currentTimeMillis();
+        calculateScheduleRecursive(currentSchedule);
+        return bestSchedule;
+    }
+
     private void cleanExistingSchedules() {
         long startTime = System.nanoTime();
-        int previousSize = existingSchedules.size();
-        existingSchedules.removeIf(minimalSchedule -> minimalSchedule.getCost() >= bestSchedule.getCost());
-        int cleaned = previousSize - existingSchedules.size();
+        int cleaned;
+        int previousSize;
+        if (isParallelised) {
+            previousSize = getQueueSize();
+            removeIfQueue(minimalSchedule -> minimalSchedule.getCost() >= bestSchedule.getCost());
+            cleaned = previousSize - getQueueSize();
+        } else {
+            previousSize = existingSchedules.size();
+            existingSchedules.removeIf(minimalSchedule -> minimalSchedule.getCost() >= bestSchedule.getCost());
+            cleaned = previousSize - existingSchedules.size();
+        }
         long endTime = System.nanoTime();
-        System.out.println("Cleaning Took " + (endTime - startTime) / 1000000 + " ms, cleaned " + cleaned + " entries (" + (cleaned * 100 / previousSize) + "%)");
+        // System.out.println("Cleaning Took " + (endTime - startTime) / 1000000 + " ms, cleaned " + cleaned + " entries (" + (cleaned * 100 / previousSize) + "%)");
     }
 
     private void calculateScheduleRecursive(Schedule currentSchedule) {
@@ -51,10 +71,10 @@ public class DFSScheduler extends Scheduler {
         if (currentSchedule.getAvailableNodes().isEmpty()) {
             // If our bestSchedule is null or the overall time for the bestSchedule is less than our current schedule
             if (bestSchedule == null || bestSchedule.getCost() > currentSchedule.getCost()) {
-                System.out.println("Found new best schedule: " + currentSchedule.getOverallTime());
+                // System.out.println("Found new best schedule: " + currentSchedule.getOverallTime());
                 bestSchedule = currentSchedule;
                 // Only run cleaner if it's been at least 5 seconds since we started, otherwise there's no point
-                if (!localDuplicateDetectionOnly && useExistingScheduleCleaner && System.currentTimeMillis() > startTime + 5000)
+                if (useExistingScheduleCleaner && System.currentTimeMillis() > startTime + 5000)
                     cleanExistingSchedules();
             }
             return;
@@ -95,7 +115,14 @@ public class DFSScheduler extends Scheduler {
                 // Only continue if sub-schedule time is under upper bound
                 // i.e. skip this branch if its overall time is already longer than the currently known best overall time
                 if (bestSchedule == null || tempSchedule.getCost() < bestSchedule.getCost()) {
-                    candidateSchedules.add(tempSchedule);
+                    if (isParallelised && checkThenAddToQueue(new MinimalSchedule(tempSchedule))) {
+                        recursiveIfNotParallel(tempSchedule);
+                    } else if (isParallelised) {
+                        branchesKilled++;
+                        branchesKilledDuplication++;
+                    } else {
+                        candidateSchedules.add(tempSchedule);
+                    }
                 } else {
                     // drop this branch, because this partial schedule is guaranteed to be worse than what we currently have, based on overallTime
                     branchesKilled++;
@@ -107,13 +134,15 @@ public class DFSScheduler extends Scheduler {
                 if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
                     // Only continue if this schedule hasn't been considered before
                     MinimalSchedule minimal = new MinimalSchedule(candidate);
-                    if (!localDuplicateDetectionOnly && !existingSchedules.contains(minimal)) {
-                        if (existingSchedules.size() < 25000000) existingSchedules.add(minimal);
+                    if (!isParallelised && !existingSchedules.contains(minimal)) {
+                        if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
                         if (nodesList != null) {
                             calculateScheduleRecursive(candidate, nodesList);
                         } else {
                             calculateScheduleRecursive(candidate);
                         }
+                    } else if (isParallelised && checkThenAddToQueue(minimal)) {
+                            recursiveIfNotParallel(candidate);
                     } else {
                         branchesKilled++; // drop this branch
                         branchesKilledDuplication++;
@@ -143,27 +172,30 @@ public class DFSScheduler extends Scheduler {
                     // Only continue if sub-schedule time is under upper bound
                     // i.e. skip this branch if its overall time is already longer than the currently known best overall time
                     if (bestSchedule == null || tempSchedule.getCost() < bestSchedule.getCost()) {
-                        candidateSchedules.add(tempSchedule);
+                        if (isParallelised && checkThenAddToQueue(new MinimalSchedule(tempSchedule))) {
+                            recursiveIfNotParallel(tempSchedule);
+                        } else if (isParallelised) {
+                            branchesKilled++;
+                            branchesKilledDuplication++;
+                        } else {
+                            candidateSchedules.add(tempSchedule);
+                        }
                     } else {
                         // drop this branch, because this partial schedule is guaranteed to be worse than what we currently have, based on overallTime
                         branchesKilled++;
                     }
                 }
             }
-            // used for local duplicate detection
-            Set<MinimalSchedule> consideredThisRound = new HashSet<>();
 
+            // If parallelised, this branch won't be entered.
             while (!candidateSchedules.isEmpty()) {
                 Schedule candidate = candidateSchedules.poll();
                 if (bestSchedule == null || candidate.getCost() < bestSchedule.getCost()) {
                     // Only continue if this schedule hasn't been considered before
                     MinimalSchedule minimal = new MinimalSchedule(candidate);
-                    if (localDuplicateDetectionOnly && !consideredThisRound.contains(minimal)) {
-                        consideredThisRound.add(minimal);
-                        calculateScheduleRecursive(candidate);
-                    } else if (!localDuplicateDetectionOnly && !existingSchedules.contains(minimal)) {
-                        if (existingSchedules.size() < 25000000) existingSchedules.add(minimal);
-                        calculateScheduleRecursive(candidate);
+                    if (!existingSchedules.contains(minimal)) {
+                        if (existingSchedules.size() < MAX_MEMORY) existingSchedules.add(minimal);
+                            recursiveIfNotParallel(candidate);
                     } else {
                         branchesKilled++; // drop this branch
                         branchesKilledDuplication++;
@@ -174,6 +206,46 @@ public class DFSScheduler extends Scheduler {
                 }
             }
         }
+    }
+
+    private void recursiveIfNotParallel(Schedule schedule) {
+        if (isParallelised) {
+            unfinishedSchedules.add(schedule);
+        } else {
+            calculateScheduleRecursive(schedule);
+        }
+    }
+
+    public PriorityQueue<Schedule> getUnfinishedSchedules() {
+        return unfinishedSchedules;
+    }
+
+    // Check if minimum schedule is in the queue, if it isnt add it, else dont
+    private static synchronized boolean checkThenAddToQueue(MinimalSchedule mSchedule) {
+        // Contains first as add is more expensive
+        if (!existingParallelSchedules.contains(mSchedule)) {
+            if (existingParallelSchedules.size() < MAX_MEMORY) {
+                existingParallelSchedules.add(mSchedule);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    //Get the queue size concurrently to ensure values are correct at the time
+    private static synchronized int getQueueSize() {
+        return existingParallelSchedules.size();
+    }
+
+    //Remove from queue based on a predicate input (Usually checking for larger schedules)
+    private static synchronized void removeIfQueue(Predicate<MinimalSchedule> filter) {
+        existingParallelSchedules.removeIf(filter);
+    }
+
+    // Only to be used for testing purposes
+    @Deprecated
+    public static void reset() {
+        existingParallelSchedules = new THashSet<>();
     }
 
     /*
