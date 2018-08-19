@@ -20,18 +20,19 @@ public class HybridScheduler extends Scheduler {
     private Set<MinimalSchedule> existingSchedules = new THashSet<>();
     private PriorityQueue<Schedule> candidateSchedules = new PriorityQueue<>();
     private PriorityQueue<Schedule> readySchedules = new PriorityQueue<>();
+    private int hybridMaxSize;
 
     private static final int HYBRID_MAX_DEPTH = 4;
-    private static final int HYBRID_MAX_SIZE = 500000;
     private static final boolean USE_DEPTH_LIMIT = false;
 
-    public HybridScheduler(Graph graph, int amountOfProcessors) {
-        super(graph, amountOfProcessors, false);
+    public HybridScheduler(Graph graph, int amountOfProcessors, boolean isParallelised, int maxSize) {
+        super(graph, amountOfProcessors, false, isParallelised);
+        this.hybridMaxSize = maxSize;
     }
 
     @Override
     protected void calculateSchedule(Schedule currentSchedule) {
-        System.out.println("Hybrid config: MAX_DEPTH = " + HYBRID_MAX_DEPTH + ", MAX_SIZE = " + HYBRID_MAX_SIZE + ", USE_DEPTH_LIMIT = " + USE_DEPTH_LIMIT);
+        System.out.println("Hybrid config: MAX_DEPTH = " + HYBRID_MAX_DEPTH + ", MAX_SIZE = " + hybridMaxSize + ", USE_DEPTH_LIMIT = " + USE_DEPTH_LIMIT);
         solveAStar(currentSchedule);
     }
 
@@ -44,13 +45,17 @@ public class HybridScheduler extends Scheduler {
 
             // if it's empty, then it's time to switch to DFS!
             if (USE_DEPTH_LIMIT && candidateSchedules.isEmpty()) {
-                existingSchedules = null; // clear ExistingSchedules from Memory
-                beginDFS();
+                existingSchedules = null;// clear ExistingSchedules from Memory
+                if (!isParallelised) {
+                    beginDFS();
+                }
                 break;
-            } else if (!USE_DEPTH_LIMIT && candidateSchedules.size() > HYBRID_MAX_SIZE) {
+            } else if (!USE_DEPTH_LIMIT && candidateSchedules.size() > hybridMaxSize) {
                 existingSchedules = null; // clear ExistingSchedules from Memory
                 readySchedules = candidateSchedules;
-                beginDFS();
+                if (!isParallelised) {
+                    beginDFS();
+                }
                 break;
             }
 
@@ -118,14 +123,17 @@ public class HybridScheduler extends Scheduler {
         }
     }
 
+    // Move all current schedules to run on DFSScheduler until finished
     private void beginDFS() {
         System.out.println("Switching to DFS from A*");
+        System.out.println(readySchedules.size());
         while (!readySchedules.isEmpty()) {
             Schedule schedule = readySchedules.poll();
+            schedule.setUseDFSCostFunction(true);
             if (bestSchedule == null || schedule.getCost() < bestSchedule.getCost()) {
-                DFSScheduler scheduler = new DFSScheduler(graph, amountOfProcessors);
+                DFSScheduler scheduler = new DFSScheduler(graph, amountOfProcessors, isParallelised);
                 scheduler.bestSchedule = bestSchedule;
-                System.out.println("Computing Schedule... " + (readySchedules.size() + 1) + " remaining, size " + (graph.getAllNodes().size() - schedule.getUnAddedNodes().size()));
+                //System.out.println("Computing Schedule... " + (readySchedules.size() + 1) + " remaining, size " + (graph.getAllNodes().size() - schedule.getUnAddedNodes().size()));
                 scheduler.calculateSchedule(schedule);
                 if (bestSchedule == null || bestSchedule.getOverallTime() > scheduler.getBestSchedule().getOverallTime()) {
                     bestSchedule = scheduler.getBestSchedule();
@@ -135,5 +143,10 @@ public class HybridScheduler extends Scheduler {
                 break; // It's a priority queue, so we don't need to see anymore.
             }
         }
+    }
+
+    // For parallelisation
+    public PriorityQueue<Schedule> getSchedules() {
+        return readySchedules;
     }
 }

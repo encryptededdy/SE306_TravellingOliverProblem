@@ -23,6 +23,7 @@ import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.SchedulerRunner;
+import uoa.se306.travellingoliverproblem.visualiser.graph.GraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
 import uoa.se306.travellingoliverproblem.visualiser.graph.SequentialGraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.schedule.ScheduleDrawer;
@@ -46,13 +47,7 @@ public class FXController {
     private GridPane tilesGrid;
 
     @FXML
-    private Pane statusPane;
-
-    @FXML
-    private Text scheduleTitleText;
-
-    @FXML
-    private ScrollPane graphScrollPane;
+    private Text statusText;
 
     private Map<Node, GraphNode> graphNodeMap;
     private Timeline pollingTimeline;
@@ -60,7 +55,7 @@ public class FXController {
     private long lastBranches = 0;
     private Schedule lastSchedule;
     long startTime;
-    private Text statusText;
+    private GridPane statusPane;
     private ColourScheme paleChristmas = new ColourScheme("#fceade", "#f48b94", "#f7a7a6", "#ffffff", "#acdbc9", "#dbebc2", "#ffffff");
 
 
@@ -80,7 +75,6 @@ public class FXController {
                 timerTimeline.stop();
                 long endTime = System.currentTimeMillis();
                 statusText.setText("Done, took " + (endTime - startTime) + " ms");
-                statusPane.setStyle("-fx-background-color: green;");
                 pollingTimeline.setCycleCount(1);
                 pollingTimeline.playFromStart();
                 SchedulerRunner.getInstance().printResult();
@@ -115,8 +109,8 @@ public class FXController {
         // Setup tiles
 
         /* STATUS PANE CODE */
-        GridPane statusPane = new GridPane();
-        statusPane.setGridLinesVisible(true);
+        statusPane = new GridPane();
+        //statusPane.setGridLinesVisible(true);
         statusPane.setMinSize(480, 230);
         statusPane.setPrefSize(480, 230);
         statusPane.setMaxSize(480, 230);
@@ -125,34 +119,34 @@ public class FXController {
         GridPane.setConstraints(statusPane, 0, 0, 2, 1);
 
         Text statusTextLabel = new Text("Status: ");
-        GridPane.setConstraints(statusTextLabel, 0,0);
-        Text statusText = new Text("Starting up...");
-        GridPane.setConstraints(statusText, 1,0);
+        GridPane.setConstraints(statusTextLabel, 0,1);
+        statusText = new Text("Starting up...");
+        GridPane.setConstraints(statusText, 1,1);
 
         Text branchRateTextLabel = new Text("Branches/sec: ");
-        GridPane.setConstraints(branchRateTextLabel, 0,1);
+        GridPane.setConstraints(branchRateTextLabel, 0,2);
         Text branchRateText = new Text("0");
-        GridPane.setConstraints(branchRateText, 1,1);
+        GridPane.setConstraints(branchRateText, 1,2);
 
         Text memoryUsageTextLabel = new Text("Memory Usage: ");
-        GridPane.setConstraints(memoryUsageTextLabel, 0,2);
+        GridPane.setConstraints(memoryUsageTextLabel, 0,3);
         Text memoryUsageText = new Text("0 MB");
-        GridPane.setConstraints(memoryUsageText, 1,2);
+        GridPane.setConstraints(memoryUsageText, 1,3);
 
         Text branchesConsideredTextLabel = new Text("Branches Considered: ");
-        GridPane.setConstraints(branchesConsideredTextLabel, 0,3);
+        GridPane.setConstraints(branchesConsideredTextLabel, 0,4);
         Text branchesConsideredText = new Text("0 Branches");
-        GridPane.setConstraints(branchesConsideredText, 1,3);
+        GridPane.setConstraints(branchesConsideredText, 1,4);
 
         Text fileNameTextLabel = new Text("Filename: ");
-        GridPane.setConstraints(fileNameTextLabel, 0,4);
+        GridPane.setConstraints(fileNameTextLabel, 0,5);
         Text fileNameText = new Text();
-        GridPane.setConstraints(fileNameText, 1,4);
+        GridPane.setConstraints(fileNameText, 1,5);
 
         Text threadsTextLabel = new Text("Number of Threads: ");
-        GridPane.setConstraints(threadsTextLabel, 0,5);
+        GridPane.setConstraints(threadsTextLabel, 0,6);
         Text threadsText = new Text();
-        GridPane.setConstraints(threadsText, 1,5);
+        GridPane.setConstraints(threadsText, 1,6);
 
         ArrayList<Text> statusTexts = new ArrayList<>();
         statusTexts.add(statusTextLabel);
@@ -170,9 +164,11 @@ public class FXController {
 
         statusTexts.forEach(text -> {
             text.setFont(new Font("Roboto", 18));
+            statusPane.setMargin(text, new Insets(5));
         });
-
         statusPane.getChildren().addAll(statusTexts);
+
+
         /* END OF STATUS PANE CODE */
 
         Tile generatedBranches = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
