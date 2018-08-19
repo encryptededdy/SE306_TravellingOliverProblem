@@ -1,5 +1,6 @@
 package uoa.se306.travellingoliverproblem.fileIO;
 
+import uoa.se306.travellingoliverproblem.Main;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
@@ -16,8 +17,24 @@ public class DotStandardOutput implements ScheduleOutputter {
     public DotStandardOutput() { }
 
     public DotStandardOutput(Graph graph, Schedule schedule) {
-        String outputGraphName = graph.getGraphName().substring(0,1).toUpperCase() + graph.getGraphName().substring(1);
-        outputGraphName = removeQuotes(outputGraphName);
+
+        String outputGraphName;
+        if(graph.getGraphName() == null && Main.outputFileName.equals(".dot")){
+            outputGraphName = "";
+        } else{
+            outputGraphName = graph.getGraphName();
+            if(outputGraphName == null) {
+                // get the fine name without the .dot extension
+                outputGraphName = Main.outputFileName.substring(0, (Main.outputFileName.length() - 4));
+                // capitalise start of string
+                outputGraphName = outputGraphName.substring(0, 1).toUpperCase() + outputGraphName.substring(1);
+            } else {
+                outputGraphName = outputGraphName.substring(0, 1).toUpperCase() + graph.getGraphName().substring(1);
+                outputGraphName = removeQuotes(outputGraphName);
+            }
+        }
+
+
         this.dotOutputStringBuilder = new StringBuilder("digraph \"output" + outputGraphName + "\" {");
         this.graph = graph;
         this.schedule = schedule;
