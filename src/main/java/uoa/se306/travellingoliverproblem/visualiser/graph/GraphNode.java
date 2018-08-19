@@ -21,19 +21,12 @@ import java.util.Map;
 
 
 public class GraphNode extends Pane {
-
     private String name;
-
     private Circle circle = new Circle();
-
     private Color circleColor = Color.SKYBLUE;
-
     private ScheduleNode scheduleNode;
-
     private HashMap<Shape, Polygon> parentEdges;
-
     private HashMap<Shape, Polygon> childEdges;
-
     private Integer cost;
 
     public GraphNode(String name, Integer cost, Integer inNodes, Integer outNodes) {
