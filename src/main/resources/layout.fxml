@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<HBox prefWidth="1700.0" style="-fx-background-color: #424242;" xmlns="http://javafx.com/javafx/10.0.1"
+<HBox prefWidth="1715.0" style="-fx-background-color: #424242;" xmlns="http://javafx.com/javafx/10.0.1"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="uoa.se306.travellingoliverproblem.visualiser.FXController">
     <children>
         <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0"
@@ -39,12 +38,14 @@
                 </AnchorPane>
                 <HBox maxWidth="1200.0" prefHeight="850.0">
                     <children>
-                        <ScrollPane fx:id="graphScrollPane" maxHeight="850.0" prefHeight="850.0" prefWidth="380.0">
+                        <ScrollPane fx:id="graphScrollPane" maxHeight="850.0" prefHeight="850.0" prefWidth="380.0"
+                                    style="-fx-background: #2A2A2A; -fx-background-color: #2A2A2A;">
                             <content>
                                 <Pane fx:id="graphPane"/>
                             </content>
                         </ScrollPane>
-                        <ScrollPane prefHeight="850.0" prefWidth="820.0">
+                        <ScrollPane prefHeight="850.0" prefWidth="820.0"
+                                    style="-fx-background: #2A2A2A; -fx-background-color: #2A2A2A;">
                             <content>
                                 <Pane fx:id="schedulePane" prefWidth="800.0"/>
                             </content>
@@ -53,6 +54,6 @@
                 </HBox>
             </children>
         </VBox>
-        <VBox fx:id="tilesBox" prefHeight="800.0" prefWidth="500.0"/>
+        <VBox fx:id="tilesBox" prefHeight="800.0" prefWidth="515.0"/>
     </children>
 </HBox>

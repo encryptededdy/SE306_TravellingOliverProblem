@@ -18,23 +18,25 @@ import java.lang.reflect.Field;
 public class ScheduleNode extends Pane {
     private String name;
     private Rectangle rect;
+    private Color color;
 
     // normal schedule
-    public ScheduleNode(double width, ScheduleEntry schedule, GraphNode graphNode) {
+    public ScheduleNode(double width, ScheduleEntry schedule, GraphNode graphNode, Color color) {
         super();
 
         this.name = schedule.getNode().toString();
+        this.color = color;
 
         rect = new Rectangle();
         rect.setHeight(ScheduleDrawer.ROW_HEIGHT);
         rect.setWidth(width);
-        rect.setFill(Color.SKYBLUE);
-        rect.setStroke(Color.BLACK);
+        rect.setFill(color);
+        rect.setStroke(Color.WHITE);
 
         Text nameLabel = new Text(name);
         //Text costLabel = new Text(cost.toString());
         nameLabel.setFill(Color.WHITE);
-        nameLabel.setFont(new Font("Roboto", 15));
+        nameLabel.setFont(new Font("Roboto Bold", 16));
         //costLabel.setFont(new Font(30));
         //costLabel.setOpacity(0.4);
         //costLabel.setFill(Color.WHITE);
@@ -75,7 +77,7 @@ public class ScheduleNode extends Pane {
         rect.setFill(Color.TRANSPARENT);
 
         Text nameLabel = new Text(name);
-        nameLabel.setFill(Color.BLACK);
+        nameLabel.setFill(Color.WHITE);
         nameLabel.setFont(new Font("Roboto", 15));
 
         StackPane stack = new StackPane();
@@ -126,7 +128,9 @@ public class ScheduleNode extends Pane {
 
     public void highlight() { rect.setFill(Color.ORANGERED); }
 
-    public void unHighlight() { rect.setFill(Color.SKYBLUE); }
+    public void unHighlight() {
+        rect.setFill(color);
+    }
 
 
     public String getName() {

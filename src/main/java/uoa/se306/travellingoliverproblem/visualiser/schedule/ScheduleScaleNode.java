@@ -13,7 +13,7 @@ public class ScheduleScaleNode extends Pane {
 
         Text nameLabel = new Text(number.toString());
         //Text costLabel = new Text(cost.toString());
-        nameLabel.setFill(Color.BLACK);
+        nameLabel.setFill(Color.WHITE);
         nameLabel.setFont(new Font(15));
 
         HBox labelContainer = new HBox(nameLabel);

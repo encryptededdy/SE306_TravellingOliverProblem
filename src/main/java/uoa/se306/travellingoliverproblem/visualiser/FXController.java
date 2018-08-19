@@ -11,9 +11,10 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
@@ -26,7 +27,6 @@ import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
 import uoa.se306.travellingoliverproblem.visualiser.graph.SequentialGraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.schedule.ScheduleDrawer;
 
-import java.text.DecimalFormat;
 import java.util.Map;
 
 import static uoa.se306.travellingoliverproblem.scheduler.Scheduler.COMPUTATIONAL_LOAD;
@@ -111,18 +111,9 @@ public class FXController {
                 .animated(true)
                 .build();
 
-        Tile generatedBranches = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
-                .title("Branches Generated")
-                .minWidth(500)
-                .decimals(0)
-                .chartData(new ChartData(0), new ChartData(0))
-                .animated(false)
-                .smoothing(true)
-                .build();
-
         Tile boundedBranches = TileBuilder.create().skinType(Tile.SkinType.DONUT_CHART)
                 .title("Branch Bound ratio")
-                .minWidth(500)
+                .minWidth(505)
                 .minHeight(400)
                 .decimals(0)
                 .animated(true)
@@ -141,7 +132,6 @@ public class FXController {
                 .decimals(0)
                 .chartData(new ChartData(0), new ChartData(0))
                 .animated(false)
-                .numberFormat(new DecimalFormat("######E0"))
                 .smoothing(true)
                 .build();
 
@@ -154,6 +144,12 @@ public class FXController {
 
         FlowGridPane bigTiles = new FlowGridPane(1, 1, boundedBranches);
         FlowGridPane smallTiles = new FlowGridPane(2, 2, memoryTile, bestTime, branchRate, branchConsidered);
+        bigTiles.setBackground(new Background(new BackgroundFill(Color.web("#424242"), CornerRadii.EMPTY, Insets.EMPTY)));
+        smallTiles.setBackground(new Background(new BackgroundFill(Color.web("#424242"), CornerRadii.EMPTY, Insets.EMPTY)));
+        smallTiles.setHgap(5);
+        smallTiles.setVgap(5);
+        bigTiles.setPadding(new Insets(5));
+        smallTiles.setPadding(new Insets(5));
         tilesBox.getChildren().addAll(bigTiles, smallTiles);
         pollingTimeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
             // Check for new schedule
@@ -168,7 +164,6 @@ public class FXController {
             double memoryUse = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1000000d;
             long totalBranches = SchedulerRunner.getInstance().getScheduler().getBranchesConsidered() + SchedulerRunner.getInstance().getScheduler().getBranchesKilled();
             memoryTile.setValue(memoryUse);
-            generatedBranches.addChartData(new ChartData(totalBranches));
             branchRate.addChartData(new ChartData(totalBranches - lastBranches));
             branchConsidered.addChartData(new ChartData(SchedulerRunner.getInstance().getScheduler().getBranchesConsidered()));
             // Setup data for pie chart
