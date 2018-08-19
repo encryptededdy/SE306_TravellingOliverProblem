@@ -150,7 +150,10 @@ public class Main extends Application {
                             break;
                         case "-s":
                         case "--scheduler":
-                            String typeString = args[i + 1].toUpperCase();
+                            String typeString = "";
+                            if (args.length > i + 1) {
+                                typeString = args[i + 1].toUpperCase();
+                            }
                             i++;
                             try {
                                 schedulerType = SchedulerType.valueOf(typeString);

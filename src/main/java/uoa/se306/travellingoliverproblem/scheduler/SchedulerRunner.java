@@ -101,7 +101,7 @@ public class SchedulerRunner {
                         return new DFSScheduler(inputGraph, noProcessors, isParallelised);
                     case HYBRID:
                         System.out.println("Using Hybrid Scheduler (BETA). Note that Visualisation is not supported in this mode.");
-                        return new HybridScheduler(inputGraph, noProcessors, isParallelised, 1000);
+                        return new HybridScheduler(inputGraph, noProcessors, isParallelised, 100000);
                     default:
                         return new DFSScheduler(inputGraph, noProcessors, isParallelised);
                 }
