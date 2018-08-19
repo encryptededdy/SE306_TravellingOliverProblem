@@ -1,5 +1,6 @@
 package uoa.se306.travellingoliverproblem.scheduler;
 
+import uoa.se306.travellingoliverproblem.Main;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.parallel.BranchAndBoundRecursiveAction;
@@ -26,7 +27,7 @@ public class ParallelScheduler extends Scheduler {
         schedules.add(currentSchedule);
         // Run recursive task with x no of threads (Defined in main)
         bab = new BranchAndBoundRecursiveAction(schedules, amountOfProcessors);
-        bab.invoke();
+        Main.forkJoinPool.invoke(bab);
         // Check if an error occurred and that the recursive action completely correctly
         if (bab.isCompletedAbnormally()) {
             System.exit(1); // Bad
