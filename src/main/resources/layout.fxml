@@ -23,8 +23,8 @@
                                 <Font name="Roboto Medium" size="24.0"/>
                             </font>
                         </Text>
-                        <AnchorPane fx:id="statusPane" layoutX="913.0" layoutY="-1.0" prefHeight="50.0"
-                                    prefWidth="291.0" style="-fx-background-color: orange;">
+                        <AnchorPane fx:id="statusPane" layoutX="854.0" layoutY="-1.0" prefHeight="50.0"
+                                    prefWidth="350.0" style="-fx-background-color: orange;">
                             <children>
                                 <Text fx:id="statusText" fill="WHITE" layoutX="18.0" layoutY="34.0" strokeType="OUTSIDE"
                                       strokeWidth="0.0" text="Starting up...">
