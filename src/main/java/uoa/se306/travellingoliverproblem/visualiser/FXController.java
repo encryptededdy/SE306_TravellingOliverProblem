@@ -26,6 +26,7 @@ import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
 import uoa.se306.travellingoliverproblem.visualiser.graph.SequentialGraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.schedule.ScheduleDrawer;
 
+import java.text.DecimalFormat;
 import java.util.Map;
 
 import static uoa.se306.travellingoliverproblem.scheduler.Scheduler.COMPUTATIONAL_LOAD;
@@ -140,6 +141,7 @@ public class FXController {
                 .decimals(0)
                 .chartData(new ChartData(0), new ChartData(0))
                 .animated(false)
+                .numberFormat(new DecimalFormat("######E0"))
                 .smoothing(true)
                 .build();
 

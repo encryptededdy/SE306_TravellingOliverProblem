@@ -8,6 +8,8 @@ import java.util.PriorityQueue;
 
 public class ParallelScheduler extends Scheduler {
 
+    private BranchAndBoundRecursiveAction bab;
+
     public ParallelScheduler(Graph graph, int amountOfProcessors, boolean isParallelised) {
         super(graph, amountOfProcessors, true, isParallelised);
         BranchAndBoundRecursiveAction.graph = graph;
@@ -23,13 +25,18 @@ public class ParallelScheduler extends Scheduler {
         PriorityQueue<Schedule> schedules = new PriorityQueue<>();
         schedules.add(currentSchedule);
         // Run recursive task with x no of threads (Defined in main)
-        BranchAndBoundRecursiveAction bab = new BranchAndBoundRecursiveAction(schedules, amountOfProcessors);
+        bab = new BranchAndBoundRecursiveAction(schedules, amountOfProcessors);
         bab.invoke();
         // Check if an error occurred and that the recursive action completely correctly
         if (bab.isCompletedAbnormally()) {
             System.exit(1); // Bad
         }
         bestSchedule = bab.getBestSchedule();
+    }
+
+    @Override
+    public Schedule getCurrentBestSchedule() {
+        return bab.getBestSchedule();
     }
 
     @Override
