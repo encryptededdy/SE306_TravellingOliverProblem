@@ -125,7 +125,7 @@ public class SequentialGraphDrawer {
 
                 double ctrlX;
 
-                boolean adjacent = lineEndY - lineStartY < 100 ? true : false;
+                boolean adjacent = lineEndY - lineStartY < 100;
 
                 if (adjacent) {
                     ctrlX = cubicCurve.getStartX();
@@ -134,13 +134,6 @@ public class SequentialGraphDrawer {
                 } else {
                     ctrlX = cubicCurve.getStartX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 3;
                 }
-
-//                if (ctrlX > backgroundPane.getWidth() + 10) {
-//                    ctrlX = backgroundPane.getWidth() - 10;
-//                } else if (ctrlX < -10) {
-//                    ctrlX = -10;
-//                }
-
 
                 cubicCurve.setControlX1(ctrlX);
                 cubicCurve.setControlX2(ctrlX);
@@ -167,12 +160,17 @@ public class SequentialGraphDrawer {
             }
         }
 
+        double verticalScalingFactor = 850.0 / (graph.getAllNodes().size() * 61.0 + 100);
+
         // Calculate scale and apply
         double toFit = widest * 2 + 40;
         if (toFit > 380) {
-            double scalingFactor = 380 / toFit;
+            double scalingFactor = (verticalScalingFactor < (380 / toFit)) ? verticalScalingFactor : 380 / toFit;
             parentPane.setScaleX(scalingFactor);
             parentPane.setScaleY(scalingFactor);
+        } else if (verticalScalingFactor < 1) {
+            parentPane.setScaleX(verticalScalingFactor);
+            parentPane.setScaleY(verticalScalingFactor);
         }
 
         sp.setHvalue(0.5);
