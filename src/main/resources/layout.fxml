@@ -39,13 +39,12 @@
                 <HBox maxWidth="1200.0" prefHeight="850.0">
                     <children>
                         <ScrollPane fx:id="graphScrollPane" maxHeight="850.0" prefHeight="850.0" prefWidth="380.0"
-                                    style="-fx-background: #2A2A2A; -fx-background-color: #2A2A2A;">
+                                    stylesheets="@scrollpane.css">
                             <content>
                                 <Pane fx:id="graphPane"/>
                             </content>
                         </ScrollPane>
-                        <ScrollPane prefHeight="850.0" prefWidth="820.0"
-                                    style="-fx-background: #2A2A2A; -fx-background-color: #2A2A2A;">
+                        <ScrollPane prefHeight="850.0" prefWidth="820.0" stylesheets="@scrollpane.css">
                             <content>
                                 <Pane fx:id="schedulePane" prefWidth="800.0"/>
                             </content>

@@ -31,7 +31,7 @@ public class SequentialGraphDrawer {
         this.sp = graphScrollPane;
         this.parentPane = parentPane;
         this.graph = graph;
-        backgroundPane.setMinWidth(500);
+        backgroundPane.setMinWidth(750);
         StackPane sp = new StackPane(backgroundPane, vbox);
         // populate pane
         parentPane.getChildren().add(sp);
@@ -80,6 +80,7 @@ public class SequentialGraphDrawer {
 
     private void drawLines() {
         boolean right = true;
+        double widest = 0;
         for (Map.Entry<Node, GraphNode> node : visited.entrySet()) {
             for (Map.Entry<Node, Integer> child : node.getKey().getChildren().entrySet()) {
                 // Draw a cubicCurve!
@@ -129,9 +130,9 @@ public class SequentialGraphDrawer {
                 if (adjacent) {
                     ctrlX = cubicCurve.getStartX();
                 } else if (right) {
-                    ctrlX = cubicCurve.getStartX() + Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 4;
+                    ctrlX = cubicCurve.getStartX() + Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 3;
                 } else {
-                    ctrlX = cubicCurve.getStartX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 4;
+                    ctrlX = cubicCurve.getStartX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 3;
                 }
 
                 if (ctrlX > backgroundPane.getWidth() + 10) {
@@ -149,6 +150,16 @@ public class SequentialGraphDrawer {
                 double bezierMidpointX = (0.125 * lineStartX) + ((3 * 0.125) * ctrlX) + ((3 * 0.125) * ctrlX) + (0.125 * lineEndX);
                 Polygon arrowHeadShape = drawArrowHead(bezierMidpointX, (lineStartY + lineEndY + 15) / 2);
 
+                // calculate max width
+                double widthFromCenter;
+                if (bezierMidpointX > 375) {
+                    widthFromCenter = bezierMidpointX - 375;
+                } else {
+                    widthFromCenter = 375 - bezierMidpointX;
+                }
+
+                if (widthFromCenter > widest) widest = widthFromCenter;
+
                 source.addChildEdge(cubicCurve, arrowHeadShape);
                 dest.addParentEdge(cubicCurve, arrowHeadShape);
 
@@ -157,7 +168,17 @@ public class SequentialGraphDrawer {
                 right = !right;
             }
         }
+
+        // Calculate scale and apply
+        double toFit = widest * 2 + 40;
+        if (toFit > 380) {
+            double scalingFactor = 380 / toFit;
+            parentPane.setScaleX(scalingFactor);
+            parentPane.setScaleY(scalingFactor);
+        }
+
         sp.setHvalue(0.5);
+        sp.setVvalue(0.5);
     }
 
     private Polygon drawArrowHead(double arrowHeadTipX, double arrowHeadTipY) {
