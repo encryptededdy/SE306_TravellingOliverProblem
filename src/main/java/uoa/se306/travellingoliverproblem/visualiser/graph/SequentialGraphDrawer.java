@@ -31,7 +31,7 @@ public class SequentialGraphDrawer {
         this.sp = graphScrollPane;
         this.parentPane = parentPane;
         this.graph = graph;
-        backgroundPane.setMinWidth(600);
+        backgroundPane.setMinWidth(500);
         StackPane sp = new StackPane(backgroundPane, vbox);
         // populate pane
         parentPane.getChildren().add(sp);
@@ -122,32 +122,35 @@ public class SequentialGraphDrawer {
                 cubicCurve.setControlY1(cubicCurve.getStartY());
                 cubicCurve.setControlY2(cubicCurve.getEndY());
 
-                double ctrlX1;
-                double ctrlX2;
+                double ctrlX;
 
                 boolean adjacent = lineEndY - lineStartY < 100 ? true : false;
 
                 if (adjacent) {
-                    ctrlX1 = cubicCurve.getStartX();
-                    ctrlX2 = cubicCurve.getEndX();
+                    ctrlX = cubicCurve.getStartX();
                 } else if (right) {
-                    ctrlX1 = cubicCurve.getStartX() + Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2;
-                    ctrlX2 = cubicCurve.getEndX() + Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2;
+                    ctrlX = cubicCurve.getStartX() + Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 4;
                 } else {
-                    ctrlX1 = cubicCurve.getStartX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2;
-                    ctrlX2 = cubicCurve.getEndX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2;
+                    ctrlX = cubicCurve.getStartX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 4;
                 }
-                cubicCurve.setControlX1(ctrlX1);
-                cubicCurve.setControlX2(ctrlX2);
+                System.out.println(sp.getWidth());
+                if (ctrlX > backgroundPane.getWidth() + 10) {
+                    ctrlX = backgroundPane.getWidth() - 10;
+                } else if (ctrlX < -10) {
+                    ctrlX = -10;
+                }
+
+
+                cubicCurve.setControlX1(ctrlX);
+                cubicCurve.setControlX2(ctrlX);
                 backgroundPane.getChildren().add(cubicCurve);
 
                 // calculate midpoint x-coordinate on bezier curve
-                double bezierMidpointX = (0.125 * lineStartX) + ((3 * 0.125) * ctrlX1) + ((3 * 0.125) * ctrlX2) + (0.125 * lineEndX);
-                drawArrowHead(bezierMidpointX, (lineStartY + lineEndY + 15) / 2);
+                double bezierMidpointX = (0.125 * lineStartX) + ((3 * 0.125) * ctrlX) + ((3 * 0.125) * ctrlX) + (0.125 * lineEndX);
+                Polygon arrowHeadShape = drawArrowHead(bezierMidpointX, (lineStartY + lineEndY + 15) / 2);
 
-
-
-
+                source.addChildEdge(cubicCurve, arrowHeadShape);
+                dest.addParentEdge(cubicCurve, arrowHeadShape);
 
                 // TODO: Draw weight... somehow!
 
@@ -157,7 +160,7 @@ public class SequentialGraphDrawer {
         sp.setHvalue(0.5);
     }
 
-    private void drawArrowHead(double arrowHeadTipX, double arrowHeadTipY) {
+    private Polygon drawArrowHead(double arrowHeadTipX, double arrowHeadTipY) {
         double theta = Math.PI / 2;
 
         double arrowMidPointX =  arrowHeadTipX + (-15 * Math.cos(theta));
@@ -179,8 +182,10 @@ public class SequentialGraphDrawer {
                 arrowHeadLeftPointX, arrowHeadLeftPointY,
                 arrowHeadRightPointX, arrowHeadRightPointY
         });
-        arrowHeadShape.setFill(Color.BLACK);
+        arrowHeadShape.setFill(Color.GRAY);
 
         backgroundPane.getChildren().add(arrowHeadShape);
+
+        return arrowHeadShape;
     }
 }
