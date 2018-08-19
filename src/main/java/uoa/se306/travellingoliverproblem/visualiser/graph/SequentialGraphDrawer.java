@@ -146,10 +146,10 @@ public class SequentialGraphDrawer {
                 } else {
                     ctrlY1 = cubicCurve.getStartY() + Math.abs(cubicCurve.getEndX() - cubicCurve.getStartX()) / 4;
                     ctrlY2 = cubicCurve.getEndY() + Math.abs(cubicCurve.getEndX() - cubicCurve.getStartX()) / 4;
-                    if (ctrlY1 > 250.0) {
+                    if (ctrlY1 > 500.0) {
                         ctrlY1 = 245.0;
                     }
-                    if (ctrlY2 > 250.0) {
+                    if (ctrlY2 > 500.0) {
                         ctrlY2 = 245.0;
                     }
                 }

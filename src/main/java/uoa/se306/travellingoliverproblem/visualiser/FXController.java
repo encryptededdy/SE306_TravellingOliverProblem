@@ -117,9 +117,9 @@ public class FXController {
         /* STATUS PANE CODE */
         GridPane statusPane = new GridPane();
         statusPane.setGridLinesVisible(true);
-        statusPane.setMinSize(490, 240);
-        statusPane.setPrefSize(490, 240);
-        statusPane.setMaxSize(490, 240);
+        statusPane.setMinSize(480, 230);
+        statusPane.setPrefSize(480, 230);
+        statusPane.setMaxSize(480, 230);
         statusPane.setEffect(ds);
         statusPane.setBackground(new Background(new BackgroundFill(paleChristmas.backgroundColor, new CornerRadii(4), new Insets(0))));
         GridPane.setConstraints(statusPane, 0, 0, 2, 1);
@@ -178,8 +178,8 @@ public class FXController {
         Tile generatedBranches = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
                 .title("Branches Generated")
                 .decimals(0)
-                .minWidth(240).maxWidth(240)
-                .minHeight(240).maxHeight(240)
+                .minWidth(230).maxWidth(230)
+                .minHeight(230).maxHeight(230)
                 .chartData(new ChartData(0), new ChartData(0))
                 .animated(false)
                 .smoothing(true)
@@ -190,8 +190,8 @@ public class FXController {
                 .title("Branch Bound Ratio")
                 .decimals(0)
                 .animated(true)
-                .minWidth(490).maxWidth(490)
-                .minHeight(240).maxHeight(240)
+                .minWidth(480).maxWidth(480)
+                .minHeight(230).maxHeight(230)
                 .build();
         GridPane.setConstraints(boundedBranches, 0, 3, 2, 1);
 
@@ -199,19 +199,20 @@ public class FXController {
                 .title("Current best schedule length")
                 .decimals(0)
                 .chartData(new ChartData(COMPUTATIONAL_LOAD), new ChartData(COMPUTATIONAL_LOAD))
-                .minWidth(240).maxWidth(240)
-                .minHeight(240).maxHeight(240)
+                .minWidth(230).maxWidth(230)
+                .minHeight(230).maxHeight(230)
                 .smoothing(true)
                 .build();
         GridPane.setConstraints(bestTime, 1, 2);
 
 
         tilesGrid.setHgap(0);
-        tilesGrid.setGridLinesVisible(true);
-        tilesGrid.setMargin(statusPane, new Insets(5));
-        tilesGrid.setMargin(generatedBranches, new Insets(5));
-        tilesGrid.setMargin(bestTime, new Insets(5));
-        tilesGrid.setMargin(boundedBranches, new Insets(5));
+        //tilesGrid.setGridLinesVisible(true);
+        tilesGrid.setEffect(ds);
+        tilesGrid.setMargin(statusPane, new Insets(10));
+        tilesGrid.setMargin(generatedBranches, new Insets(10));
+        tilesGrid.setMargin(bestTime, new Insets(10));
+        tilesGrid.setMargin(boundedBranches, new Insets(10));
 
 
 
