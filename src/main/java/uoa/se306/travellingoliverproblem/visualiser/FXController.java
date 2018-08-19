@@ -20,13 +20,13 @@ import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.SchedulerRunner;
+import uoa.se306.travellingoliverproblem.scheduler.SchedulerType;
+import uoa.se306.travellingoliverproblem.visualiser.graph.GraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
 import uoa.se306.travellingoliverproblem.visualiser.graph.SequentialGraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.schedule.ScheduleDrawer;
 
 import java.util.Map;
-
-import static uoa.se306.travellingoliverproblem.scheduler.Scheduler.COMPUTATIONAL_LOAD;
 
 public class FXController {
     @FXML
@@ -63,8 +63,8 @@ public class FXController {
         graphNodeMap = drawer.getGraphNodes();
     }
 
-    public void startProcessing(Graph inputGraph, int processors, String outputName) {
-        Task<Void> task = SchedulerRunner.getInstance().startSchedulerJavaFXTask(inputGraph, processors);
+    public void startProcessing(Graph inputGraph, int processors, String outputName, SchedulerType type) {
+        Task<Void> task = SchedulerRunner.getInstance().startSchedulerJavaFXTask(inputGraph, processors, type);
         drawGraph(SchedulerRunner.getInstance().getInputGraph());
         startTime = System.currentTimeMillis();
         task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {

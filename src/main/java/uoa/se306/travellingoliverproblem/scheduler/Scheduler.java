@@ -10,7 +10,7 @@ public abstract class Scheduler {
 
     // Best schedule found from all iterations
     Schedule bestSchedule;
-    private int amountOfProcessors;
+    int amountOfProcessors;
     // Graph of all nodes
     protected Graph graph;
 
@@ -37,7 +37,7 @@ public abstract class Scheduler {
     // Template method pattern
     public Schedule getBestSchedule() {
         calculateSchedule(new Schedule(amountOfProcessors, graph.getStartingNodes(), graph.getAllNodes(), useDFSCostFunction));
-        bestSchedule.checkValidity();
+        //bestSchedule.checkValidity();
         return bestSchedule;
     }
 

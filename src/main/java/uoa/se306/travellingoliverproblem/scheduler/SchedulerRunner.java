@@ -2,6 +2,7 @@ package uoa.se306.travellingoliverproblem.scheduler;
 
 import javafx.concurrent.Task;
 import uoa.se306.travellingoliverproblem.graph.Graph;
+import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
@@ -26,12 +27,11 @@ public class SchedulerRunner {
     private SchedulerRunner() {
     }
 
-    public void startScheduler(Graph inputGraph, int noProcessors) {
+    public void startScheduler(Graph inputGraph, int noProcessors, SchedulerType type) {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
-        scheduler = new DFSScheduler(inputGraph, noProcessors);
-        //scheduler = new AStarSearchScheduler(inputGraph, noProcessors);
+        scheduler = autoPickScheduler(inputGraph, noProcessors, type);
 
         // create task to run on a separate thread
         Runnable scheduleTask = () -> {
@@ -49,12 +49,11 @@ public class SchedulerRunner {
         scheduleThread.start();
     }
 
-    public Task<Void> startSchedulerJavaFXTask(Graph inputGraph, int noProcessors) {
+    public Task<Void> startSchedulerJavaFXTask(Graph inputGraph, int noProcessors, SchedulerType type) {
         this.inputGraph = inputGraph;
         this.noProcessors = noProcessors;
 
-        scheduler = new DFSScheduler(inputGraph, noProcessors);
-        //scheduler = new AStarSearchScheduler(inputGraph, noProcessors);
+        scheduler = autoPickScheduler(inputGraph, noProcessors, type);
 
         // create task to run on a separate thread
         return new Task<Void>() {
@@ -84,6 +83,30 @@ public class SchedulerRunner {
                 scheduler.getBranchesConsidered()+scheduler.getBranchesKilled(),
                 scheduler.getBranchesKilled(),
                 scheduler.proportionKilled()*100);
+    }
+
+    private Scheduler autoPickScheduler(Graph inputGraph, int noProcessors, SchedulerType type) {
+        if (type != null) {
+            switch (type) {
+                case ASTAR:
+                    System.out.println("Using A* Scheduler");
+                    return new AStarSearchScheduler(inputGraph, noProcessors);
+                case DFS:
+                    System.out.println("Using DFS Scheduler");
+                    return new DFSScheduler(inputGraph, noProcessors);
+                case HYBRID:
+                    System.out.println("Using Hybrid Scheduler (BETA). Note that Visualisation is not supported in this mode.");
+                    return new HybridScheduler(inputGraph, noProcessors);
+                default:
+                    return new DFSScheduler(inputGraph, noProcessors);
+            }
+        } else if (inputGraph.getAllNodes().size() < 10 && !inputGraph.getAllNodes().stream().allMatch(Node::isIndependent)) {
+            System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using A* scheduling algorithm");
+            return new AStarSearchScheduler(inputGraph, noProcessors);
+        } else {
+            System.out.println("Input graph has " + inputGraph.getAllNodes().size() + " nodes. Using DFS/BnB scheduling algorithm");
+            return new DFSScheduler(inputGraph, noProcessors);
+        }
     }
 
     public Graph getInputGraph() {
