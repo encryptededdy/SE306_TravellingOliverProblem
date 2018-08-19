@@ -17,23 +17,28 @@ import java.lang.reflect.Field;
 
 public class ScheduleNode extends Pane {
     private String name;
+    private Rectangle rect;
+    private Color color;
 
     // normal schedule
-    public ScheduleNode(double width, ScheduleEntry schedule, GraphNode graphNode) {
+    public ScheduleNode(double width, ScheduleEntry schedule, GraphNode graphNode, Color color) {
         super();
 
         this.name = schedule.getNode().toString();
+        this.color = color;
 
-        Rectangle rect = new Rectangle();
+        graphNode.setCircleColour(color);
+
+        rect = new Rectangle();
         rect.setHeight(ScheduleDrawer.ROW_HEIGHT);
         rect.setWidth(width);
-        rect.setFill(Color.SKYBLUE);
-        rect.setStroke(Color.BLACK);
+        rect.setFill(color);
+        rect.setStroke(Color.WHITE);
 
         Text nameLabel = new Text(name);
         //Text costLabel = new Text(cost.toString());
         nameLabel.setFill(Color.WHITE);
-        nameLabel.setFont(new Font(15));
+        nameLabel.setFont(new Font("Roboto Bold", 16));
         //costLabel.setFont(new Font(30));
         //costLabel.setOpacity(0.4);
         //costLabel.setFill(Color.WHITE);
@@ -42,14 +47,16 @@ public class ScheduleNode extends Pane {
         stack.getChildren().addAll(rect, nameLabel);
         // stack.setPadding(new Insets(20));
 
+        graphNode.setScheduleNode(this);
+
         this.setOnMouseEntered(event -> {
             graphNode.highlight();
-            rect.setFill(Color.ORANGERED);
+            highlight();
         });
 
         this.setOnMouseExited(event -> {
             graphNode.unHighlight();
-            rect.setFill(Color.SKYBLUE);
+            unHighlight();
         });
 
         Tooltip t = new Tooltip(String.format("Start time: %s, End time: %s, Cost: %s", schedule.getStartTime(), schedule.getEndTime(), schedule.getLength()));
@@ -72,8 +79,8 @@ public class ScheduleNode extends Pane {
         rect.setFill(Color.TRANSPARENT);
 
         Text nameLabel = new Text(name);
-        nameLabel.setFill(Color.BLACK);
-        nameLabel.setFont(new Font(15));
+        nameLabel.setFill(Color.WHITE);
+        nameLabel.setFont(new Font("Roboto", 15));
 
         StackPane stack = new StackPane();
         stack.getChildren().addAll(rect, nameLabel);
@@ -117,6 +124,12 @@ public class ScheduleNode extends Pane {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void highlight() { rect.setFill(Color.ORANGERED); }
+
+    public void unHighlight() {
+        rect.setFill(color);
     }
 
 

@@ -31,6 +31,10 @@ public abstract class Scheduler {
         this.amountOfProcessors = amountOfProcessors;
     }
 
+    public Schedule getCurrentBestSchedule() {
+        return bestSchedule;
+    }
+
     public void setBestSchedule(Schedule bestSchedule) {
         this.bestSchedule = bestSchedule;
     }

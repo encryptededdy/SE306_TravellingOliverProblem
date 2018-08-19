@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
 import uoa.se306.travellingoliverproblem.fileIO.DotReader;
@@ -21,7 +22,7 @@ import java.util.concurrent.ForkJoinPool;
 
 public class Main extends Application {
 
-    private static ForkJoinPool forkJoinPool;
+    public static ForkJoinPool forkJoinPool;
     private static SchedulerType schedulerType;
     private static Graph inputGraph;
     private static int processors = 1;
@@ -30,14 +31,18 @@ public class Main extends Application {
 
     // JavaFX start method (depends if visualisation enabled)
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws Exception{
+        Font.loadFont(getClass().getResource("/Roboto-Regular.ttf").toExternalForm(), 10);
+        Font.loadFont(getClass().getResource("/Roboto-Bold.ttf").toExternalForm(), 10);
+        Font.loadFont(getClass().getResource("/Roboto-Medium.ttf").toExternalForm(), 10);
+        Font.loadFont(getClass().getResource("/Roboto-Light.ttf").toExternalForm(), 10);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/layout.fxml"));
         Parent root = loader.load();
         FXController controller = loader.getController();
         controller.startProcessing(inputGraph, processors, isParallelised, outputFileName, schedulerType);
         primaryStage.setTitle("Visualisation");
         primaryStage.setResizable(false);
-        primaryStage.setScene(new Scene(root, 1200, 850));
+        primaryStage.setScene(new Scene(root, 1715, 850));
         primaryStage.sizeToScene(); // JavaFX Bug RT-30647 workaround
         primaryStage.show();
     }

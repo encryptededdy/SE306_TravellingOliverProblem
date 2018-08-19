@@ -1,23 +1,25 @@
 package uoa.se306.travellingoliverproblem.visualiser.schedule;
 
+import eu.hansolo.tilesfx.Tile;
 import javafx.geometry.Insets;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
 import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ScheduleDrawer {
-    public static int SCHEDULE_WIDTH = 700;
-    public static int ROW_HEIGHT = 30;
-    public static int HEADER_WIDTH = 100;
+    private static int SCHEDULE_WIDTH = 700; // width of the whole thing
+    static int ROW_HEIGHT = 40;
+    static int HEADER_WIDTH = 100;
+
+    private static List<Color> colors = new ArrayList<>(Arrays.asList(Color.BLACK, Tile.TileColor.GREEN.color, Tile.TileColor.YELLOW_ORANGE.color, Tile.TileColor.BLUE.color, Tile.TileColor.MAGENTA.color, Tile.TileColor.PINK.color, Tile.TileColor.LIGHT_GREEN.color, Tile.TileColor.GRAY.color));
 
     private Pane parentPane;
     private VBox vbox = new VBox();
@@ -52,10 +54,16 @@ public class ScheduleDrawer {
         }
 
         // draw processors
+        Iterator<Color> colorIterator = colors.iterator();
         for (ScheduledProcessor p : schedule.getProcessors()) {
+            if (!colorIterator.hasNext()) {
+                colorIterator = colors.iterator(); // loop
+            }
+            Color color = colorIterator.next();
+
             HBox row = new HBox();
-            row.setMinHeight(30);
-            row.setPadding(new Insets(15, 0, 0, 0));
+            row.setMinHeight(ROW_HEIGHT);
+            row.setPadding(new Insets(20, 0, 0, 0));
             processorRows.add(processorNo, row);
 
             // draw header
@@ -69,12 +77,16 @@ public class ScheduleDrawer {
                     // Draw gap
                     int gap = e.getStartTime() - lastScheduleEnd;
                     double width = ((gap / (double) totalTime) * dividableWidth);
+                    // round width to nearest 0.1
+                    width = Math.round(width);
                     ScheduleNode node = new ScheduleNode(width);
                     row.getChildren().add(node);
                 }
                 // Draw entry
                 double width = ((e.getLength() / (double) totalTime) * dividableWidth);
-                ScheduleNode node = new ScheduleNode(width, e, graphNodes.get(e.getNode()));
+                // round width to nearest 0.1
+                width = Math.round(width);
+                ScheduleNode node = new ScheduleNode(width, e, graphNodes.get(e.getNode()), color);
                 row.getChildren().add(node);
                 lastScheduleEnd = e.getEndTime();
             }
@@ -90,8 +102,10 @@ public class ScheduleDrawer {
             scaleSpacing = 5;
         } else if (totalTime <= 150) {
             scaleSpacing = 10;
-        } else {
+        } else if (totalTime <= 250) {
             scaleSpacing = 25;
+        } else {
+            scaleSpacing = 50;
         }
 
         // draw scale
@@ -105,11 +119,11 @@ public class ScheduleDrawer {
         row.getChildren().add(header);
         for (int i = 0; i <= totalTime; i++) {
             ScheduleScaleNode node;
-            if (i % scaleSpacing == 0) {
+            if (i % scaleSpacing == 0) { // draw a number
                 node = new ScheduleScaleNode(i, width);
                 row.getChildren().add(node);
             } else {
-                if ((i - 1) % scaleSpacing == 0) {
+                if ((i - 1) % scaleSpacing == 0) { // draw empty space
                     node = new ScheduleScaleNode(width * (scaleSpacing - 1));
                     row.getChildren().add(node);
                 }

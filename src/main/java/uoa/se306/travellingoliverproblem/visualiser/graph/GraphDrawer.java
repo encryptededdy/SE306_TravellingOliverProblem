@@ -10,13 +10,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
 import javafx.util.Duration;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 public class GraphDrawer {
     private Pane parentPane;
@@ -39,7 +38,7 @@ public class GraphDrawer {
 
     public void drawGraph() {
         HashSet<Node> currentLevel = new HashSet<>(graph.getStartingNodes()); // start with... starting nodes
-        drawLevel(currentLevel);
+        drawLevel(currentLevel, new HashSet<>());
 
         // hacky delay
         PauseTransition pt = new PauseTransition(Duration.seconds(0.5));
@@ -47,23 +46,49 @@ public class GraphDrawer {
         pt.play();
     }
 
-    private void drawLevel(HashSet<Node> currentLevel) {
+    private void drawLevel(HashSet<Node> currentLevel, HashSet<Node> postponed) {
+        HashSet<Node> thisLevel = new HashSet<>();
         HashSet<Node> subLevel = new HashSet<>();
         HBox horizBox = new HBox();
         horizBox.setAlignment(Pos.CENTER);
-        for (Node n : currentLevel) {
-            if (!visited.containsKey(n)) {
-                GraphNode graphNode = new GraphNode(n.toString(), n.getCost());
+
+        Iterator<Node> postponedIterator = postponed.iterator(); // use iterator to prevent concurrentModification when removing from inside loop
+        while (postponedIterator.hasNext()) { // consider postponed nodes first
+            Node n = postponedIterator.next();
+            if (!visited.containsKey(n) &&
+                    Collections.disjoint(n.getChildren().keySet(), thisLevel) &&
+                    Collections.disjoint(n.getParents().keySet(), thisLevel) &&
+                    (thisLevel.size() <= 5)) { // if there are no parents/children on this level
+                GraphNode graphNode = new GraphNode(n.toString(), n.getCost(), n.getChildren().size(), n.getParents().size());
                 horizBox.getChildren().add(graphNode);
                 visited.put(n, graphNode);
                 subLevel.addAll(n.getChildren().keySet());
+                postponedIterator.remove();
+                thisLevel.add(n); // but add this to thisLevel
+            }
+        }
+        for (Node n : currentLevel) { // ...then consider the "normal" nodes
+            if (thisLevel.size() >= 5) {
+                postponed.add(n); // max width of each row is 5
+            } else if (!visited.containsKey(n)) {
+                if (Collections.disjoint(n.getChildren().keySet(), thisLevel) &&
+                        Collections.disjoint(n.getParents().keySet(), thisLevel)) { // if there are no parents/children on this level
+                    GraphNode graphNode = new GraphNode(n.toString(), n.getCost(), n.getChildren().size(), n.getParents().size());
+                    horizBox.getChildren().add(graphNode);
+                    visited.put(n, graphNode);
+                    thisLevel.add(n);
+                    subLevel.addAll(n.getChildren().keySet());
+                } else {
+                    // Postpone this node
+                    postponed.add(n);
+                }
             }
         }
         vbox.getChildren().add(horizBox);
-        if (subLevel.size() > 0) drawLevel(subLevel);
+        if (subLevel.size() > 0) drawLevel(subLevel, postponed);
     }
 
-    public void drawLines() {
+    private void drawLines() {
         for (Map.Entry<Node, GraphNode> node : visited.entrySet()) {
             for (Map.Entry<Node, Integer> child : node.getKey().getChildren().entrySet()) {
                 // Draw a line!
@@ -79,27 +104,72 @@ public class GraphDrawer {
                 line.setStrokeWidth(4);
                 line.setStroke(Color.DIMGRAY);
 
+                double lineEndX = destnBounds.getMinX() + destnBounds.getWidth()/2;
+                double lineEndY = destnBounds.getMinY() + destnBounds.getHeight()/2;
+
+                double lineStartX = sourceBounds.getMinX() + sourceBounds.getWidth()/2;
+                double lineStartY = sourceBounds.getMinY() + sourceBounds.getHeight()/2;
+
                 // ugly code binding X start, end, Y start, end
                 line.startXProperty().bind(Bindings.createDoubleBinding(() -> {
-                    return sourceBounds.getMinX() + sourceBounds.getWidth()/2;
+                    return lineStartX;
                 }, source.layoutBoundsProperty()));
 
                 line.startYProperty().bind(Bindings.createDoubleBinding(() -> {
-                    return sourceBounds.getMinY() + sourceBounds.getHeight()/2;
+                    return lineStartY;
                 }, source.layoutBoundsProperty()));
 
                 line.endXProperty().bind(Bindings.createDoubleBinding(() -> {
-                    return destnBounds.getMinX() + destnBounds.getWidth()/2;
+                    return lineEndX;
                 }, dest.layoutBoundsProperty()));
 
                 line.endYProperty().bind(Bindings.createDoubleBinding(() -> {
-                    return destnBounds.getMinY() + destnBounds.getHeight()/2;
+                    return lineEndY;
                 }, dest.layoutBoundsProperty()));
 
+                double deltaX = lineEndX - lineStartX;
+                double deltaY = lineEndY - lineStartY;
+
+                double theta = Math.atan(deltaX/deltaY);
+                if (theta < 0) {
+                    theta = (2 * Math.PI) + (Math.PI / 2) - theta;
+                } else {
+                    theta = (Math.PI / 2) - theta;
+                }
+
+                System.out.println(child.getKey().toString() + "(" + deltaX + "," + deltaY + ")" + " " + theta);
+
+                double newDeltaX = -30 * Math.cos(theta);
+                double newDeltaY = -30 * Math.sin(theta);
+
+                double arrowHeadTipX = lineEndX + newDeltaX;
+                double arrowHeadTipY = lineEndY + newDeltaY;
+
+                double arrowMidPointX =  lineEndX + (-45 * Math.cos(theta));
+                double arrowMidPointY =  lineEndY + (-45 * Math.sin(theta));
+
+                double beta = (Math.PI/2) - theta;
+                double leftDeltaX = 10 * Math.cos(beta);
+                double leftDeltaY = 10 * Math.sin(beta);
+
+                double arrowHeadLeftPointX = arrowMidPointX + leftDeltaX;
+                double arrowHeadLeftPointY = arrowMidPointY - leftDeltaY;
+
+                double arrowHeadRightPointX = arrowMidPointX - leftDeltaX;
+                double arrowHeadRightPointY = arrowMidPointY + leftDeltaY;
+
+                Polygon arrowHeadShape = new Polygon();
+                arrowHeadShape.getPoints().addAll(new Double[]{
+                        arrowHeadTipX, arrowHeadTipY,
+                        arrowHeadLeftPointX, arrowHeadLeftPointY,
+                        arrowHeadRightPointX, arrowHeadRightPointY
+                });
+                arrowHeadShape.setFill(Color.DIMGRAY);
 
                 // TODO: Draw weight... somehow!
 
                 backgroundPane.getChildren().add(line);
+                backgroundPane.getChildren().add(arrowHeadShape);
             }
         }
     }

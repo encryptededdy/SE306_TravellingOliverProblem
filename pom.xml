@@ -91,6 +91,14 @@
                 </executions>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/eu.hansolo/tilesfx -->

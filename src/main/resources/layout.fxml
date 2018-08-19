@@ -3,54 +3,74 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0"
-      prefWidth="1200.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="uoa.se306.travellingoliverproblem.visualiser.FXController">
+<HBox prefWidth="1715.0" style="-fx-background-color: #424242;" xmlns="http://javafx.com/javafx/10.0.1"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="uoa.se306.travellingoliverproblem.visualiser.FXController">
     <children>
-      <AnchorPane prefHeight="50.0" prefWidth="200.0">
-         <children>
-            <Text layoutX="14.0" layoutY="34.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Input DAG">
-               <font>
-                  <Font name="System Bold" size="24.0" />
-               </font>
-            </Text>
-             <Text layoutX="385.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0"
-                   text="Current Optimal Schedule">
-               <font>
-                  <Font name="System Bold" size="24.0" />
-               </font>
-            </Text>
-             <AnchorPane fx:id="statusPane" layoutX="909.0" layoutY="-1.0" prefHeight="50.0" prefWidth="291.0"
-                         style="-fx-background-color: orange;">
-                 <children>
-                     <Text fx:id="statusText" fill="WHITE" layoutX="18.0" layoutY="33.0" strokeType="OUTSIDE"
-                           strokeWidth="0.0" text="Processing... 0m 0s elapsed">
-                         <font>
-                             <Font name="System Bold" size="20.0"/>
-                         </font>
-                     </Text>
-                 </children>
-             </AnchorPane>
-         </children>
-      </AnchorPane>
-        <HBox prefHeight="550.0">
-         <children>
-             <ScrollPane maxHeight="550.0" prefHeight="550.0" prefWidth="380.0">
-               <content>
-                    <Pane fx:id="graphPane" />
-               </content>
-            </ScrollPane>
-             <ScrollPane prefHeight="550.0" prefWidth="820.0">
-                 <content>
-                     <Pane fx:id="schedulePane" prefWidth="800.0" />
-                 </content>
-             </ScrollPane>
-         </children>
-      </HBox>
-        <ScrollPane prefHeight="250.0" prefWidth="200.0">
-            <content>
-                <HBox fx:id="tilesBox" prefHeight="235.0" style="-fx-background-color: #bebebe;"/>
-            </content>
-        </ScrollPane>
+        <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0"
+              prefWidth="1205.0">
+            <children>
+                <AnchorPane prefHeight="50.0" prefWidth="200.0">
+                    <children>
+                        <Text fill="WHITE" layoutX="14.0" layoutY="34.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                              text="Input DAG">
+                            <font>
+                                <Font name="Roboto Medium" size="24.0"/>
+                            </font>
+                        </Text>
+                        <Text fx:id="scheduleTitleText" fill="WHITE" layoutX="392.0" layoutY="34.0" strokeType="OUTSIDE"
+                              strokeWidth="0.0" text="Current Known Best Schedule">
+                            <font>
+                                <Font name="Roboto Medium" size="24.0"/>
+                            </font>
+                        </Text>
+                        <AnchorPane fx:id="statusPane" layoutX="913.0" layoutY="-1.0" prefHeight="50.0"
+                                    prefWidth="291.0" style="-fx-background-color: orange;">
+                            <children>
+                                <Text fx:id="statusText" fill="WHITE" layoutX="18.0" layoutY="34.0" strokeType="OUTSIDE"
+                                      strokeWidth="0.0" text="Starting up...">
+                                    <font>
+                                        <Font name="Roboto Medium" size="24.0"/>
+                                    </font>
+                                </Text>
+                            </children>
+                        </AnchorPane>
+                    </children>
+                </AnchorPane>
+                <HBox maxWidth="1200.0" prefHeight="850.0">
+                    <children>
+                        <ScrollPane fx:id="graphScrollPane" hbarPolicy="NEVER" maxHeight="850.0" minWidth="380.0"
+                                    prefHeight="850.0" prefWidth="380.0" stylesheets="@scrollpane.css"
+                                    vbarPolicy="NEVER">
+                            <content>
+                                <Pane fx:id="graphPane"/>
+                            </content>
+                        </ScrollPane>
+                        <Pane minWidth="5.0" prefHeight="200.0" prefWidth="5.0"/>
+                        <VBox>
+                            <children>
+                                <ScrollPane minWidth="820.0" prefHeight="750.0" prefWidth="820.0"
+                                            stylesheets="@scrollpane.css">
+                                    <content>
+                                        <Pane fx:id="schedulePane" prefWidth="800.0"/>
+                                    </content>
+                                </ScrollPane>
+                                <AnchorPane prefHeight="75.0" prefWidth="200.0">
+                                    <children>
+                                        <Text fx:id="scheduleStatusText" fill="WHITE" layoutX="13.0" layoutY="27.0"
+                                              strokeType="OUTSIDE" strokeWidth="0.0" text="Scheduling x on y threads"
+                                              wrappingWidth="791.6059417724609">
+                                            <font>
+                                                <Font name="Roboto Medium" size="18.0"/>
+                                            </font>
+                                        </Text>
+                                    </children>
+                                </AnchorPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+        <VBox fx:id="tilesBox" minWidth="515.0" prefHeight="800.0" prefWidth="515.0"/>
     </children>
-</VBox>
+</HBox>
