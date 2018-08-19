@@ -3,6 +3,7 @@ package uoa.se306.travellingoliverproblem.visualiser;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.chart.ChartData;
+import eu.hansolo.tilesfx.tools.FlowGridPane;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -11,8 +12,8 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
@@ -21,12 +22,13 @@ import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.SchedulerRunner;
 import uoa.se306.travellingoliverproblem.scheduler.SchedulerType;
-import uoa.se306.travellingoliverproblem.visualiser.graph.GraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
 import uoa.se306.travellingoliverproblem.visualiser.graph.SequentialGraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.schedule.ScheduleDrawer;
 
 import java.util.Map;
+
+import static uoa.se306.travellingoliverproblem.scheduler.Scheduler.COMPUTATIONAL_LOAD;
 
 public class FXController {
     @FXML
@@ -36,7 +38,7 @@ public class FXController {
     private Pane schedulePane;
 
     @FXML
-    private HBox tilesBox;
+    private VBox tilesBox;
 
     @FXML
     private Pane statusPane;
@@ -110,8 +112,8 @@ public class FXController {
 
         Tile generatedBranches = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
                 .title("Branches Generated")
+                .minWidth(500)
                 .decimals(0)
-                .minWidth(400)
                 .chartData(new ChartData(0), new ChartData(0))
                 .animated(false)
                 .smoothing(true)
@@ -119,15 +121,15 @@ public class FXController {
 
         Tile boundedBranches = TileBuilder.create().skinType(Tile.SkinType.DONUT_CHART)
                 .title("Branch Bound ratio")
+                .minWidth(500)
+                .minHeight(400)
                 .decimals(0)
                 .animated(true)
-                .minWidth(350)
                 .build();
 
         Tile branchRate = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
                 .title("Branches/sec")
                 .decimals(0)
-                .minWidth(300)
                 .chartData(new ChartData(0), new ChartData(0))
                 .animated(false)
                 .smoothing(true)
@@ -138,7 +140,6 @@ public class FXController {
                 .decimals(0)
                 .chartData(new ChartData(0), new ChartData(0))
                 .animated(false)
-                .minWidth(300)
                 .smoothing(true)
                 .build();
 
@@ -149,7 +150,9 @@ public class FXController {
                 .smoothing(true)
                 .build();
 
-        tilesBox.getChildren().addAll(memoryTile, boundedBranches, bestTime, generatedBranches, branchRate, branchConsidered);
+        FlowGridPane bigTiles = new FlowGridPane(1, 1, boundedBranches);
+        FlowGridPane smallTiles = new FlowGridPane(2, 2, memoryTile, bestTime, branchRate, branchConsidered);
+        tilesBox.getChildren().addAll(bigTiles, smallTiles);
         pollingTimeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
             // Check for new schedule
             if (lastSchedule == null || !lastSchedule.equals(SchedulerRunner.getInstance().getScheduler().getCurrentBestSchedule())) {
