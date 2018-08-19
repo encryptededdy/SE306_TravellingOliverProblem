@@ -19,7 +19,7 @@ public class ScheduleDrawer {
     static int ROW_HEIGHT = 40;
     static int HEADER_WIDTH = 100;
 
-    private static List<Color> colors = new ArrayList<>(Arrays.asList(Tile.TileColor.DARK_BLUE.color, Tile.TileColor.GREEN.color, Tile.TileColor.YELLOW_ORANGE.color, Tile.TileColor.BLUE.color, Tile.TileColor.MAGENTA.color, Tile.TileColor.PINK.color, Tile.TileColor.LIGHT_GREEN.color, Tile.TileColor.GRAY.color));
+    private static List<Color> colors = new ArrayList<>(Arrays.asList(Color.BLACK, Tile.TileColor.GREEN.color, Tile.TileColor.YELLOW_ORANGE.color, Tile.TileColor.BLUE.color, Tile.TileColor.MAGENTA.color, Tile.TileColor.PINK.color, Tile.TileColor.LIGHT_GREEN.color, Tile.TileColor.GRAY.color));
 
     private Pane parentPane;
     private VBox vbox = new VBox();

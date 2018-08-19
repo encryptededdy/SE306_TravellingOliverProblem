@@ -59,7 +59,7 @@ public class GraphDrawer {
                     Collections.disjoint(n.getChildren().keySet(), thisLevel) &&
                     Collections.disjoint(n.getParents().keySet(), thisLevel) &&
                     (thisLevel.size() <= 5)) { // if there are no parents/children on this level
-                GraphNode graphNode = new GraphNode(n.toString(), n.getCost());
+                GraphNode graphNode = new GraphNode(n.toString(), n.getCost(), n.getChildren().size(), n.getParents().size());
                 horizBox.getChildren().add(graphNode);
                 visited.put(n, graphNode);
                 subLevel.addAll(n.getChildren().keySet());
@@ -73,7 +73,7 @@ public class GraphDrawer {
             } else if (!visited.containsKey(n)) {
                 if (Collections.disjoint(n.getChildren().keySet(), thisLevel) &&
                         Collections.disjoint(n.getParents().keySet(), thisLevel)) { // if there are no parents/children on this level
-                    GraphNode graphNode = new GraphNode(n.toString(), n.getCost());
+                    GraphNode graphNode = new GraphNode(n.toString(), n.getCost(), n.getChildren().size(), n.getParents().size());
                     horizBox.getChildren().add(graphNode);
                     visited.put(n, graphNode);
                     thisLevel.add(n);

@@ -27,6 +27,8 @@ public class ScheduleNode extends Pane {
         this.name = schedule.getNode().toString();
         this.color = color;
 
+        graphNode.setCircleColour(color);
+
         rect = new Rectangle();
         rect.setHeight(ScheduleDrawer.ROW_HEIGHT);
         rect.setWidth(width);
@@ -123,8 +125,6 @@ public class ScheduleNode extends Pane {
             e.printStackTrace();
         }
     }
-
-
 
     public void highlight() { rect.setFill(Color.ORANGERED); }
 

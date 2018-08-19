@@ -71,7 +71,7 @@ public class SequentialGraphDrawer {
     }
 
     private void addNode(Node n) {
-        GraphNode graphNode = new GraphNode(n.toString(), n.getCost());
+        GraphNode graphNode = new GraphNode(n.toString(), n.getCost(), n.getParents().size(), n.getChildren().size());
         HBox hbox = new HBox(graphNode);
         hbox.setAlignment(Pos.CENTER);
         vbox.getChildren().add(hbox);
@@ -133,7 +133,7 @@ public class SequentialGraphDrawer {
                 } else {
                     ctrlX = cubicCurve.getStartX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 4;
                 }
-                System.out.println(sp.getWidth());
+
                 if (ctrlX > backgroundPane.getWidth() + 10) {
                     ctrlX = backgroundPane.getWidth() - 10;
                 } else if (ctrlX < -10) {
