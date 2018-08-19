@@ -5,9 +5,17 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import uoa.se306.travellingoliverproblem.visualiser.schedule.ScheduleNode;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
 
 public class GraphNode extends Pane {
@@ -18,13 +26,26 @@ public class GraphNode extends Pane {
 
     private ScheduleNode scheduleNode;
 
+    private HashMap<Shape, Polygon> parentEdges;
+
+    private HashMap<Shape, Polygon> childEdges;
+
+    private ArrayList<GraphNode> parentGraphNodes;
+
+    private ArrayList<GraphNode> childGraphNodes;
+
     public GraphNode(String name, Integer cost) {
         super();
 
         this.name = name;
+        this.parentEdges = new HashMap<>();
+        this.childEdges = new HashMap<>();
+        this.parentGraphNodes = new ArrayList<>();
+        this.childGraphNodes = new ArrayList<>();
 
         circle.setRadius(25);
         circle.setFill(Color.SKYBLUE);
+        circle.setStroke(Color.WHITE);
 
         Text nameLabel = new Text(name);
         Text costLabel = new Text(cost.toString());
@@ -80,15 +101,42 @@ public class GraphNode extends Pane {
         getChildren().add(stack);
 
     }
+    public void addParentEdge(Shape lineEdge, Polygon arrowHeadShape) {
+        this.parentEdges.put(lineEdge, arrowHeadShape);
+    }
+
+    public void addChildEdge(Shape lineEdge, Polygon arrowHeadShape) {
+        this.childEdges.put(lineEdge, arrowHeadShape);
+    }
 
     public void setScheduleNode(ScheduleNode scheduleNode) {this.scheduleNode = scheduleNode;}
 
     public void highlight() {
         circle.setFill(Color.ORANGERED);
+
+        for (Map.Entry<Shape, Polygon> edge : this.parentEdges.entrySet()) {
+            edge.getKey().setStroke(Color.WHITE);
+            edge.getValue().setFill(Color.WHITE);
+        }
+
+        for (Map.Entry<Shape, Polygon> edge : this.childEdges.entrySet()) {
+            edge.getKey().setStroke(Color.YELLOW);
+            edge.getValue().setFill(Color.YELLOW);
+        }
     }
 
     public void unHighlight() {
         circle.setFill(Color.SKYBLUE);
+
+        for (Map.Entry<Shape, Polygon> edge : this.parentEdges.entrySet()) {
+            edge.getKey().setStroke(Color.DIMGRAY);
+            edge.getValue().setFill(Color.GRAY);
+        }
+
+        for (Map.Entry<Shape, Polygon> edge : this.childEdges.entrySet()) {
+            edge.getKey().setStroke(Color.DIMGRAY);
+            edge.getValue().setFill(Color.GRAY);
+        }
     }
 
     public String getName() {
