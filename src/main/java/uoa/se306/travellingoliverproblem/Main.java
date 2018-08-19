@@ -36,6 +36,7 @@ public class Main extends Application {
         Font.loadFont(getClass().getResource("/Roboto-Bold.ttf").toExternalForm(), 10);
         Font.loadFont(getClass().getResource("/Roboto-Medium.ttf").toExternalForm(), 10);
         Font.loadFont(getClass().getResource("/Roboto-Light.ttf").toExternalForm(), 10);
+        System.out.println(getClass().getResource("layout.fxml"));
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/layout.fxml"));
         Parent root = loader.load();
         FXController controller = loader.getController();

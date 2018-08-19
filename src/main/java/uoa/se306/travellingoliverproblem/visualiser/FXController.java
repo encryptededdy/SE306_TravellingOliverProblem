@@ -23,6 +23,7 @@ import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.scheduler.SchedulerRunner;
+import uoa.se306.travellingoliverproblem.scheduler.SchedulerType;
 import uoa.se306.travellingoliverproblem.visualiser.graph.GraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
 import uoa.se306.travellingoliverproblem.visualiser.graph.SequentialGraphDrawer;
@@ -36,6 +37,9 @@ import static uoa.se306.travellingoliverproblem.scheduler.Scheduler.COMPUTATIONA
 public class FXController {
     @FXML
     private Pane graphPane;
+
+    @FXML
+    private ScrollPane graphScrollPane;
 
     @FXML
     private Pane schedulePane;
@@ -65,8 +69,8 @@ public class FXController {
         graphNodeMap = drawer.getGraphNodes();
     }
 
-    public void startProcessing(Graph inputGraph, int processors, String outputName) {
-        Task<Void> task = SchedulerRunner.getInstance().startSchedulerJavaFXTask(inputGraph, processors);
+    public void startProcessing(Graph inputGraph, int processors, boolean isParallelised, String outputName, SchedulerType type) {
+        Task<Void> task = SchedulerRunner.getInstance().startSchedulerJavaFXTask(inputGraph, processors, isParallelised, type);
         drawGraph(SchedulerRunner.getInstance().getInputGraph());
         startTime = System.currentTimeMillis();
         task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
@@ -79,7 +83,6 @@ public class FXController {
                 pollingTimeline.playFromStart();
                 SchedulerRunner.getInstance().printResult();
                 drawSchedule(SchedulerRunner.getInstance().getSchedule());
-                scheduleTitleText.setText("Best Schedule");
                 DotFileWriter fileWriter = new DotFileWriter(inputGraph, SchedulerRunner.getInstance().getSchedule(), outputName);
                 fileWriter.outputSchedule();
             }

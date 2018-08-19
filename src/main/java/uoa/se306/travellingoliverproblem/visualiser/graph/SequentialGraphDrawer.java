@@ -147,10 +147,10 @@ public class SequentialGraphDrawer {
                     ctrlY1 = cubicCurve.getStartY() + Math.abs(cubicCurve.getEndX() - cubicCurve.getStartX()) / 4;
                     ctrlY2 = cubicCurve.getEndY() + Math.abs(cubicCurve.getEndX() - cubicCurve.getStartX()) / 4;
                     if (ctrlY1 > 500.0) {
-                        ctrlY1 = 245.0;
+                        ctrlY1 = 495.0;
                     }
                     if (ctrlY2 > 500.0) {
-                        ctrlY2 = 245.0;
+                        ctrlY2 = 495.0;
                     }
                 }
 
@@ -163,11 +163,6 @@ public class SequentialGraphDrawer {
                 System.out.println(lineStartY);
                 double bezierMidpointY = (0.125 * lineStartY) + ((3 * 0.125) * ctrlY1) + ((3 * 0.125) * ctrlY2) + (0.125 * lineEndY);
                 drawArrowHead((lineStartX + lineEndX + 15) / 2, bezierMidpointY);
-
-
-
-
-
                 // TODO: Draw weight... somehow!
 
                 top = !top;
