@@ -10,9 +10,12 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import uoa.se306.travellingoliverproblem.fileIO.DotFileWriter;
@@ -24,6 +27,7 @@ import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
 import uoa.se306.travellingoliverproblem.visualiser.graph.SequentialGraphDrawer;
 import uoa.se306.travellingoliverproblem.visualiser.schedule.ScheduleDrawer;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import static uoa.se306.travellingoliverproblem.scheduler.Scheduler.COMPUTATIONAL_LOAD;
@@ -39,10 +43,10 @@ public class FXController {
     private HBox tilesBox;
 
     @FXML
-    private Pane statusPane;
+    private GridPane tilesGrid;
 
     @FXML
-    private Text statusText;
+    private Pane statusPane;
 
     @FXML
     private Text scheduleTitleText;
@@ -56,9 +60,12 @@ public class FXController {
     private long lastBranches = 0;
     private Schedule lastSchedule;
     long startTime;
+    private Text statusText;
+    private ColourScheme paleChristmas = new ColourScheme("#fceade", "#f48b94", "#f7a7a6", "#ffffff", "#acdbc9", "#dbebc2", "#ffffff");
+
 
     private void drawGraph(Graph graph) {
-        SequentialGraphDrawer drawer = new SequentialGraphDrawer(graphPane, graph, graphScrollPane);
+        SequentialGraphDrawer drawer = new SequentialGraphDrawer(graphPane, graph, graphScrollPane, this.paleChristmas);
         drawer.drawGraph();
         graphNodeMap = drawer.getGraphNodes();
     }
@@ -100,56 +107,115 @@ public class FXController {
     }
 
     private void startPolling() {
+        DropShadow ds = new DropShadow();
+        ds.setOffsetY(3.0);
+        ds.setOffsetX(3.0);
+        ds.setColor(Color.GRAY);
+
         // Setup tiles
-        Tile memoryTile = TileBuilder.create().skinType(Tile.SkinType.BAR_GAUGE)
-                .title("Memory usage")
-                .unit("MB")
-                .maxValue(4000)
-                .animated(true)
-                .build();
+
+        /* STATUS PANE CODE */
+        GridPane statusPane = new GridPane();
+        statusPane.setGridLinesVisible(true);
+        statusPane.setMinSize(490, 240);
+        statusPane.setPrefSize(490, 240);
+        statusPane.setMaxSize(490, 240);
+        statusPane.setEffect(ds);
+        statusPane.setBackground(new Background(new BackgroundFill(paleChristmas.backgroundColor, new CornerRadii(4), new Insets(0))));
+        GridPane.setConstraints(statusPane, 0, 0, 2, 1);
+
+        Text statusTextLabel = new Text("Status: ");
+        GridPane.setConstraints(statusTextLabel, 0,0);
+        Text statusText = new Text("Starting up...");
+        GridPane.setConstraints(statusText, 1,0);
+
+        Text branchRateTextLabel = new Text("Branches/sec: ");
+        GridPane.setConstraints(branchRateTextLabel, 0,1);
+        Text branchRateText = new Text("0");
+        GridPane.setConstraints(branchRateText, 1,1);
+
+        Text memoryUsageTextLabel = new Text("Memory Usage: ");
+        GridPane.setConstraints(memoryUsageTextLabel, 0,2);
+        Text memoryUsageText = new Text("0 MB");
+        GridPane.setConstraints(memoryUsageText, 1,2);
+
+        Text branchesConsideredTextLabel = new Text("Branches Considered: ");
+        GridPane.setConstraints(branchesConsideredTextLabel, 0,3);
+        Text branchesConsideredText = new Text("0 Branches");
+        GridPane.setConstraints(branchesConsideredText, 1,3);
+
+        Text fileNameTextLabel = new Text("Filename: ");
+        GridPane.setConstraints(fileNameTextLabel, 0,4);
+        Text fileNameText = new Text();
+        GridPane.setConstraints(fileNameText, 1,4);
+
+        Text threadsTextLabel = new Text("Number of Threads: ");
+        GridPane.setConstraints(threadsTextLabel, 0,5);
+        Text threadsText = new Text();
+        GridPane.setConstraints(threadsText, 1,5);
+
+        ArrayList<Text> statusTexts = new ArrayList<>();
+        statusTexts.add(statusTextLabel);
+        statusTexts.add(statusText);
+        statusTexts.add(branchRateTextLabel);
+        statusTexts.add(branchRateText);
+        statusTexts.add(memoryUsageTextLabel);
+        statusTexts.add(memoryUsageText);
+        statusTexts.add(branchesConsideredTextLabel);
+        statusTexts.add(branchesConsideredText);
+        statusTexts.add(fileNameTextLabel);
+        statusTexts.add(fileNameText);
+        statusTexts.add(threadsTextLabel);
+        statusTexts.add(threadsText);
+
+        statusTexts.forEach(text -> {
+            text.setFont(new Font("Roboto", 18));
+        });
+
+        statusPane.getChildren().addAll(statusTexts);
+        /* END OF STATUS PANE CODE */
 
         Tile generatedBranches = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
                 .title("Branches Generated")
                 .decimals(0)
-                .minWidth(400)
+                .minWidth(240).maxWidth(240)
+                .minHeight(240).maxHeight(240)
                 .chartData(new ChartData(0), new ChartData(0))
                 .animated(false)
                 .smoothing(true)
                 .build();
+        GridPane.setConstraints(generatedBranches,0, 2);
 
         Tile boundedBranches = TileBuilder.create().skinType(Tile.SkinType.DONUT_CHART)
-                .title("Branch Bound ratio")
+                .title("Branch Bound Ratio")
                 .decimals(0)
                 .animated(true)
-                .minWidth(350)
+                .minWidth(490).maxWidth(490)
+                .minHeight(240).maxHeight(240)
                 .build();
-
-        Tile branchRate = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
-                .title("Branches/sec")
-                .decimals(0)
-                .minWidth(300)
-                .chartData(new ChartData(0), new ChartData(0))
-                .animated(false)
-                .smoothing(true)
-                .build();
-
-        Tile branchConsidered = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
-                .title("Branches Considered")
-                .decimals(0)
-                .chartData(new ChartData(0), new ChartData(0))
-                .animated(false)
-                .minWidth(300)
-                .smoothing(true)
-                .build();
+        GridPane.setConstraints(boundedBranches, 0, 3, 2, 1);
 
         Tile bestTime = TileBuilder.create().skinType(Tile.SkinType.SMOOTH_AREA_CHART)
                 .title("Current best schedule length")
                 .decimals(0)
                 .chartData(new ChartData(COMPUTATIONAL_LOAD), new ChartData(COMPUTATIONAL_LOAD))
+                .minWidth(240).maxWidth(240)
+                .minHeight(240).maxHeight(240)
                 .smoothing(true)
                 .build();
+        GridPane.setConstraints(bestTime, 1, 2);
 
-        tilesBox.getChildren().addAll(memoryTile, boundedBranches, bestTime, generatedBranches, branchRate, branchConsidered);
+
+        tilesGrid.setHgap(0);
+        tilesGrid.setGridLinesVisible(true);
+        tilesGrid.setMargin(statusPane, new Insets(5));
+        tilesGrid.setMargin(generatedBranches, new Insets(5));
+        tilesGrid.setMargin(bestTime, new Insets(5));
+        tilesGrid.setMargin(boundedBranches, new Insets(5));
+
+
+
+        tilesGrid.getChildren().addAll(generatedBranches, bestTime, boundedBranches, statusPane);
         pollingTimeline = new Timeline(new KeyFrame(Duration.millis(1000), event -> {
             // Check for new schedule
             if (lastSchedule == null || !lastSchedule.equals(SchedulerRunner.getInstance().getScheduler().getCurrentBestSchedule())) {
@@ -160,10 +226,10 @@ public class FXController {
             // Update statistics
             double memoryUse = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1000000d;
             long totalBranches = SchedulerRunner.getInstance().getScheduler().getBranchesConsidered() + SchedulerRunner.getInstance().getScheduler().getBranchesKilled();
-            memoryTile.setValue(memoryUse);
+            memoryUsageText.setText(Integer.toString((int) memoryUse) + "MB/4000MB");
             generatedBranches.addChartData(new ChartData(totalBranches));
-            branchRate.addChartData(new ChartData(totalBranches - lastBranches));
-            branchConsidered.addChartData(new ChartData(SchedulerRunner.getInstance().getScheduler().getBranchesConsidered()));
+            branchRateText.setText(Long.toString(totalBranches - lastBranches));
+            branchesConsideredText.setText(Long.toString(SchedulerRunner.getInstance().getScheduler().getBranchesConsidered()) + " Branches");
             // Setup data for pie chart
             ChartData cd1 = new ChartData("Considered", SchedulerRunner.getInstance().getScheduler().getBranchesConsidered(), Tile.GREEN);
             ChartData cd2 = new ChartData("Pruned", SchedulerRunner.getInstance().getScheduler().getBranchesKilled() - SchedulerRunner.getInstance().getScheduler().getBranchesKilledDuplication(), Tile.BLUE);
@@ -177,7 +243,7 @@ public class FXController {
 
     private void drawSchedule(Schedule schedule) {
         schedulePane.getChildren().clear();
-        ScheduleDrawer drawer = new ScheduleDrawer(schedulePane, schedule, graphNodeMap);
+        ScheduleDrawer drawer = new ScheduleDrawer(schedulePane, schedule, graphNodeMap, paleChristmas);
         drawer.drawSchedule();
     }
 }

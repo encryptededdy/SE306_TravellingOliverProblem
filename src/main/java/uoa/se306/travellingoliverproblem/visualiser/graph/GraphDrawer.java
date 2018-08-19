@@ -14,6 +14,7 @@ import javafx.scene.shape.Polygon;
 import javafx.util.Duration;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
+import uoa.se306.travellingoliverproblem.visualiser.ColourScheme;
 
 import java.util.*;
 
@@ -23,10 +24,13 @@ public class GraphDrawer {
     private VBox vbox = new VBox();
     private Graph graph;
     private Map<Node, GraphNode> visited = new HashMap<>();
+    private ColourScheme colourScheme;
 
-    public GraphDrawer(Pane parentPane, Graph graph) {
+
+    public GraphDrawer(Pane parentPane, Graph graph, ColourScheme colourScheme) {
         this.parentPane = parentPane;
         this.graph = graph;
+        this.colourScheme = colourScheme;
 
         // populate pane
         parentPane.getChildren().add(new StackPane(backgroundPane, vbox));
@@ -59,7 +63,7 @@ public class GraphDrawer {
                     Collections.disjoint(n.getChildren().keySet(), thisLevel) &&
                     Collections.disjoint(n.getParents().keySet(), thisLevel) &&
                     (thisLevel.size() <= 5)) { // if there are no parents/children on this level
-                GraphNode graphNode = new GraphNode(n.toString(), n.getCost());
+                GraphNode graphNode = new GraphNode(n.toString(), n.getCost(), this.colourScheme);
                 horizBox.getChildren().add(graphNode);
                 visited.put(n, graphNode);
                 subLevel.addAll(n.getChildren().keySet());
@@ -73,7 +77,7 @@ public class GraphDrawer {
             } else if (!visited.containsKey(n)) {
                 if (Collections.disjoint(n.getChildren().keySet(), thisLevel) &&
                         Collections.disjoint(n.getParents().keySet(), thisLevel)) { // if there are no parents/children on this level
-                    GraphNode graphNode = new GraphNode(n.toString(), n.getCost());
+                    GraphNode graphNode = new GraphNode(n.toString(), n.getCost(), this.colourScheme);
                     horizBox.getChildren().add(graphNode);
                     visited.put(n, graphNode);
                     thisLevel.add(n);

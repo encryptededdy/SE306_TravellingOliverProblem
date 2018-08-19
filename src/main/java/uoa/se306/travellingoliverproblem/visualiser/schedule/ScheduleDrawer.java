@@ -8,6 +8,7 @@ import uoa.se306.travellingoliverproblem.graph.Node;
 import uoa.se306.travellingoliverproblem.schedule.Schedule;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
 import uoa.se306.travellingoliverproblem.schedule.ScheduledProcessor;
+import uoa.se306.travellingoliverproblem.visualiser.ColourScheme;
 import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ScheduleDrawer {
-    public static int SCHEDULE_WIDTH = 700; // width of the whole thing
+    public static int SCHEDULE_WIDTH = 1100; // width of the whole thing
     public static int ROW_HEIGHT = 30;
     public static int HEADER_WIDTH = 100;
 
@@ -24,11 +25,13 @@ public class ScheduleDrawer {
     private List<HBox> processorRows = new ArrayList<>();
     private Map<Node, GraphNode> graphNodes;
     private Schedule schedule;
+    private ColourScheme colourScheme;
 
-    public ScheduleDrawer(Pane parentPane, Schedule schedule, Map<Node, GraphNode> graphNodes) {
+    public ScheduleDrawer(Pane parentPane, Schedule schedule, Map<Node, GraphNode> graphNodes, ColourScheme colourScheme) {
         this.graphNodes = graphNodes;
         this.parentPane = parentPane;
         this.schedule = schedule;
+        this.colourScheme = colourScheme;
 
         parentPane.getChildren().add(vbox);
     }
@@ -55,11 +58,11 @@ public class ScheduleDrawer {
         for (ScheduledProcessor p : schedule.getProcessors()) {
             HBox row = new HBox();
             row.setMinHeight(30);
-            row.setPadding(new Insets(15, 0, 0, 0));
+            row.setPadding(new Insets(15, 0, 15, 0));
             processorRows.add(processorNo, row);
 
             // draw header
-            ScheduleNode header = new ScheduleNode("Processor "+processorNo);
+            ScheduleNode header = new ScheduleNode("Processor "+processorNo, colourScheme);
             row.getChildren().add(header);
 
             // draw schedule
@@ -78,7 +81,7 @@ public class ScheduleDrawer {
                 double width = ((e.getLength() / (double) totalTime) * dividableWidth);
                 // round width to nearest 0.1
                 width = Math.round(width);
-                ScheduleNode node = new ScheduleNode(width, e, graphNodes.get(e.getNode()));
+                ScheduleNode node = new ScheduleNode(width, e, graphNodes.get(e.getNode()), colourScheme);
                 row.getChildren().add(node);
                 lastScheduleEnd = e.getEndTime();
             }
@@ -112,7 +115,7 @@ public class ScheduleDrawer {
         for (int i = 0; i <= totalTime; i++) {
             ScheduleScaleNode node;
             if (i % scaleSpacing == 0) { // draw a number
-                node = new ScheduleScaleNode(i, width);
+                node = new ScheduleScaleNode(i, width, colourScheme);
                 row.getChildren().add(node);
             } else {
                 if ((i - 1) % scaleSpacing == 0) { // draw empty space

@@ -11,6 +11,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import uoa.se306.travellingoliverproblem.schedule.ScheduleEntry;
+import uoa.se306.travellingoliverproblem.visualiser.ColourScheme;
 import uoa.se306.travellingoliverproblem.visualiser.graph.GraphNode;
 
 import java.lang.reflect.Field;
@@ -18,26 +19,28 @@ import java.lang.reflect.Field;
 public class ScheduleNode extends Pane {
     private String name;
     private Rectangle rect;
+    private ColourScheme colourScheme;
+    private Text nameLabel;
 
     // normal schedule
-    public ScheduleNode(double width, ScheduleEntry schedule, GraphNode graphNode) {
+    public ScheduleNode(double width, ScheduleEntry schedule, GraphNode graphNode, ColourScheme colourScheme) {
         super();
 
         this.name = schedule.getNode().toString();
+        this.colourScheme = colourScheme;
 
         rect = new Rectangle();
         rect.setHeight(ScheduleDrawer.ROW_HEIGHT);
         rect.setWidth(width);
-        rect.setFill(Color.SKYBLUE);
-        rect.setStroke(Color.BLACK);
 
-        Text nameLabel = new Text(name);
+        this.nameLabel = new Text(name);
         //Text costLabel = new Text(cost.toString());
-        nameLabel.setFill(Color.WHITE);
         nameLabel.setFont(new Font("Roboto", 15));
         //costLabel.setFont(new Font(30));
         //costLabel.setOpacity(0.4);
         //costLabel.setFill(Color.WHITE);
+        this.unHighlight();
+
 
         StackPane stack = new StackPane();
         stack.getChildren().addAll(rect, nameLabel);
@@ -64,10 +67,11 @@ public class ScheduleNode extends Pane {
     }
 
     // processor header
-    public ScheduleNode(String processorName) {
+    public ScheduleNode(String processorName, ColourScheme colourScheme) {
         super();
 
         this.name = processorName;
+        this.colourScheme = colourScheme;
 
         Rectangle rect = new Rectangle();
         rect.setHeight(ScheduleDrawer.ROW_HEIGHT);
@@ -75,7 +79,7 @@ public class ScheduleNode extends Pane {
         rect.setFill(Color.TRANSPARENT);
 
         Text nameLabel = new Text(name);
-        nameLabel.setFill(Color.BLACK);
+        nameLabel.setFill(colourScheme.mainAccent);
         nameLabel.setFont(new Font("Roboto", 15));
 
         StackPane stack = new StackPane();
@@ -124,9 +128,17 @@ public class ScheduleNode extends Pane {
 
 
 
-    public void highlight() { rect.setFill(Color.ORANGERED); }
+    public void highlight() {
+        rect.setFill(this.colourScheme.mainAccent);
+        rect.setStroke(this.colourScheme.mainAccent);
+        nameLabel.setFill(this.colourScheme.fgMainAccent);
+    }
 
-    public void unHighlight() { rect.setFill(Color.SKYBLUE); }
+    public void unHighlight() {
+        rect.setFill(this.colourScheme.backgroundColor);
+        rect.setStroke(this.colourScheme.lighterAccent);
+        nameLabel.setFill(this.colourScheme.mainAccent);
+    }
 
 
     public String getName() {

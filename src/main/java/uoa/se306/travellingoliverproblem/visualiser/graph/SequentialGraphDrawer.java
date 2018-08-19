@@ -3,18 +3,17 @@ package uoa.se306.travellingoliverproblem.visualiser.graph;
 import javafx.animation.PauseTransition;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.CubicCurve;
 import javafx.scene.shape.Polygon;
 import javafx.util.Duration;
 import uoa.se306.travellingoliverproblem.graph.Graph;
 import uoa.se306.travellingoliverproblem.graph.Node;
+import uoa.se306.travellingoliverproblem.visualiser.ColourScheme;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,20 +21,24 @@ import java.util.Map;
 public class SequentialGraphDrawer {
     private Pane parentPane;
     private Pane backgroundPane = new Pane();
-    private VBox vbox = new VBox();
+    private HBox parentHBox = new HBox();
     private Graph graph;
     private LinkedHashMap<Node, GraphNode> visited = new LinkedHashMap<>();
     private ScrollPane sp;
+    private ColourScheme colourScheme;
 
-    public SequentialGraphDrawer(Pane parentPane, Graph graph, ScrollPane graphScrollPane) {
+    public SequentialGraphDrawer(Pane parentPane, Graph graph, ScrollPane graphScrollPane, ColourScheme colourScheme) {
         this.sp = graphScrollPane;
         this.parentPane = parentPane;
         this.graph = graph;
-        backgroundPane.setMinWidth(600);
-        StackPane sp = new StackPane(backgroundPane, vbox);
+        this.colourScheme = colourScheme;
+        backgroundPane.setMinWidth(1200);
+        backgroundPane.setMinHeight(500);
+        backgroundPane.setBackground(new Background(new BackgroundFill(colourScheme.backgroundColor, new CornerRadii(0), new Insets(0))));
+        StackPane sp = new StackPane(backgroundPane, parentHBox);
         // populate pane
         parentPane.getChildren().add(sp);
-        // TODO: Deal with vbox width / centering
+        // TODO: Deal with parentHBox width / centering
     }
 
     public Map<Node, GraphNode> getGraphNodes() {
@@ -71,15 +74,16 @@ public class SequentialGraphDrawer {
     }
 
     private void addNode(Node n) {
-        GraphNode graphNode = new GraphNode(n.toString(), n.getCost());
-        HBox hbox = new HBox(graphNode);
-        hbox.setAlignment(Pos.CENTER);
-        vbox.getChildren().add(hbox);
+        GraphNode graphNode = new GraphNode(n.toString(), n.getCost(), colourScheme);
+        VBox vBox = new VBox(graphNode);
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setMinWidth(100);
+        parentHBox.getChildren().add(vBox);
         visited.put(n, graphNode);
     }
 
     private void drawLines() {
-        boolean right = true;
+        boolean top = true;
         for (Map.Entry<Node, GraphNode> node : visited.entrySet()) {
             for (Map.Entry<Node, Integer> child : node.getKey().getChildren().entrySet()) {
                 // Draw a cubicCurve!
@@ -92,8 +96,8 @@ public class SequentialGraphDrawer {
 
                 CubicCurve cubicCurve = new CubicCurve();
                 //Line cubicCurve = new Line(sourceBounds.getMaxX(), sourceBounds.getMaxY(), destnBounds.getMaxX(), destnBounds.getMaxY());
-                cubicCurve.setStrokeWidth(4);
-                cubicCurve.setStroke(Color.DIMGRAY);
+                cubicCurve.setStrokeWidth(2);
+                cubicCurve.setStroke(Color.web("#f48b94"));
                 cubicCurve.setFill(Color.TRANSPARENT);
 
                 double lineEndX = destnBounds.getMinX() + destnBounds.getWidth()/2;
@@ -119,31 +123,46 @@ public class SequentialGraphDrawer {
                     return lineEndY;
                 }, dest.layoutBoundsProperty()));
 
-                cubicCurve.setControlY1(cubicCurve.getStartY());
-                cubicCurve.setControlY2(cubicCurve.getEndY());
+                cubicCurve.setControlX1(cubicCurve.getStartX());
+                cubicCurve.setControlX2(cubicCurve.getEndX());
 
-                double ctrlX1;
-                double ctrlX2;
+                double ctrlY1;
+                double ctrlY2;
 
-                boolean adjacent = lineEndY - lineStartY < 100 ? true : false;
+                boolean adjacent = lineEndX - lineStartX < 120;
 
                 if (adjacent) {
-                    ctrlX1 = cubicCurve.getStartX();
-                    ctrlX2 = cubicCurve.getEndX();
-                } else if (right) {
-                    ctrlX1 = cubicCurve.getStartX() + Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2;
-                    ctrlX2 = cubicCurve.getEndX() + Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2;
+                    ctrlY1 = cubicCurve.getStartY();
+                    ctrlY2 = cubicCurve.getEndY();
+                } else if (top) {
+                    ctrlY1 = cubicCurve.getStartY() - Math.abs(cubicCurve.getEndX() - cubicCurve.getStartX()) / 4;
+                    ctrlY2 = cubicCurve.getEndY() - Math.abs(cubicCurve.getEndX() - cubicCurve.getStartX()) / 4;
+                    if (ctrlY1 < 0) {
+                        ctrlY1 = 5.0;
+                    }
+                    if (ctrlY2 < 0) {
+                        ctrlY2 = 5.0;
+                    }
                 } else {
-                    ctrlX1 = cubicCurve.getStartX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2;
-                    ctrlX2 = cubicCurve.getEndX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 2;
+                    ctrlY1 = cubicCurve.getStartY() + Math.abs(cubicCurve.getEndX() - cubicCurve.getStartX()) / 4;
+                    ctrlY2 = cubicCurve.getEndY() + Math.abs(cubicCurve.getEndX() - cubicCurve.getStartX()) / 4;
+                    if (ctrlY1 > 250.0) {
+                        ctrlY1 = 245.0;
+                    }
+                    if (ctrlY2 > 250.0) {
+                        ctrlY2 = 245.0;
+                    }
                 }
-                cubicCurve.setControlX1(ctrlX1);
-                cubicCurve.setControlX2(ctrlX2);
+
+                System.out.println("(" + cubicCurve.getStartX() + "," + ctrlY1 + "," + cubicCurve.getEndX() + "," + ctrlY2 + ")");
+                cubicCurve.setControlY1(ctrlY1);
+                cubicCurve.setControlY2(ctrlY2);
                 backgroundPane.getChildren().add(cubicCurve);
 
                 // calculate midpoint x-coordinate on bezier curve
-                double bezierMidpointX = (0.125 * lineStartX) + ((3 * 0.125) * ctrlX1) + ((3 * 0.125) * ctrlX2) + (0.125 * lineEndX);
-                drawArrowHead(bezierMidpointX, (lineStartY + lineEndY + 15) / 2);
+                System.out.println(lineStartY);
+                double bezierMidpointY = (0.125 * lineStartY) + ((3 * 0.125) * ctrlY1) + ((3 * 0.125) * ctrlY2) + (0.125 * lineEndY);
+                drawArrowHead((lineStartX + lineEndX + 15) / 2, bezierMidpointY);
 
 
 
@@ -151,14 +170,14 @@ public class SequentialGraphDrawer {
 
                 // TODO: Draw weight... somehow!
 
-                right = !right;
+                top = !top;
             }
         }
         sp.setHvalue(0.5);
     }
 
     private void drawArrowHead(double arrowHeadTipX, double arrowHeadTipY) {
-        double theta = Math.PI / 2;
+        double theta = 0.0;
 
         double arrowMidPointX =  arrowHeadTipX + (-15 * Math.cos(theta));
         double arrowMidPointY =  arrowHeadTipY + (-15 * Math.sin(theta));
@@ -179,8 +198,8 @@ public class SequentialGraphDrawer {
                 arrowHeadLeftPointX, arrowHeadLeftPointY,
                 arrowHeadRightPointX, arrowHeadRightPointY
         });
-        arrowHeadShape.setFill(Color.BLACK);
-
+        arrowHeadShape.setFill(colourScheme.secondaryAccent);
         backgroundPane.getChildren().add(arrowHeadShape);
+        arrowHeadShape.toFront();
     }
 }

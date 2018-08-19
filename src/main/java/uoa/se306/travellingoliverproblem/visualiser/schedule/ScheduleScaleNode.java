@@ -6,14 +6,15 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import uoa.se306.travellingoliverproblem.visualiser.ColourScheme;
 
 public class ScheduleScaleNode extends Pane {
-    public ScheduleScaleNode(Integer number, double width) {
+    public ScheduleScaleNode(Integer number, double width, ColourScheme colourScheme) {
         super();
 
         Text nameLabel = new Text(number.toString());
         //Text costLabel = new Text(cost.toString());
-        nameLabel.setFill(Color.BLACK);
+        nameLabel.setFill(colourScheme.mainAccent);
         nameLabel.setFont(new Font(15));
 
         HBox labelContainer = new HBox(nameLabel);

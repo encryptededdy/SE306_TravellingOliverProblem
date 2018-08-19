@@ -1,0 +1,7 @@
+.scrollPane {
+    -fx-padding: 10;
+}
+
+.tilePane {
+    -fx-border-radius: 4;
+}
