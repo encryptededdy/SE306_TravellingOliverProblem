@@ -74,7 +74,7 @@ public class FXController {
         Task<Void> task = SchedulerRunner.getInstance().startSchedulerJavaFXTask(inputGraph, processors, isParallelised, type);
         drawGraph(SchedulerRunner.getInstance().getInputGraph());
         startTime = System.currentTimeMillis();
-        scheduleStatusText.setText(String.format("Scheduling %s onto %s processors, on %s thread(s)", inputGraph.getGraphName(), processors, (Main.forkJoinPool.getPoolSize() == 0) ? 1 : Main.forkJoinPool.getPoolSize()));
+        scheduleStatusText.setText(String.format("Scheduling %s onto %s processors, on %s thread(s)", inputGraph.getGraphName(), processors, (Main.forkJoinPool == null || Main.forkJoinPool.getParallelism() == 0) ? 1 : Main.forkJoinPool.getParallelism()));
         task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent event) {
