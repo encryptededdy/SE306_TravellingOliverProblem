@@ -38,8 +38,8 @@
                 </AnchorPane>
                 <HBox maxWidth="1200.0" prefHeight="850.0">
                     <children>
-                        <ScrollPane fx:id="graphScrollPane" maxHeight="850.0" prefHeight="850.0" prefWidth="380.0"
-                                    stylesheets="@scrollpane.css">
+                        <ScrollPane fx:id="graphScrollPane" hbarPolicy="NEVER" maxHeight="850.0" prefHeight="850.0"
+                                    prefWidth="380.0" stylesheets="@scrollpane.css">
                             <content>
                                 <Pane fx:id="graphPane"/>
                             </content>

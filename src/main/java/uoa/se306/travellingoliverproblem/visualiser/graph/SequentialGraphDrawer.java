@@ -31,7 +31,7 @@ public class SequentialGraphDrawer {
         this.sp = graphScrollPane;
         this.parentPane = parentPane;
         this.graph = graph;
-        backgroundPane.setMinWidth(750);
+        backgroundPane.setMinWidth(1000);
         StackPane sp = new StackPane(backgroundPane, vbox);
         // populate pane
         parentPane.getChildren().add(sp);
@@ -135,11 +135,11 @@ public class SequentialGraphDrawer {
                     ctrlX = cubicCurve.getStartX() - Math.abs(cubicCurve.getEndY() - cubicCurve.getStartY()) / 3;
                 }
 
-                if (ctrlX > backgroundPane.getWidth() + 10) {
-                    ctrlX = backgroundPane.getWidth() - 10;
-                } else if (ctrlX < -10) {
-                    ctrlX = -10;
-                }
+//                if (ctrlX > backgroundPane.getWidth() + 10) {
+//                    ctrlX = backgroundPane.getWidth() - 10;
+//                } else if (ctrlX < -10) {
+//                    ctrlX = -10;
+//                }
 
 
                 cubicCurve.setControlX1(ctrlX);
@@ -152,18 +152,16 @@ public class SequentialGraphDrawer {
 
                 // calculate max width
                 double widthFromCenter;
-                if (bezierMidpointX > 375) {
-                    widthFromCenter = bezierMidpointX - 375;
+                if (bezierMidpointX > 500) {
+                    widthFromCenter = bezierMidpointX - 500;
                 } else {
-                    widthFromCenter = 375 - bezierMidpointX;
+                    widthFromCenter = 500 - bezierMidpointX;
                 }
 
                 if (widthFromCenter > widest) widest = widthFromCenter;
 
                 source.addChildEdge(cubicCurve, arrowHeadShape);
                 dest.addParentEdge(cubicCurve, arrowHeadShape);
-
-                // TODO: Draw weight... somehow!
 
                 right = !right;
             }
