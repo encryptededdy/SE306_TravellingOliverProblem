@@ -157,8 +157,10 @@ public class FXController {
             // Check for new schedule
             if (lastSchedule == null || !lastSchedule.equals(SchedulerRunner.getInstance().getScheduler().getCurrentBestSchedule())) {
                 lastSchedule = SchedulerRunner.getInstance().getScheduler().getCurrentBestSchedule();
-                drawSchedule(lastSchedule);
-                bestTime.addChartData(new ChartData(lastSchedule.getOverallTime()));
+                if (lastSchedule != null) {
+                    drawSchedule(lastSchedule);
+                    bestTime.addChartData(new ChartData(lastSchedule.getOverallTime()));
+                }
             }
             // Update statistics
             double memoryUse = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1000000d;
