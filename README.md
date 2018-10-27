@@ -14,6 +14,9 @@ There are three other goals for this project, and they are:
 
 For more information about the algorithm(s) and optimizations, please see the Wiki.
 
+### Visualisation
+![](https://i.imgur.com/NScQlee.png)
+
 ## Instructions
 ### Usage
 * Look at the github wiki for further information
